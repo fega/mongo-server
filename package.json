@@ -1,0 +1,36 @@
+{
+  "name": "mongoserver",
+  "version": "0.1.0",
+  "description": "\"a quick server in mongodb. inspired in json-server\" -n",
+  "main": "server.js",
+  "scripts": {
+    "test": "NODE_ENV=test mocha ./test/**/*.test.js --exit --ui qunit",
+    "test:watch": "NODE_ENV=test mocha --exit --watch --ui qunit",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "preferGlobal": true,
+  "bin": "./index.js",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "commander": "^2.16.0",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.3",
+    "flattenjs": "^1.0.4",
+    "http-errors": "^1.7.0",
+    "mongodb": "^3.1.1",
+    "morgan": "^1.9.0",
+    "pluralize": "^7.0.0",
+    "pretty-error": "^2.1.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.3",
+    "supertest": "^3.1.0"
+  }
+}
