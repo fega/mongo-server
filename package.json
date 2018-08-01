@@ -1,5 +1,5 @@
 {
-  "name": "mongoserver",
+  "name": "moser",
   "version": "0.1.0",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "server.js",

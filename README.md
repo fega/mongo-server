@@ -8,14 +8,14 @@ Hyper-Heavily inspired on [json-server](https://github.com/typicode/json-server)
 Install   mongo Server 
 
 ```
-npm install -g mongoserver
+npm install -g moser
 ```
 
 Start Mongo Server
 
 ```bash
 docker run -d -p 27017:27017 mongo # if you have docker but no mongodb 
-mongoserver --mongo mongodb://localhost:27017
+moser --mongo mongodb://localhost:27017
 ```
 
 Now if you go to [http://localhost:3000/posts/](http://localhost:3000/posts/), you'll get
