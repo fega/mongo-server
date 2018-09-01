@@ -157,15 +157,19 @@ test('?$order=asc, OK', async () => {
 test('?$order=[asc,desc], OK');
 test('?$order=invalid, BAD_REQUEST');
 
-test.only('?$populate, OK, 1 population', async () => {
+test('?$populate, OK, 1 population', async () => {
   await db.collection('companies').insertOne({ _id: 1, name: 'corp' });
   await db.collection('companies').insertOne({ _id: 2, name: 'inc' });
   await db.collection('employees').insertOne({ _id: 1, name: 'Foobio', company_id: 1 });
   await db.collection('employees').insertOne({ _id: 2, name: 'Barfy', company_ids: [1, 2] });
   const r = await request(server).get('/companies?$populate=employees').expect(200);
 
-  a.equal(r.body[0].employees.length, 2);
-  a.equal(r.body[1].employees.length, 1);
+  a.equal(r.body[0].employees.length, 2, '$populate failed');
+  a.equal(r.body[1].employees.length, 1, '$populate failed');
+
+  const r2 = await request(server).get('/employees?$fill=companies').expect(200);
+  a.equal(r2.body[0].companies.length, 1, '$fill failed');
+  a.equal(r2.body[1].companies.length, 2, '$fill failed');
 });
 test('?$populate, OK, 2 multitple population');
 test('?$populate, BAD_REQUEST');

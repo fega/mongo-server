@@ -18,24 +18,24 @@ program
   .parse(process.argv);
 
 
-const main = async (p) => {
+const main = async (programConfig) => {
   try {
     // start
     console.log(tag, `Version: ${pkg.version}`);
 
     // default config
     let config = {
-      port: p.port || 3000,
-      host: p.host || 'localhost',
-      mongo: p.mongo || 'mongodb://localhost:27017',
-      db: p.db || 'mongo-server',
+      port: programConfig.port || 3000,
+      host: programConfig.host || 'localhost',
+      mongo: programConfig.mongo || 'mongodb://localhost:27017',
+      db: programConfig.db || 'mongo-server',
     };
 
 
     // read and merge config file
-    if (p.config) {
+    if (programConfig.config) {
       console.log(tag, 'Reading config file');
-      const file = require(path.resolve(p.config)); // eslint-disable-line
+      const file = require(path.resolve(programConfig.config)); // eslint-disable-line
       config = { ...config, ...file };
       console.log(tag, 'Config file loaded');
     }

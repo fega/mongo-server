@@ -124,14 +124,6 @@ GET /companies$populate=employees
 
 ## Extras
 
-### Alternative port
-
-You can start Mongo Server on other ports with the `--port` flag:
-
-```bash
-$ json-server --watch db.json --port 3004
-```
-
 ### CLI usage
 
 ```bash
@@ -146,24 +138,31 @@ Usage: mongodb-server [options]
     -d --db <string>         database name               mongo-server
     -h, --help               output usage information
 ```
-
+# Config file
 You can also set options in a `js` or `json` configuration file.
 
-```json
+```js
 {
-  "port": 3000
+  // Port, default 3000
+  port: 3000,
+  // REST api root, default "/"
+  root: "/",
+  // mongodb url default: "mongodb://localhost:27088"
+  mongo: 'mongodb://localhost:27088',
+  // database name
+  db:'dbName',
+  // enable cors using the cors module https://www.npmjs.com/package/cors
+  cors: {origin:true},
+  // enable gzip compression using the compression module https://www.npmjs.com/package/compression
+  compress: {},
+  // enable helmet module https://www.npmjs.com/package/helmet
+  helmet: {},
+  // static file server, by default is "public" in the execution dir
+  static: 'public',
+  // root path for static file serving, by default "/"
+  staticRoot: '/'  
 }
-``` 
-
-
-### Static file server
-
-Coming soon...
-
-
-### Access from anywhere
-
-Coming soon...
+```
 
 ### Strict Schemas
 

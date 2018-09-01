@@ -1,7 +1,6 @@
 module.exports = {
   resources: {
     posts: {
-
       $post: false,
       $patch: false,
       $delete: false,
@@ -11,7 +10,12 @@ module.exports = {
     },
     users: {
       $localAuth: ['email', 'password'],
+      $fbAuth: true,
+      $googlebAuth: true,
+      $fcmToken: true,
+      $permissions: [['admin'], ['user:read', 'user:write']],
     },
+    comments: true,
     $restrict: true,
   },
   port: 3000,

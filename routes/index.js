@@ -1,10 +1,10 @@
+
 const express = require('express');
 const { ObjectId } = require('mongodb');
 const HttpError = require('http-errors');
 const pluralize = require('pluralize');
 const { omit } = require('lodash');
-
-const asyncController = asyncFn => (req, res, next) => Promise.resolve(asyncFn(req, res, next)).catch(next);
+const { asyncController } = require("./asyncController");
 
 const {
   getTextQuery,
@@ -27,7 +27,7 @@ module.exports = (db) => {
    */
   const find = async (resource, query) => {
     const {
-      $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, ...filter
+      $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, $fill, ...filter
     } = query;
     const result = await db.collection(resource).find(
       {
@@ -47,8 +47,12 @@ module.exports = (db) => {
   };
   const findAndPopulate = async (resource, query) => {
     const {
-      $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, ...filter
+      $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, $fill, ...filter
     } = query;
+    const prePopulate1 = `____${$populate}`;
+    const prePopulate2 = `__${$populate}`;
+    const preParent1 = `----${$fill}`;
+    const preParent2 = `--${$fill}`;
 
     // Build pipeline
     const pipeline = [{
@@ -70,7 +74,7 @@ module.exports = (db) => {
           from: $populate,
           localField: '_id',
           foreignField: `${pluralize.singular(resource)}_id`,
-          as: `____${$populate}`,
+          as: prePopulate1,
         },
       });
       pipeline.push({
@@ -79,27 +83,61 @@ module.exports = (db) => {
           from: $populate,
           localField: '_id',
           foreignField: `${pluralize.singular(resource)}_ids`,
-          as: `__${$populate}`,
+          as: prePopulate2,
+        },
+      });
+    }
+    if ($fill) {
+      pipeline.push({
+        $lookup:
+        {
+          from: resource,
+          localField: `${pluralize.singular($fill)}_id`,
+          foreignField: '_id',
+          as: preParent1,
+        },
+      });
+      pipeline.push({
+        $lookup:
+        {
+          from: resource,
+          localField: `${pluralize.singular($fill)}_ids`,
+          foreignField: '_id',
+          as: preParent2,
         },
       });
     }
     // execute aggregation
     const result = await db.collection(resource).aggregate(pipeline).toArray();
+
     // merge fields
-    const r = result.map((value) => {
-      const partialObject = omit(value, [`____${$populate}`, `__${$populate}`]);
-      return {
-        [$populate]: [...value[`____${$populate}`], ...value[`__${$populate}`]],
-        ...partialObject,
-      };
+    const r = result.map((object) => {
+      let completeObject = object;
+      // populate processing
+      if ($populate) {
+        const partialObject = omit(object, [prePopulate1, prePopulate2]);
+        completeObject = {
+          [$populate]: [...object[prePopulate1], ...object[prePopulate2]],
+          ...partialObject,
+        };
+      }
+      // parent processing
+      if ($fill) {
+        const partialObject = omit(object, [preParent1, preParent2]);
+        completeObject = {
+          [$fill]: [...object[preParent1], ...object[preParent2]],
+          ...partialObject,
+        };
+      }
+      return completeObject;
     });
     return r;
   };
   router.get('/:resource', asyncController(async (req, res) => {
     const {
-      $populate,
+      $populate, $fill,
     } = req.query;
-    const result = $populate
+    const result = ($populate || $fill)
       ? await findAndPopulate(req.params.resource, req.query)
       : await find(req.params.resource, req.query);
     res.json($populate ? populate(result) : result);
