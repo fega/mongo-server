@@ -18,7 +18,7 @@ const {
 } = require('../lib');
 
 
-module.exports = (db) => {
+module.exports = (config, db) => {
   const router = express.Router();
   /**
    * Executes a simple query
@@ -133,6 +133,25 @@ module.exports = (db) => {
     });
     return r;
   };
+
+  /**
+   * Restrict endpoints
+   */
+  if (config.restrict) {
+    const { resources } = config;
+    if (!resources) throw new Error('config.resources Option is necessary when restrict is set to true');
+
+    const allowedResources = Array.isArray(resources)
+      ? resources : Object.keys(resources).filter(item => resources[item]);
+
+    router.use(['/:resource', '/:resource/:id'], (req, res, next) => {
+      if (allowedResources.includes(req.params.resource)) return next();
+      throw new HttpError[404]('Not found');
+    });
+  }
+  /**
+   * Routes
+   */
   router.get('/:resource', asyncController(async (req, res) => {
     const {
       $populate, $fill,

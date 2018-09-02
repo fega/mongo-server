@@ -1,8 +1,11 @@
 /* eslint-env node, mocha */
 const chai = require('chai');
+const asPromised = require('chai-as-promised');
 const request = require('supertest');
 const createServer = require('../server');
 const mongo = require('../db');
+
+chai.use(asPromised);
 
 const a = chai.assert;
 let db;
@@ -65,12 +68,32 @@ test('have default serveStatic', () => {
   const cors = serverEmpty._router.stack.find(m => m.name === 'serveStatic');
   a.exists(cors);
   a.deepEqual(cors.regexp, /^\/?(?=\/|$)/i);
-  console.log(server);
 });
 test('Have personalized Middleware', () => {
   const cors = server._router.stack.find(m => m.name === 'personalizedMiddleware');
-  console.log(server._router.stack);
   a.exists(cors);
   a.deepEqual(cors.regexp, /^\/?(?=\/|$)/i);
+});
+test('Restrict Option Error', async () => {
+  await a.isRejected(createServer({
+    noListen: true,
+    restrict: true,
+  }));
+});
+test('Restrict Option', async () => {
+  const restrictedServer = await createServer({
+    noListen: true,
+    restrict: true,
+    resources: {
+      dogs: true,
+      cats: false,
+    },
+  }, db);
+  const r = await request(restrictedServer).get('/dogs');
+  const r1 = await request(restrictedServer).get('/cats');
+  const r2 = await request(restrictedServer).get('/users');
+  a.equal(r.status, 200);
+  a.equal(r1.status, 404);
+  a.equal(r2.status, 404);
 });
 suite('port and host');

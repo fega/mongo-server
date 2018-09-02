@@ -16,7 +16,6 @@ module.exports = {
       $permissions: [['admin'], ['user:read', 'user:write']],
     },
     comments: true,
-    $restrict: true,
   },
   port: 3000,
   host: 'localhost',
@@ -25,5 +24,6 @@ module.exports = {
   forceSeed: false,
   mongo: 'mongodb://localhost:27017',
   middleware: [],
+  restrict: true,
   engine: true,
 };
