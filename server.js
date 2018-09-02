@@ -43,6 +43,10 @@ module.exports = async (config, db) => {
    */
   app.use(config.staticRoot || '/', express.static(path.join(__dirname, config.static || 'public')));
   /**
+   * Custom middleware
+   */
+  if (config.middleware) app.use(config.middleware);
+  /**
    * REST API mount
    */
   app.use(config.root || '/', indexRouter(db));

@@ -25,4 +25,5 @@ module.exports = {
   forceSeed: false,
   mongo: 'mongodb://localhost:27017',
   middleware: [],
+  engine: true,
 };

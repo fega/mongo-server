@@ -18,6 +18,9 @@ before(async () => {
   db = await mongo();
   console.log('before');
   serverEmpty = await createServer({}, db);
+  function personalizedMiddleware(req, res, next) {
+    next();
+  }
   server = await createServer({
     port: 3000,
     noListen: true,
@@ -25,6 +28,7 @@ before(async () => {
     helmet: {},
     cors: { origin: true },
     staticRoot: '/static',
+    middleware: [personalizedMiddleware],
   }, db);
 });
 test('have CORS enabled', () => {
@@ -59,6 +63,13 @@ test('have serveStatic non default url', () => {
 });
 test('have default serveStatic', () => {
   const cors = serverEmpty._router.stack.find(m => m.name === 'serveStatic');
+  a.exists(cors);
+  a.deepEqual(cors.regexp, /^\/?(?=\/|$)/i);
+  console.log(server);
+});
+test('Have personalized Middleware', () => {
+  const cors = server._router.stack.find(m => m.name === 'personalizedMiddleware');
+  console.log(server._router.stack);
   a.exists(cors);
   a.deepEqual(cors.regexp, /^\/?(?=\/|$)/i);
 });

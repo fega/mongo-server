@@ -4,7 +4,7 @@ const { ObjectId } = require('mongodb');
 const HttpError = require('http-errors');
 const pluralize = require('pluralize');
 const { omit } = require('lodash');
-const { asyncController } = require("./asyncController");
+const { asyncController } = require('./asyncController');
 
 const {
   getTextQuery,

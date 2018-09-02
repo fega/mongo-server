@@ -160,7 +160,9 @@ You can also set options in a `js` or `json` configuration file.
   // static file server, by default is "public" in the execution dir
   static: 'public',
   // root path for static file serving, by default "/"
-  staticRoot: '/'  
+  staticRoot: '/'
+  // personalized middleware, executed before REST api
+  middleware: [myFunction]
 }
 ```
 
