@@ -5,7 +5,7 @@ Hyper-Heavily inspired on [json-server](https://github.com/typicode/json-server)
 
 ## Getting started
 
-Install   mongo Server 
+Install mongo Server
 
 ```
 npm install -g moser
@@ -37,7 +37,7 @@ You can basically use any routes as you want without need to define them, just b
 
 ### Plural routes
 
-```
+```curl
 GET    /posts
 GET    /posts/1
 POST   /posts
@@ -46,12 +46,11 @@ PATCH  /posts/1
 DELETE /posts/1
 ```
 
-
 ### Filter
 
 Use `.` to access deep properties
 
-```
+```curl
 GET /posts?title=json-server&author=typicode
 GET /posts?id=1&id=2
 GET /comments?author.name=typicode
@@ -63,8 +62,7 @@ Use `$page` and optionally `$limit` to paginate returned data.
 
 In the `Link` header you'll get `first`, `prev`, `next` and `last` links.
 
-
-```
+```curl
 GET /posts?$page=7
 GET /posts?$page=7&$limit=20
 ```
@@ -75,14 +73,14 @@ _10 items are returned by default_
 
 Add `$sort` and `$order` (ascending order by default)
 
-```
+```curl
 GET /posts?$sort=views&$order=asc
 GET /posts/1/comments?$sort=votes&$order=asc
 ```
 
 For multiple fields, use the following format (NOT_IMPLEMENTED YET):
 
-```
+```curl
 GET /posts?$sort=user,views&$order=desc,asc
 ```
 
@@ -90,7 +88,7 @@ GET /posts?$sort=user,views&$order=desc,asc
 
 Use `$query` to send a JSON with any mongodb query
 
-```
+```curl
 GET /posts?$query={"name":"Puky"}
 ```
 
@@ -102,7 +100,7 @@ Coming soon...
 
 To include children resources, add `$populate`
 
-```
+```curl
 GET /companies$populate=employees
 ```
 
@@ -138,7 +136,9 @@ Usage: mongodb-server [options]
     -d --db <string>         database name               mongo-server
     -h, --help               output usage information
 ```
-# Config file
+
+## Config file
+
 You can also set options in a `js` or `json` configuration file.
 
 ```js
@@ -166,6 +166,44 @@ You can also set options in a `js` or `json` configuration file.
 }
 ```
 
+### Strict Endpoints
+
+You can restrict the endpoints for only what you provided using the restrict option in your config file:
+
+```js
+{
+  restrict: true,
+  resources: ['users','dogs']
+  // or
+  resources: {
+    users: true,
+    dogs: true,
+  }
+}
+```
+
+### Mailing
+
+You can create a mailing service that sends you an email when a Post request hit the specified resource, using a nodemailer instance:
+
+```js
+{
+    resources: {
+      dogs: {
+        // this option will do the trick
+        email: {
+          to: ['fega.hg@gmail.com'],
+          title: 'An optional title'
+        }
+      },
+    },
+    nodemailer: {
+      // place here your nodemailer configuration
+      service: 'MailDev',
+    },
+  }
+```
+
 ### Strict Schemas
 
 coming soon...
@@ -186,15 +224,7 @@ Coming soon...
 
 Coming soon...
 
-### Add middlewares
-
-Coming soon...
-
 ### automatic auth
-
-Coming soon...
-
-### restrict routes and features
 
 Coming soon...
 

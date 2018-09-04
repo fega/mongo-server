@@ -17,13 +17,13 @@ module.exports = {
     },
     comments: true,
   },
-  port: 3000,
+  port: 3000, // ✔️
   host: 'localhost',
-  cors: '*',
-  gzip: true,
+  cors: '*', // ✔️
+  gzip: true, // ✔️
   forceSeed: false,
-  mongo: 'mongodb://localhost:27017',
-  middleware: [],
-  restrict: true,
+  mongo: 'mongodb://localhost:27017', // ✔️
+  middleware: [], // ✔️
+  restrict: true, // ✔️
   engine: true,
 };

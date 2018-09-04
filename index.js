@@ -2,6 +2,7 @@
 const program = require('commander');
 const chalk = require('chalk');
 const path = require('path');
+const { findKey } = require('lodash');
 const pkg = require('./package');
 const pe = new (require('pretty-error'))(); //eslint-disable-line
 const connect = require('./db');
@@ -23,7 +24,9 @@ const main = async (programConfig) => {
     // start
     console.log(tag, `Version: ${pkg.version}`);
 
-    // default config
+    /**
+     * Set default config
+     */
     let config = {
       port: programConfig.port || 3000,
       host: programConfig.host || 'localhost',
@@ -31,8 +34,9 @@ const main = async (programConfig) => {
       db: programConfig.db || 'mongo-server',
     };
 
-
-    // read and merge config file
+    /**
+     * read and merge config file
+     */
     if (programConfig.config) {
       console.log(tag, 'Reading config file');
       const file = require(path.resolve(programConfig.config)); // eslint-disable-line
@@ -40,14 +44,27 @@ const main = async (programConfig) => {
       console.log(tag, 'Config file loaded');
     }
 
+    /**
+     * NodeMailerConfig
+     */
+    if (findKey(config.resources || {}, 'email')) {
+      config.nodemailer = config.nodemailer || {
+        sendmail: true,
+        newline: 'unix',
+        path: '/usr/sbin/sendmail',
+      };
+    }
 
-    // connecting to mongodb
+    /**
+     * connecting to mongodb
+     */
     console.log(tag, 'connecting to mongodb');
     const db = await connect(config);
     console.log(tag, 'using', chalk.yellow(db.databaseName), 'database');
 
-
-    // creating the server
+    /**
+     * creating the server
+     */
     createServer(config, db);
   } catch (error) {
     console.log(pe.render(error));

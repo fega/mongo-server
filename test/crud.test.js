@@ -1,8 +1,16 @@
 /* eslint-env node, mocha */
 const chai = require('chai');
 const request = require('supertest');
+const MailDev = require('maildev');
+const delay = require('delay');
+const asPromised = require('chai-as-promised');
 const createServer = require('../server');
 const mongo = require('../db');
+
+chai.use(asPromised);
+
+const maildev = new MailDev();
+maildev.listen();
 
 const a = chai.assert;
 let db;
@@ -240,3 +248,41 @@ test('NOT_FOUND', async () => {
   const r = await request(server).delete('/bears/paco').send({ age: 20 }).expect(404);
 });
 test('?soft, OK');
+
+
+suite('POST /:resourceWithEmailEnabled/:id');
+test('missing resources item', async () => {
+  await a.isRejected(createServer({
+    // resources: {
+    //   dogs: { email: true },
+    // },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db), /nodemailer/);
+});
+test('resources field is present', async () => {
+  await a.isFulfilled(createServer({
+    resources: {
+      dogs: { email: { to: ['fega.hg@gmail.com'] } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db), 'nodemailer');
+});
+test('OK', async () => {
+  const server2 = await createServer({
+    resources: {
+      dogs: { email: { to: ['fega.hg@gmail.com'] } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+
+  const r = await request(server2).post('/dogs').send({ name: 'Awesome dog' });
+  console.log(r.body);
+  await delay(500);
+  a.equal(r.status, 200);
+});

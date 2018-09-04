@@ -3,8 +3,8 @@ const express = require('express');
 const { ObjectId } = require('mongodb');
 const HttpError = require('http-errors');
 const pluralize = require('pluralize');
-const { omit } = require('lodash');
-const { asyncController } = require('./asyncController');
+const { omit, get } = require('lodash');
+const { asyncController, htmlEmailTemplate } = require('./util');
 
 const {
   getTextQuery,
@@ -142,13 +142,42 @@ module.exports = (config, db) => {
     if (!resources) throw new Error('config.resources Option is necessary when restrict is set to true');
 
     const allowedResources = Array.isArray(resources)
-      ? resources : Object.keys(resources).filter(item => resources[item]);
+      ? resources
+      : Object.keys(resources).filter(item => resources[item]);
 
     router.use(['/:resource', '/:resource/:id'], (req, res, next) => {
       if (allowedResources.includes(req.params.resource)) return next();
       throw new HttpError[404]('Not found');
     });
   }
+
+  /**
+   * Email endpoints
+   */
+  if (config.nodemailer) {
+    const { resources, nodemailer } = config;
+    if (!resources) throw new Error('config.resources Option is necessary when nodemailer is set to true');
+    const Nodemailer = require('nodemailer'); // eslint-disable-line
+    const transport = Nodemailer.createTransport(nodemailer);
+
+    const emailResources = Array.isArray(resources)
+      ? []
+      : Object.keys(resources).filter(item => get(resources[item], 'email'));
+    router.post(['/:resource', '/:resource/:id'], (req, res, next) => {
+      if (!emailResources.includes(req.params.resource)) return next();
+      const resource = resources[req.params.resource];
+      console.log(resource);
+      transport.sendMail({
+        from: 'email@email.com',
+        to: resource.email.to,
+        text: 'Text',
+        html: htmlEmailTemplate(req.path, req.body),
+        title: resource.email.title || `An email from moserApi POST /${req.params.resource}`,
+      }).then(() => next()).catch(next);
+    });
+  }
+
+
   /**
    * Routes
    */

@@ -13,13 +13,12 @@ let server;
 let serverEmpty;
 
 after(async () => {
-  await db.dropDatabase();
+  // await db.dropDatabase();
 });
 
-suite.only('configuration');
+suite('configuration');
 before(async () => {
   db = await mongo();
-  console.log('before');
   serverEmpty = await createServer({}, db);
   function personalizedMiddleware(req, res, next) {
     next();
@@ -35,7 +34,6 @@ before(async () => {
   }, db);
 });
 test('have CORS enabled', () => {
-  console.log('before');
   const cors = server._router.stack.find(m => m.name === 'corsMiddleware');
   a.exists(cors);
 });
@@ -96,4 +94,3 @@ test('Restrict Option', async () => {
   a.equal(r1.status, 404);
   a.equal(r2.status, 404);
 });
-suite('port and host');
