@@ -204,6 +204,8 @@ You can create a mailing service that sends you an email when a Post request hit
   }
 ```
 
+This option could be helpful for landing pages.
+
 ### Strict Schemas
 
 coming soon...
