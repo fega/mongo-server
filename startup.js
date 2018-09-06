@@ -54,7 +54,7 @@ const main = async (programConfig) => {
     if (config.seed) {
       console.log(tag, 'Seeding Db');
       const isEmpty = await isDbEmpty(db);
-      if (isEmpty) {
+      if (isEmpty && !config.forceSeed) {
         await seedDb(db, config);
       } else {
         console.log(tag, 'Db already have data, skipping');

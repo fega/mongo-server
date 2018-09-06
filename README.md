@@ -224,7 +224,7 @@ const casual= require('casual')
         seed: ()=>[{name:"Minnie"},{name:"Mickey"}] // another way to seed dbs
       }
     },
-    seed:true,
+    seed:true, // this can also be a object being every key a resource seeder
     // if you set this this to true, you will delete the db and force seeding! be careful
     forceSeed:false,
   }
