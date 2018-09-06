@@ -249,27 +249,23 @@ test('NOT_FOUND', async () => {
 });
 test('?soft, OK');
 
-
 suite('POST /:resourceWithEmailEnabled/:id');
 test('missing resources item', async () => {
-  await a.isRejected(createServer({
-    // resources: {
-    //   dogs: { email: true },
-    // },
+  a.throws(() => createServer({
     nodemailer: {
       service: 'MailDev',
     },
   }, db), /nodemailer/);
 });
 test('resources field is present', async () => {
-  await a.isFulfilled(createServer({
+  createServer({
     resources: {
       dogs: { email: { to: ['fega.hg@gmail.com'] } },
     },
     nodemailer: {
       service: 'MailDev',
     },
-  }, db), 'nodemailer');
+  }, db);
 });
 test('OK', async () => {
   const server2 = await createServer({

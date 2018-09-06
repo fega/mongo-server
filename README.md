@@ -206,6 +206,30 @@ You can create a mailing service that sends you an email when a Post request hit
 
 This option could be helpful for landing pages.
 
+### Seeds
+
+You can seed your database using libraries like faker JS and Casual
+
+```js
+const casual= require('casual')
+{
+    resources: {
+      dogs: {
+        seed:()=>({
+          name: casual.name
+          color: casual.color_name
+        })
+      },
+      mouses:{
+        seed: ()=>[{name:"Minnie"},{name:"Mickey"}] // another way to seed dbs
+      }
+    },
+    seed:true,
+    // if you set this this to true, you will delete the db and force seeding! be careful
+    forceSeed:false,
+  }
+```
+
 ### Strict Schemas
 
 coming soon...

@@ -166,7 +166,6 @@ module.exports = (config, db) => {
     router.post(['/:resource', '/:resource/:id'], (req, res, next) => {
       if (!emailResources.includes(req.params.resource)) return next();
       const resource = resources[req.params.resource];
-      console.log(resource);
       transport.sendMail({
         from: 'email@email.com',
         to: resource.email.to,
@@ -176,7 +175,6 @@ module.exports = (config, db) => {
       }).then(() => next()).catch(next);
     });
   }
-
 
   /**
    * Routes

@@ -1,29 +1,69 @@
 module.exports = {
   resources: {
     posts: {
-      $post: false,
-      $patch: false,
-      $delete: false,
-      $restrictFields: true,
-      $restrict$query: true,
-      $postEmail: ['fega.hg@gmail.com'],
+      post: false,
+      patch: false,
+      delete: false,
+      restrictFields: true,
+      restrictQuery: true,
+      csrf: true,
+      rateLimit: true,
+      csv: true,
+      redirect: [302, 'http://google.com'],
+      webhook: ['url'],
+      reCaptcha: true,
+      apicache: '1 hour',
+      // webhook: (resource,user)=>{},
+      pdf: { title: (resources, user) => '', content: (resources, user) => '' },
+      email: { to: ['fega.hg@gmail.com'] }, // ✔️
+      // email: ['fega.hg@gmail.com'],
+      file: { field: 'file' }, // ✔️
+      in: {
+        body: null, // Joi schema here
+        query: null, // Joi schema here
+        params: null, // Joi schema here
+      },
+      out: (resource, tokenPayload) => ({ ...resource, requestedBy: tokenPayload._id }),
+      seed: () => { },
+      permissions: [
+        ['admin'], // allow if user is admin
+        ['posts:read', 'posts:write'], // allow if user have posts:read and post:write
+        (resource, tokenPayload) => { resource.user_id.equals(tokenPayload._id); }, // userId is equals to resource.user_id
+      ],
     },
     users: {
-      $localAuth: ['email', 'password'],
-      $fbAuth: true,
-      $googlebAuth: true,
-      $fcmToken: true,
-      $permissions: [['admin'], ['user:read', 'user:write']],
+      auth: {
+        local: ['email', 'password'],
+        jwt: ['_id', 'permissions'],
+        restoreEmail: true,
+        phoneCode: true,
+        facebook: { // same for google and twitter, github, linkedin
+          clientID: 'FACEBOOK_APP_ID',
+          clientSecret: 'FACEBOOK_APP_SECRET',
+          callbackURL: 'http://localhost:3000/auth/facebook/callback',
+          scope: [], // domain: 'domain.com' // auth0
+        },
+      },
+      fcmToken: true,
     },
     comments: true,
   },
-  port: 3000, // ✔️
   host: 'localhost',
+  engine: true,
+  port: 3000, // ✔️
   cors: '*', // ✔️
   gzip: true, // ✔️
   forceSeed: false,
   mongo: 'mongodb://localhost:27017', // ✔️
   middleware: [], // ✔️
   restrict: true, // ✔️
-  engine: true,
+  nodemailer: { // ✔️
+    service: 'MailDev',
+  },
+  raven: {},
+  morgan: {},
+  sitemap: true,
+  robotsTxt: true,
+  docs: true,
+  reCaptcha: true,
 };

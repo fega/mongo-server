@@ -3,6 +3,7 @@ const chai = require('chai');
 const asPromised = require('chai-as-promised');
 const request = require('supertest');
 const createServer = require('../server');
+const main = require('../startup');
 const mongo = require('../db');
 
 chai.use(asPromised);
@@ -73,10 +74,12 @@ test('Have personalized Middleware', () => {
   a.deepEqual(cors.regexp, /^\/?(?=\/|$)/i);
 });
 test('Restrict Option Error', async () => {
-  await a.isRejected(createServer({
-    noListen: true,
-    restrict: true,
-  }));
+  a.throws(() => {
+    createServer({
+      noListen: true,
+      restrict: true,
+    });
+  });
 });
 test('Restrict Option', async () => {
   const restrictedServer = await createServer({

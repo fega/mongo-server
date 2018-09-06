@@ -12,7 +12,7 @@ const indexRouter = require('./routes/index');
 const tag = chalk.cyan('[m-server]');
 
 
-module.exports = async (config, db) => {
+module.exports = (config, db) => {
   /**
    * create express server
    */
