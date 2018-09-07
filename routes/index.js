@@ -7,7 +7,7 @@ const {
   omit, get, pickBy, mapValues,
 } = require('lodash');
 const { asyncController, htmlEmailTemplate } = require('./util');
-const { generateLocalStrategies } = require('../lib/passport');
+const { generateLocalStrategies, generateJwtPermissionRoutes } = require('../lib/auth');
 const passport = require('passport');
 const {
   getTextQuery,
@@ -165,7 +165,7 @@ module.exports = (config, db) => {
     // const local = require('passport-local').Strategy;
 
     const authLocalResources = Object.keys(pickBy(resources, r => get(r, 'auth.local')));
-    if (authLocalResources) {
+    if (authLocalResources.length) {
       /**
        * sign-up middleware
        */
@@ -173,8 +173,7 @@ module.exports = (config, db) => {
         try {
           if (!authLocalResources.includes(req.params.resource)) return next();
           const resource = resources[req.params.resource];
-          const userField = resource.auth.local[0];
-          const passField = resource.auth.local[1];
+          const [userField, passField, permissions] = resource.auth.local;
           const userValue = req.body[userField];
           const passValue = req.body[passField];
           if (!userValue || !passValue) {
@@ -187,11 +186,12 @@ module.exports = (config, db) => {
           if (oldResource) return res.sendStatus(403);
 
           const $token = await jwt.sign(
-            { [userField]: userValue, resource: req.params.resource },
+            { [userField]: userValue, resource: req.params.resource, permissions },
             jwtSecret,
           );
           const insert = {
             ...req.body,
+            ...permissions ? { permissions } : {},
             [passField]: await bcrypt.hash(passValue, bcryptRounds),
             _id: ObjectId().toString(),
           };
@@ -219,6 +219,11 @@ module.exports = (config, db) => {
       });
     }
   }
+
+  /**
+   * Permission endpoints
+   */
+  generateJwtPermissionRoutes(config, router);
 
   /**
    * Email endpoints

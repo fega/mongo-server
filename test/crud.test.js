@@ -278,7 +278,6 @@ test('OK', async () => {
   }, db);
 
   const r = await request(server2).post('/dogs').send({ name: 'Awesome dog' });
-  console.log(r.body);
   await delay(500);
   a.equal(r.status, 200);
 });

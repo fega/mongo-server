@@ -237,20 +237,55 @@ The majority of systems needs a way to identify and authenticate user, with Mose
 ```js
 {
   resources: {
-    auth:{
-      local:['email','password']
+    users:{
+      auth:{
+        local:['email','password']
+      }
     }
   },
-  jwtSecret: 'secret', // by default is "secret"
+  jwtSecret: 'secret', // by default is "secret", used to sign token
   bcryptRounds:1, //used to hash passwords by default is 1
 }
 ```
 
-using this you can call the endpoint `POST /auth/users/sign-up` to create an user and `POST /auth/users/log-in` to authenticate, after that, you will get a $token parameter in your log-in response, currently that token is useless, but I'm going to add a permission system soon.
+using this you can call the endpoint `POST /auth/users/sign-up` to create an user and `POST /auth/users/log-in` to authenticate, after that, you will get a $token parameter in your log-in response, check the next section to know how to restrict access to your endpoints
 
-### Strict Schemas
+### Permission handling
 
-coming soon...
+You can protect your resources using the permissions field
+
+```js
+{
+  resources: {
+    users:{
+      auth:{
+        // the third parameter is the default user permssions (the  permissions will be saved in mongodb as "permissions")
+        // mongo server uses internally https://github.com/MichielDeMey/express-jwt-permissions for the permission system
+        local:['email','password',['dogs']]
+      }
+    }
+    dogs:{
+      // Only users with permission "dogs:read" will be able to access to this resource
+      permissions:['dogs']
+      // only users with permissions "dogs" AND "dogs:write" will be able to access to patch and put endpints
+      patch:['dogs:write']
+      put:['dogs:write']
+    }
+    cats:{
+      // Only users with permission "cats:edit" or "admin" will be able to access to this resource
+      permissions:[['admin'],['cats:edit']]
+    }
+    rabbits:{
+      // specific permission per METHOD
+      patch:['rabbits:write'],
+      put:['rabbits:write'],
+      delete:['rabbits:remove'],
+      get:['rabbits:read'],
+      getId:['rabbits:read'],
+    }
+  },
+}
+```
 
 ### Remote schema
 
