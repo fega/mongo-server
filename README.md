@@ -137,7 +137,7 @@ Usage: mongodb-server [options]
     -h, --help               output usage information
 ```
 
-## Config file
+### Config file
 
 You can also set options in a `js` or `json` configuration file.
 
@@ -229,6 +229,24 @@ const casual= require('casual')
     forceSeed:false,
   }
 ```
+
+### Login and Authentication
+
+The majority of systems needs a way to identify and authenticate user, with Moser you can activate an auth system based on JWT just adding  one option in your config file
+
+```js
+{
+  resources: {
+    auth:{
+      local:['email','password']
+    }
+  },
+  jwtSecret: 'secret', // by default is "secret"
+  bcryptRounds:1, //used to hash passwords by default is 1
+}
+```
+
+using this you can call the endpoint `POST /auth/users/sign-up` to create an user and `POST /auth/users/log-in` to authenticate, after that, you will get a $token parameter in your log-in response, currently that token is useless, but I'm going to add a permission system soon.
 
 ### Strict Schemas
 

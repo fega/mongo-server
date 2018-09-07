@@ -3,7 +3,6 @@ const chai = require('chai');
 const asPromised = require('chai-as-promised');
 const request = require('supertest');
 const createServer = require('../server');
-const main = require('../startup');
 const mongo = require('../db');
 
 chai.use(asPromised);

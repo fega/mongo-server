@@ -3,9 +3,12 @@ const express = require('express');
 const { ObjectId } = require('mongodb');
 const HttpError = require('http-errors');
 const pluralize = require('pluralize');
-const { omit, get } = require('lodash');
+const {
+  omit, get, pickBy, mapValues,
+} = require('lodash');
 const { asyncController, htmlEmailTemplate } = require('./util');
-
+const { generateLocalStrategies } = require('../lib/passport');
+const passport = require('passport');
 const {
   getTextQuery,
   getRegexQuery,
@@ -149,6 +152,72 @@ module.exports = (config, db) => {
       if (allowedResources.includes(req.params.resource)) return next();
       throw new HttpError[404]('Not found');
     });
+  }
+
+  /**
+   * Auth local endpoints
+   */
+  if (config.resources) {
+    const { resources, jwtSecret = 'secret', bcryptRounds = 1 } = config;
+    const jwt = require('jsonwebtoken');
+    const bcrypt = require('bcryptjs');
+    // const passport = require('passport');
+    // const local = require('passport-local').Strategy;
+
+    const authLocalResources = Object.keys(pickBy(resources, r => get(r, 'auth.local')));
+    if (authLocalResources) {
+      /**
+       * sign-up middleware
+       */
+      router.post('/auth/:resource/sign-up', async (req, res, next) => {
+        try {
+          if (!authLocalResources.includes(req.params.resource)) return next();
+          const resource = resources[req.params.resource];
+          const userField = resource.auth.local[0];
+          const passField = resource.auth.local[1];
+          const userValue = req.body[userField];
+          const passValue = req.body[passField];
+          if (!userValue || !passValue) {
+            return res.sendStatus(400);
+          }
+          const oldResource = await db.collection(req.params.resource).findOne({
+            [userField]: userValue,
+          });
+
+          if (oldResource) return res.sendStatus(403);
+
+          const $token = await jwt.sign(
+            { [userField]: userValue, resource: req.params.resource },
+            jwtSecret,
+          );
+          const insert = {
+            ...req.body,
+            [passField]: await bcrypt.hash(passValue, bcryptRounds),
+            _id: ObjectId().toString(),
+          };
+          await db.collection(req.params.resource).insertOne(insert);
+
+          return res.status(200).send({
+            ...omit(insert, passValue),
+            $token,
+          });
+        } catch (error) {
+          next(error);
+        }
+      });
+      /**
+       * log-in middleware
+       */
+      router.use(passport.initialize());
+      generateLocalStrategies(authLocalResources, config, db);
+      authLocalResources.map((resourceName) => {
+        router.post(
+          `/auth/${resourceName}/log-in`,
+          passport.authenticate(`local-${resourceName}`, { session: false }),
+          (req, res) => res.json(req.user),
+        );
+      });
+    }
   }
 
   /**

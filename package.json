@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.5.0",
+  "version": "0.7.0",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "server.js",
   "scripts": {
@@ -13,6 +13,7 @@
   "preferGlobal": true,
   "bin": "./index.js",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "chalk": "^2.4.1",
     "commander": "^2.16.0",
     "compression": "^1.7.3",
@@ -22,18 +23,21 @@
     "flattenjs": "^1.0.4",
     "helmet": "^3.13.0",
     "http-errors": "^1.7.0",
+    "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.10",
     "mongodb": "^3.1.1",
     "morgan": "^1.9.0",
     "nodemailer": "^4.6.8",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
     "pluralize": "^7.0.0",
     "pretty-error": "^2.1.1"
   },
   "devDependencies": {
-    "chai-as-promised": "^7.1.1",
-    "sinon": "^6.1.5",
     "casual": "^1.5.19",
     "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "delay": "^4.0.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^13.0.0",
@@ -42,6 +46,8 @@
     "mocha": "^5.2.0",
     "nodemon": "^1.18.3",
     "proxyquire": "^2.0.1",
+    "randomstring": "^1.1.5",
+    "sinon": "^6.1.5",
     "supertest": "^3.1.0"
   }
 }
