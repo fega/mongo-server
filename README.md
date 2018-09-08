@@ -142,7 +142,7 @@ Usage: mongodb-server [options]
 You can also set options in a `js` or `json` configuration file.
 
 ```js
-{
+module.exports= {
   // Port, default 3000
   port: 3000,
   // REST api root, default "/"
@@ -171,7 +171,7 @@ You can also set options in a `js` or `json` configuration file.
 You can restrict the endpoints for only what you provided using the restrict option in your config file:
 
 ```js
-{
+module.exports= {
   restrict: true,
   resources: ['users','dogs']
   // or
@@ -187,7 +187,7 @@ You can restrict the endpoints for only what you provided using the restrict opt
 You can create a mailing service that sends you an email when a Post request hit the specified resource, using a nodemailer instance:
 
 ```js
-{
+module.exports= {
     resources: {
       dogs: {
         // this option will do the trick
@@ -212,7 +212,7 @@ You can seed your database using libraries like faker JS and Casual
 
 ```js
 const casual= require('casual')
-{
+module.exports= {
     resources: {
       dogs: {
         seed:()=>({
@@ -235,7 +235,7 @@ const casual= require('casual')
 The majority of systems needs a way to identify and authenticate user, with Moser you can activate an auth system based on JWT just adding  one option in your config file
 
 ```js
-{
+module.exports= {
   resources: {
     users:{
       auth:{
@@ -255,7 +255,7 @@ using this you can call the endpoint `POST /auth/users/sign-up` to create an use
 You can protect your resources using the permissions field
 
 ```js
-{
+module.exports= {
   resources: {
     users:{
       auth:{
@@ -287,13 +287,33 @@ You can protect your resources using the permissions field
 }
 ```
 
+### Input validation and Output Formating
+
+In a production environment you should never trust in your incoming data,  you can validate the incoming data easily:
+```js
+const postsIn = {
+  // you can restrict the body (only in PUT PATCH and POST requests)
+  body: {
+    title: Joi.string().required(),
+    content: Joi.string().required(),
+  },
+  // or the queryString (only in GET)
+  get:{
+    title:Joi.string(),
+  }
+};
+module.exports= {
+  resources: {
+      posts:{ in: postsIn }
+    },
+  },
+}
+```
+And also you can process your outcoming data (to prevent unwanted leaks or add better formatting)
+
 ### Remote schema
 
 coming soon...
-
-### Generate random data
-
-Coming soon...
 
 ### HTTPS
 

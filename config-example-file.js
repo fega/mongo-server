@@ -1,9 +1,9 @@
 module.exports = {
   resources: {
     posts: {
-      post: false,
-      patch: false,
-      delete: false,
+      post: false, // ✔️
+      patch: false, // ✔️
+      delete: false, // ✔️
       restrictFields: true,
       restrictQuery: true,
       csrf: true,
@@ -18,22 +18,24 @@ module.exports = {
       email: { to: ['fega.hg@gmail.com'] }, // ✔️
       // email: ['fega.hg@gmail.com'],
       file: { field: 'file' }, // ✔️
-      in: {
-        body: null, // Joi schema here
-        query: null, // Joi schema here
-        params: null, // Joi schema here
+      in: {// ✔️
+        body: null, // Joi schema here// ✔️
+        query: null, // Joi schema here// ✔️
+        params: null, // Joi schema here// ✔️
       },
       out: (resource, tokenPayload) => ({ ...resource, requestedBy: tokenPayload._id }),
-      seed: () => { },
+      seed: () => { }, // ✔️
       permissions: [
-        ['admin'], // allow if user is admin
-        ['posts:read', 'posts:write'], // allow if user have posts:read and post:write
+        ['admin'], // allow if user is admin // ✔️
+        ['posts:read', 'posts:write'], // allow if user have posts:read and post:write// ✔️
+        ['$ONWER'], // allow if resource is part of resource_id or resource_ids in the target resource// ✔️
+        ['$VERIFIED'], // allow if user is already verified by email or phone code
         (resource, tokenPayload) => { resource.user_id.equals(tokenPayload._id); }, // userId is equals to resource.user_id
       ],
     },
     users: {
       auth: {
-        local: ['email', 'password'],
+        local: ['email', 'password'], // ✔️
         jwt: ['_id', 'permissions'],
         restoreEmail: true,
         phoneCode: true,

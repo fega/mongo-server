@@ -4,6 +4,7 @@ const asPromised = require('chai-as-promised');
 const request = require('supertest');
 const { generate } = require('randomstring');
 const jwt = require('jsonwebtoken');
+const Joi = require('joi');
 const createServer = require('../server');
 const mongo = require('../db');
 
@@ -15,6 +16,7 @@ let db;
 after(async () => {
   // await db.dropDatabase();
 });
+
 
 suite('local auth');
 before(async () => {
@@ -125,9 +127,9 @@ test('LOGIN FLOW', async () => {
 });
 test('Should never leak the password');
 
-suite('permssions');
 
-test('GET POST PATCH PUT DELETE /:resources 401 UNATHORIZED, no user', async () => {
+suite('Permissions');
+test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, no user', async () => {
   const s = createServer({
     resources: {
       users: { auth: { local: ['email', 'password'] } },
@@ -151,8 +153,7 @@ test('GET POST PATCH PUT DELETE /:resources 401 UNATHORIZED, no user', async () 
   a.equal(r4.status, 401, 'Get /resources/:id failing');
   a.equal(r5.status, 200, 'Other endpoints are failing');
 });
-
-test('GET POST PATCH PUT DELETE /:resources 401 UNATHORIZED, Invalid JWT', async () => {
+test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, Invalid JWT', async () => {
   const s = createServer({
     resources: {
       users: { auth: { local: ['email', 'password'] } },
@@ -232,4 +233,70 @@ test('GET POST PATCH PUT DELETE /:resources 200 OK', async () => {
   a.equal(r3.status, 403, 'PUT /resources/:id failing');
   a.equal(r4.status, 404, 'DELETE /resources/:id failing');
   a.equal(r5.status, 200, 'Other endpoints are failing');
+});
+
+
+suite('IN validation');
+test('validation OK', async () => {
+  const s = createServer({
+    resources: {
+      posts: {
+        patch: {
+          in: {
+            body: {
+              version: Joi.number().required(),
+            },
+          },
+        },
+        in: {
+          body: {
+            title: Joi.string().required(),
+            content: Joi.string().required(),
+          },
+        },
+      },
+    },
+  }, db);
+  const token = await jwt.sign({ permissions: ['posts:read'] }, 'secret');
+  const header = ['Authorization', `Bearer ${token}`];
+
+  const r = await request(s).get('/posts').set(...header);
+  const r0 = await request(s).get('/posts/an-id').set(...header);
+  const r1 = await request(s).post('/posts').set(...header);
+  const r2 = await request(s).patch('/posts/an-id').set(...header);
+  const r3 = await request(s).put('/posts/an-id').set(...header);
+
+  a.equal(r.status, 200, 'GET /resources failing');
+  a.equal(r0.status, 404, 'GET /resources/:id failing');
+  a.equal(r1.status, 400, 'POST /resources failing');
+  a.equal(r2.status, 400, 'PATCH /resources failing');
+  a.equal(r3.status, 400, 'PUT /resources failing');
+
+  const rValid1 = await request(s).post('/posts').set(...header).send({ title: 'hey', content: 'hey' });
+  const rValid2 = await request(s).patch('/posts/an-id').set(...header).send({ title: 'hey', content: 'hey', version: 1 });
+  a.equal(rValid1.status, 200, 'POST /resources valid request failing');
+  a.equal(rValid2.status, 404, 'POST /resources valid request failing');
+});
+suite('OUT validation');
+test('validation OK', async () => {
+  const s = createServer({
+    resources: {
+      posts: {
+        patch: {
+        },
+        out: (resource, user) => ({
+          id: resource._id,
+          extra: 'extra',
+        }),
+      },
+    },
+  }, db);
+  const token = await jwt.sign({ permissions: ['posts:read'] }, 'secret');
+  const header = ['Authorization', `Bearer ${token}`];
+
+  const r0 = await request(s).post('/posts').set(...header);
+  const r1 = await request(s).get(`/posts/${r0.body.id}`).set(...header);
+  a.equal(r1.status, 200);
+  a.exists(r1.body.id);
+  a.equal(r1.body.extra, 'extra');
 });

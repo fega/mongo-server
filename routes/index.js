@@ -7,7 +7,7 @@ const {
   omit, get, pickBy, mapValues,
 } = require('lodash');
 const { asyncController, htmlEmailTemplate } = require('./util');
-const { generateLocalStrategies, generateJwtPermissionRoutes } = require('../lib/auth');
+const { generateLocalStrategies, generateJwtPermissionRoutes, generateInputValidationRoutes } = require('../lib/auth');
 const passport = require('passport');
 const {
   getTextQuery,
@@ -225,6 +225,12 @@ module.exports = (config, db) => {
    */
   generateJwtPermissionRoutes(config, router);
 
+
+  /**
+   * Generate Validation endpoints
+   */
+  generateInputValidationRoutes(config, router);
+
   /**
    * Email endpoints
    */
@@ -253,27 +259,29 @@ module.exports = (config, db) => {
   /**
    * Routes
    */
-  router.get('/:resource', asyncController(async (req, res) => {
-    const {
-      $populate, $fill,
-    } = req.query;
+  router.get('/:resource', asyncController(async (req, res, next) => {
+    const { $populate, $fill } = req.query;
+
     const result = ($populate || $fill)
       ? await findAndPopulate(req.params.resource, req.query)
       : await find(req.params.resource, req.query);
-    res.json($populate ? populate(result) : result);
+    res.locals.resources = $populate ? populate(result) : result;
+    return next();
   }));
   router.get('/:resource/:id', asyncController(async (req, res, next) => {
     const result = await db.collection(req.params.resource).findOne({ _id: req.params.id });
     if (!result) return next(HttpError(404, 'Not found'));
-    return res.send(result);
+    res.locals.resources = result;
+    return next();
   }));
-  router.post('/:resource/', asyncController(async (req, res) => {
+  router.post('/:resource/', asyncController(async (req, res, next) => {
     const insert = {
       ...req.body,
       _id: ObjectId().toString(),
     };
     await db.collection(req.params.resource).insertOne(insert);
-    res.send(insert);
+    res.locals.resources = insert;
+    return next();
   }));
   router.put('/:resource/:id', asyncController(async (req, res, next) => {
     const { _id, ...put } = req.body;
@@ -283,7 +291,8 @@ module.exports = (config, db) => {
         returnOriginal: false,
       });
     if (!result.value) return next(HttpError(404, 'Resource not found'));
-    return res.send(result.value);
+    res.locals.resources = result.value;
+    return next();
   }));
   router.patch('/:resource/:id', asyncController(async (req, res, next) => {
     const { _id, ...patch } = req.body;
@@ -294,7 +303,8 @@ module.exports = (config, db) => {
         returnOriginal: false,
       });
     if (!result.value) return next(HttpError(404, 'Resource not found'));
-    return res.send(result.value);
+    res.locals.resources = result.value;
+    return next();
   }));
   router.delete('/:resource/:id', asyncController(async (req, res, next) => {
     const result = await db
@@ -303,5 +313,19 @@ module.exports = (config, db) => {
     if (!result.value) return next(HttpError(404, 'Resource not found'));
     return res.sendStatus(204);
   }));
+
+  router.use(['/:resource/:id', '/:resource'], (req, res, next) => {
+    const { resources } = res.locals;
+    if (!resources) return next();
+    const out = get(config, `resources.${req.params.resource}.out`);
+    console.log(out, req.params.resource);
+    if (out) {
+      if (Array.isArray(resources)) {
+        return res.json(resources.map(r => out(r, req.user)));
+      }
+      return res.json(out(resources, req.user));
+    }
+    return res.json(resources);
+  });
   return router;
 };
