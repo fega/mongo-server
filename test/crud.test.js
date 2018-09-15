@@ -195,7 +195,6 @@ test('?$populate, OK, 1 population', async () => {
 });
 test('?$populate, OK, 2 multitple population', async () => {
   const r = await request(server).get('/companies?$populate[]=employees&$populate[]=products');
-  console.log(r.body);
 
   a.equal(r.status, 200, 'companies population failed');
   a.equal(r.body[0].employees.length, 2, '$populate failed');
