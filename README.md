@@ -78,10 +78,10 @@ GET /posts?$sort=views&$order=asc
 GET /posts/1/comments?$sort=votes&$order=asc
 ```
 
-For multiple fields, use the following format (NOT_IMPLEMENTED YET):
+For multiple fields, use the following format:
 
 ```curl
-GET /posts?$sort=user,views&$order=desc,asc
+GET /posts?$sort=user&$sort=views&$order[]=desc$$order[]=asc
 ```
 
 ### Advanced queries

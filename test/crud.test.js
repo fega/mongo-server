@@ -133,7 +133,19 @@ test('?$sort=name, OK', async () => {
   a.equal(r.body[3].name, 4);
   a.equal(r.body[4].name, 5);
 });
-test('?$sort=[name,age], OK');
+test('?$sort[]=name&$sort[]=age, OK', async () => {
+  await db.collection('robots-armors').insertOne({ name: 4, age: 4 });
+  await db.collection('robots-armors').insertOne({ name: 2, age: 2 });
+  await db.collection('robots-armors').insertOne({ name: 3, age: 3 });
+  await db.collection('robots-armors').insertOne({ name: 1, age: 1 });
+  await db.collection('robots-armors').insertOne({ name: 5, age: 5 });
+  const r = await request(server).get('/robots-armors?$sort[]=name&$sort[]=age').expect(200);
+  a.equal(r.body[0].name, 1);
+  a.equal(r.body[1].name, 2);
+  a.equal(r.body[2].name, 3);
+  a.equal(r.body[3].name, 4);
+  a.equal(r.body[4].name, 5);
+});
 test('?$sort=invalid, BAD_REQUEST');
 
 test('?$order=desc, OK', async () => {
@@ -162,7 +174,6 @@ test('?$order=asc, OK', async () => {
   a.equal(r.body[3].name, 4);
   a.equal(r.body[4].name, 5);
 });
-test('?$order=[asc,desc], OK');
 test('?$order=invalid, BAD_REQUEST');
 
 test('?$populate, OK, 1 population', async () => {
@@ -170,8 +181,11 @@ test('?$populate, OK, 1 population', async () => {
   await db.collection('companies').insertOne({ _id: 2, name: 'inc' });
   await db.collection('employees').insertOne({ _id: 1, name: 'Foobio', company_id: 1 });
   await db.collection('employees').insertOne({ _id: 2, name: 'Barfy', company_ids: [1, 2] });
-  const r = await request(server).get('/companies?$populate=employees').expect(200);
+  await db.collection('products').insertOne({ _id: 7, name: 'Tonic', company_ids: [1] });
+  await db.collection('products').insertOne({ _id: 8, name: 'Salt', company_ids: [1, 2] });
+  const r = await request(server).get('/companies?$populate=employees');
 
+  a.equal(r.status, 200, 'companies population failed');
   a.equal(r.body[0].employees.length, 2, '$populate failed');
   a.equal(r.body[1].employees.length, 1, '$populate failed');
 
@@ -179,7 +193,20 @@ test('?$populate, OK, 1 population', async () => {
   a.equal(r2.body[0].companies.length, 1, '$fill failed');
   a.equal(r2.body[1].companies.length, 2, '$fill failed');
 });
-test('?$populate, OK, 2 multitple population');
+test('?$populate, OK, 2 multitple population', async () => {
+  const r = await request(server).get('/companies?$populate[]=employees&$populate[]=products');
+  console.log(r.body);
+
+  a.equal(r.status, 200, 'companies population failed');
+  a.equal(r.body[0].employees.length, 2, '$populate failed');
+  a.equal(r.body[0].products.length, 2, '$populate failed');
+  a.equal(r.body[1].employees.length, 1, '$populate failed');
+  a.equal(r.body[1].products.length, 1, '$populate failed');
+
+  const r2 = await request(server).get('/employees?$fill[]=companies').expect(200);
+  a.equal(r2.body[0].companies.length, 1, '$fill failed');
+  a.equal(r2.body[1].companies.length, 2, '$fill failed');
+});
 test('?$populate, BAD_REQUEST');
 
 test('?$range, OK, 1 range');

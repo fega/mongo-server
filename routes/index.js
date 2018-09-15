@@ -2,22 +2,27 @@
 const express = require('express');
 const { ObjectId } = require('mongodb');
 const HttpError = require('http-errors');
+const passport = require('passport');
 const pluralize = require('pluralize');
 const {
-  omit, get, pickBy, mapValues,
+  omit, get, pickBy,
 } = require('lodash');
 const { asyncController, htmlEmailTemplate } = require('./util');
-const { generateLocalStrategies, generateJwtPermissionRoutes, generateInputValidationRoutes } = require('../lib/auth');
-const passport = require('passport');
+const {
+  generateLocalStrategies,
+  generateJwtPermissionRoutes,
+  generateInputValidationRoutes,
+} = require('../lib/auth');
 const {
   getTextQuery,
   getRegexQuery,
   getRangeQuery,
   getSort,
-  populate,
   getQuery,
   getNumber,
   getFilters,
+  getPipelines,
+  unrollPopulatePipeline,
 } = require('../lib');
 
 
@@ -52,11 +57,6 @@ module.exports = (config, db) => {
     const {
       $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, $fill, ...filter
     } = query;
-    const prePopulate1 = `____${$populate}`;
-    const prePopulate2 = `__${$populate}`;
-    const preParent1 = `----${$fill}`;
-    const preParent2 = `--${$fill}`;
-
     // Build pipeline
     const pipeline = [{
       $match: {
@@ -70,70 +70,12 @@ module.exports = (config, db) => {
     if ($sort) pipeline.push({ $sort: getSort($sort, $order) });
     pipeline.push({ $skip: getNumber($page, 0) * getNumber($limit, 10) });
     pipeline.push({ $limit: getNumber($limit, 10) });
-    if ($populate) {
-      pipeline.push({
-        $lookup:
-        {
-          from: $populate,
-          localField: '_id',
-          foreignField: `${pluralize.singular(resource)}_id`,
-          as: prePopulate1,
-        },
-      });
-      pipeline.push({
-        $lookup:
-        {
-          from: $populate,
-          localField: '_id',
-          foreignField: `${pluralize.singular(resource)}_ids`,
-          as: prePopulate2,
-        },
-      });
-    }
-    if ($fill) {
-      pipeline.push({
-        $lookup:
-        {
-          from: resource,
-          localField: `${pluralize.singular($fill)}_id`,
-          foreignField: '_id',
-          as: preParent1,
-        },
-      });
-      pipeline.push({
-        $lookup:
-        {
-          from: resource,
-          localField: `${pluralize.singular($fill)}_ids`,
-          foreignField: '_id',
-          as: preParent2,
-        },
-      });
-    }
+    pipeline.push(...getPipelines($populate, $fill, resource));
     // execute aggregation
     const result = await db.collection(resource).aggregate(pipeline).toArray();
 
     // merge fields
-    const r = result.map((object) => {
-      let completeObject = object;
-      // populate processing
-      if ($populate) {
-        const partialObject = omit(object, [prePopulate1, prePopulate2]);
-        completeObject = {
-          [$populate]: [...object[prePopulate1], ...object[prePopulate2]],
-          ...partialObject,
-        };
-      }
-      // parent processing
-      if ($fill) {
-        const partialObject = omit(object, [preParent1, preParent2]);
-        completeObject = {
-          [$fill]: [...object[preParent1], ...object[preParent2]],
-          ...partialObject,
-        };
-      }
-      return completeObject;
-    });
+    const r = unrollPopulatePipeline($populate, $fill, result);
     return r;
   };
 
@@ -260,21 +202,25 @@ module.exports = (config, db) => {
    * Routes
    */
   router.get('/:resource', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.get`) === false) return next();
     const { $populate, $fill } = req.query;
 
     const result = ($populate || $fill)
       ? await findAndPopulate(req.params.resource, req.query)
       : await find(req.params.resource, req.query);
-    res.locals.resources = $populate ? populate(result) : result;
+    res.locals.resources = result;
     return next();
   }));
   router.get('/:resource/:id', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.getId`) === false) return next();
     const result = await db.collection(req.params.resource).findOne({ _id: req.params.id });
     if (!result) return next(HttpError(404, 'Not found'));
     res.locals.resources = result;
     return next();
   }));
   router.post('/:resource/', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.post`) === false) return next();
+
     const insert = {
       ...req.body,
       _id: ObjectId().toString(),
@@ -284,6 +230,8 @@ module.exports = (config, db) => {
     return next();
   }));
   router.put('/:resource/:id', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.put`) === false) return next();
+
     const { _id, ...put } = req.body;
     const result = await db
       .collection(req.params.resource)
@@ -295,6 +243,8 @@ module.exports = (config, db) => {
     return next();
   }));
   router.patch('/:resource/:id', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.patch`) === false) return next();
+
     const { _id, ...patch } = req.body;
     if (!Object.keys(patch).length) return next(HttpError(400, 'Missing body'));
     const result = await db
@@ -307,18 +257,17 @@ module.exports = (config, db) => {
     return next();
   }));
   router.delete('/:resource/:id', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.delete`) === false) return next();
     const result = await db
       .collection(req.params.resource)
       .findOneAndDelete({ _id: req.params.id });
     if (!result.value) return next(HttpError(404, 'Resource not found'));
     return res.sendStatus(204);
   }));
-
   router.use(['/:resource/:id', '/:resource'], (req, res, next) => {
     const { resources } = res.locals;
     if (!resources) return next();
     const out = get(config, `resources.${req.params.resource}.out`);
-    console.log(out, req.params.resource);
     if (out) {
       if (Array.isArray(resources)) {
         return res.json(resources.map(r => out(r, req.user)));

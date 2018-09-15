@@ -87,12 +87,23 @@ test('Restrict Option', async () => {
     resources: {
       dogs: true,
       cats: false,
+      rabbits: {
+        get: false,
+        getId: false,
+      },
     },
   }, db);
   const r = await request(restrictedServer).get('/dogs');
   const r1 = await request(restrictedServer).get('/cats');
   const r2 = await request(restrictedServer).get('/users');
+
   a.equal(r.status, 200);
   a.equal(r1.status, 404);
   a.equal(r2.status, 404);
+  const r3 = await request(restrictedServer).get('/rabbits');
+  const r4 = await request(restrictedServer).post('/rabbits');
+  const r5 = await request(restrictedServer).get('/rabbits/an-id');
+  a.equal(r3.status, 404);
+  a.equal(r4.status, 200);
+  a.equal(r5.status, 404);
 });
