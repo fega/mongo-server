@@ -6,7 +6,8 @@
   "scripts": {
     "test": "NODE_ENV=test mocha ./test/**/*.test.js --exit --ui qunit --timeout 5000",
     "test:watch": "NODE_ENV=test mocha --exit --watch --ui qunit --timeout 5000",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "lint": "eslint ./"
   },
   "author": "",
   "license": "ISC",
@@ -15,7 +16,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "chalk": "^2.4.1",
-    "commander": "^2.16.0",
+    "commander": "^2.18.0",
     "compression": "^1.7.3",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
@@ -25,12 +26,12 @@
     "express-validation": "^1.0.2",
     "flattenjs": "^1.0.4",
     "helmet": "^3.13.0",
-    "http-errors": "^1.7.0",
+    "http-errors": "^1.7.1",
     "joi": "^13.6.0",
     "jsonwebtoken": "^8.3.0",
-    "lodash": "^4.17.10",
-    "mongodb": "^3.1.1",
-    "morgan": "^1.9.0",
+    "lodash": "^4.17.11",
+    "mongodb": "^3.1.6",
+    "morgan": "^1.9.1",
     "nodemailer": "^4.6.8",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
@@ -42,16 +43,16 @@
     "casual": "^1.5.19",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
-    "delay": "^4.0.0",
+    "delay": "^4.0.1",
     "eslint": "^4.19.1",
-    "eslint-config-airbnb-base": "^13.0.0",
-    "eslint-plugin-import": "^2.13.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
     "maildev": "^1.0.0-rc3",
     "mocha": "^5.2.0",
-    "nodemon": "^1.18.3",
-    "proxyquire": "^2.0.1",
+    "nodemon": "^1.18.4",
+    "proxyquire": "^2.1.0",
     "randomstring": "^1.1.5",
-    "sinon": "^6.1.5",
-    "supertest": "^3.1.0"
+    "sinon": "^6.3.3",
+    "supertest": "^3.3.0"
   }
 }

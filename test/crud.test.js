@@ -17,7 +17,15 @@ let db;
 let server;
 before(async () => {
   db = await mongo();
-  server = await createServer({ port: 3000, noListen: true }, db);
+  server = await createServer({
+    port: 3000,
+    noListen: true,
+    resources: {
+      products: {
+        out: resource => ({ ...resource, extraField: true }),
+      },
+    },
+  }, db);
 });
 after(async () => {
   await db.dropDatabase();
@@ -199,6 +207,7 @@ test('?$populate, OK, 2 multitple population', async () => {
   a.equal(r.status, 200, 'companies population failed');
   a.equal(r.body[0].employees.length, 2, '$populate failed');
   a.equal(r.body[0].products.length, 2, '$populate failed');
+  a.equal(r.body[0].products[0].extraField, true, '$populate OUT function failed');
   a.equal(r.body[1].employees.length, 1, '$populate failed');
   a.equal(r.body[1].products.length, 1, '$populate failed');
 
@@ -206,6 +215,7 @@ test('?$populate, OK, 2 multitple population', async () => {
   a.equal(r2.body[0].companies.length, 1, '$fill failed');
   a.equal(r2.body[1].companies.length, 2, '$fill failed');
 });
+
 test('?$populate, BAD_REQUEST');
 
 test('?$range, OK, 1 range');

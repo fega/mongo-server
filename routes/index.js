@@ -3,7 +3,6 @@ const express = require('express');
 const { ObjectId } = require('mongodb');
 const HttpError = require('http-errors');
 const passport = require('passport');
-const pluralize = require('pluralize');
 const {
   omit, get, pickBy,
 } = require('lodash');
@@ -21,8 +20,9 @@ const {
   getQuery,
   getNumber,
   getFilters,
-  getPipelines,
+  getPopulatePipelines,
   unrollPopulatePipeline,
+  getOut,
 } = require('../lib');
 
 
@@ -70,7 +70,7 @@ module.exports = (config, db) => {
     if ($sort) pipeline.push({ $sort: getSort($sort, $order) });
     pipeline.push({ $skip: getNumber($page, 0) * getNumber($limit, 10) });
     pipeline.push({ $limit: getNumber($limit, 10) });
-    pipeline.push(...getPipelines($populate, $fill, resource));
+    pipeline.push(...getPopulatePipelines($populate, $fill, resource));
     // execute aggregation
     const result = await db.collection(resource).aggregate(pipeline).toArray();
 
@@ -267,14 +267,14 @@ module.exports = (config, db) => {
   router.use(['/:resource/:id', '/:resource'], (req, res, next) => {
     const { resources } = res.locals;
     if (!resources) return next();
-    const out = get(config, `resources.${req.params.resource}.out`);
-    if (out) {
-      if (Array.isArray(resources)) {
-        return res.json(resources.map(r => out(r, req.user)));
-      }
-      return res.json(out(resources, req.user));
-    }
-    return res.json(resources);
+    res.json(getOut(
+      req.params.resource,
+      resources,
+      config,
+      req.user,
+      req.query.$populate,
+      req.query.$fill,
+    ));
   });
   return router;
 };

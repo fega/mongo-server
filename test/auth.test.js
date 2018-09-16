@@ -300,3 +300,6 @@ test('validation OK', async () => {
   a.exists(r1.body.id);
   a.equal(r1.body.extra, 'extra');
 });
+test('validation for nested resources', async () => {
+
+});

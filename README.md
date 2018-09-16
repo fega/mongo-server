@@ -182,9 +182,25 @@ module.exports= {
 }
 ```
 
+### Defaults
+
+With Defaults, you can assign default properties on resource creation / update,
+if the function result includes  the keys `$owner`, `$timestamps` or `$changelog` `$version`, it will trigger special behaviors
+
+```js
+module.exports= {
+  restrict: true,
+  // or
+  resources: {
+    users: true,
+    dogs: true,
+  }
+}
+```
+
 ### Mailing
 
-You can create a mailing service that sends you an email when a Post request hit the specified resource, using a nodemailer instance:
+You can create a mailing service that sends you an email when a POST request hit the specified resource, using a nodemailer instance:
 
 ```js
 module.exports= {
@@ -289,7 +305,7 @@ module.exports= {
 
 ### Input validation and Output Formating
 
-In a production environment you should never trust in your incoming data,  you can validate the incoming data easily:
+In a production environment you should never trust in your incoming data,so here you can validate the incoming data easily using the Joi library (you need to install it):
 ```js
 const postsIn = {
   // you can restrict the body (only in PUT PATCH and POST requests)
@@ -304,12 +320,13 @@ const postsIn = {
 };
 module.exports= {
   resources: {
-      posts:{ in: postsIn }
+      posts:{ in: postsIn },
+      // also you can process your outcoming data (to prevent unwanted leaks or add better formatting)
+      out:(resource,user)=>{/*Return whatever you want */}
     },
   },
 }
 ```
-And also you can process your outcoming data (to prevent unwanted leaks or add better formatting)
 
 ### Remote schema
 
