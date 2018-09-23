@@ -1,5 +1,7 @@
 # mongodb-sever
 
+![Mongo-server](https://i.imgur.com/DJgIHcL.png)
+
 Get a full REST API with __zero coding__ in __less than 30 seconds__ (seriously)
 Hyper-Heavily inspired on [json-server](https://github.com/typicode/json-server)
 
@@ -189,11 +191,18 @@ if the function result includes  the keys `$owner`, `$timestamps` or `$changelog
 
 ```js
 module.exports= {
-  restrict: true,
-  // or
   resources: {
-    users: true,
-    dogs: true,
+    dogs: {
+      post:{
+        permissions:["user:permission"],
+        default:(resource,user)=>({
+          ...resource,
+          $owner:true, // this will be saved as resourceName_id: id, so you can use it with the populate feature defined in the Relationships section
+          $timestamps:true, // createdAt, updatedAt
+          $version: true,
+        })
+      }
+    },
   }
 }
 ```
@@ -306,6 +315,7 @@ module.exports= {
 ### Input validation and Output Formating
 
 In a production environment you should never trust in your incoming data,so here you can validate the incoming data easily using the Joi library (you need to install it):
+
 ```js
 const postsIn = {
   // you can restrict the body (only in PUT PATCH and POST requests)
@@ -337,10 +347,6 @@ coming soon...
 Coming soon...
 
 ### Add custom routes
-
-Coming soon...
-
-### automatic auth
 
 Coming soon...
 
