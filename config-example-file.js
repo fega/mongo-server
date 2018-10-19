@@ -68,4 +68,5 @@ module.exports = {
   robotsTxt: true,
   docs: true,
   reCaptcha: true,
+  pagination: 10,  // default pagination
 };

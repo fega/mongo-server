@@ -22,6 +22,7 @@ const main = async (programConfig) => {
       host: programConfig.host || 'localhost',
       mongo: programConfig.mongo || 'mongodb://localhost:27017',
       db: programConfig.db || 'mongo-server',
+      pagination: programConfig.pagination || 10,
     };
     /**
      * read and merge config file

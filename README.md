@@ -162,9 +162,11 @@ module.exports= {
   // static file server, by default is "public" in the execution dir
   static: 'public',
   // root path for static file serving, by default "/"
-  staticRoot: '/'
+  staticRoot: '/',
   // personalized middleware, executed before REST api
-  middleware: [myFunction]
+  middleware: [myFunction],
+  // default pagination limit
+  pagination: 10,
 }
 ```
 

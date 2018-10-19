@@ -9,8 +9,8 @@ const mongo = require('../db');
 
 chai.use(asPromised);
 
-const maildev = new MailDev();
-maildev.listen();
+// const maildev = new MailDev();
+// maildev.listen();
 
 const a = chai.assert;
 let db;
@@ -18,6 +18,7 @@ let server;
 before(async () => {
   db = await mongo();
   server = await createServer({
+    pagination: 10,
     port: 3000,
     noListen: true,
     resources: {

@@ -46,8 +46,8 @@ module.exports = (config, db) => {
         ...getFilters(filter),
       },
       {
-        limit: getNumber($limit, 10),
-        skip: getNumber($page, 0) * getNumber($limit, 10),
+        limit: getNumber($limit, config.pagination),
+        skip: getNumber($page, 0) * getNumber($limit, config.pagination),
         sort: getSort($sort, $order),
       },
     ).toArray();
@@ -68,8 +68,8 @@ module.exports = (config, db) => {
       },
     }];
     if ($sort) pipeline.push({ $sort: getSort($sort, $order) });
-    pipeline.push({ $skip: getNumber($page, 0) * getNumber($limit, 10) });
-    pipeline.push({ $limit: getNumber($limit, 10) });
+    pipeline.push({ $skip: getNumber($page, 0) * getNumber($limit, config.pagination) });
+    pipeline.push({ $limit: getNumber($limit, config.pagination) });
     pipeline.push(...getPopulatePipelines($populate, $fill, resource));
     // execute aggregation
     const result = await db.collection(resource).aggregate(pipeline).toArray();
