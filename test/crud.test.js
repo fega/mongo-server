@@ -1,6 +1,7 @@
 /* eslint-env node, mocha */
 const chai = require('chai');
 const request = require('supertest');
+const sinon = require('sinon');
 const MailDev = require('maildev');
 const delay = require('delay');
 const asPromised = require('chai-as-promised');
@@ -317,4 +318,42 @@ test('OK', async () => {
   const r = await request(server2).post('/dogs').send({ name: 'Awesome dog' });
   await delay(500);
   a.equal(r.status, 200);
+});
+
+suite('Logic handlers, (do fields)');
+test('OK', async () => {
+  const doGet = sinon.spy();
+  const doGetId = sinon.spy();
+  const doPost = sinon.spy();
+  const doPatch = sinon.spy();
+  const doPut = sinon.spy();
+  const doDelete = sinon.spy();
+  const server2 = await createServer({
+    resources: {
+      dogs: {
+        get: {
+          do: doGet,
+        },
+        getId: {
+          do: doGetId,
+        },
+        post: {
+          do: doPost,
+        },
+        patch: {
+          do: doPatch,
+        },
+        put: {
+          do: doPut,
+        },
+        delete: {
+          do: doDelete,
+        },
+      },
+    },
+  }, db);
+
+  const r = await request(server2).post('/zombies').send({ name: 'Awesome dog' });
+  a.equal(r.status, 200);
+  a.equal(doPost.calledOnce, true);
 });

@@ -2,16 +2,17 @@
 const express = require('express');
 const { ObjectId } = require('mongodb');
 const HttpError = require('http-errors');
-const passport = require('passport');
 const {
-  omit, get, pickBy,
+  get,
 } = require('lodash');
-const { asyncController, htmlEmailTemplate } = require('./util');
+const { asyncController } = require('./util');
 const {
-  generateLocalStrategies,
+  generateAuthLocalHandlers,
   generateJwtPermissionRoutes,
   generateInputValidationRoutes,
-} = require('../lib/auth');
+  generateRestrictHandlers,
+  generateNodemailerHandlers,
+} = require('../lib/middleware');
 const {
   getTextQuery,
   getRegexQuery,
@@ -24,7 +25,6 @@ const {
   unrollPopulatePipeline,
   getOut,
 } = require('../lib');
-
 
 module.exports = (config, db) => {
   const router = express.Router();
@@ -82,91 +82,17 @@ module.exports = (config, db) => {
   /**
    * Restrict endpoints
    */
-  if (config.restrict) {
-    const { resources } = config;
-    if (!resources) throw new Error('config.resources Option is necessary when restrict is set to true');
-
-    const allowedResources = Array.isArray(resources)
-      ? resources
-      : Object.keys(resources).filter(item => resources[item]);
-
-    router.use(['/:resource', '/:resource/:id'], (req, res, next) => {
-      if (allowedResources.includes(req.params.resource)) return next();
-      throw new HttpError[404]('Not found');
-    });
-  }
+  generateRestrictHandlers(config, router);
 
   /**
    * Auth local endpoints
    */
-  if (config.resources) {
-    const { resources, jwtSecret = 'secret', bcryptRounds = 1 } = config;
-    const jwt = require('jsonwebtoken');
-    const bcrypt = require('bcryptjs');
-    // const passport = require('passport');
-    // const local = require('passport-local').Strategy;
-
-    const authLocalResources = Object.keys(pickBy(resources, r => get(r, 'auth.local')));
-    if (authLocalResources.length) {
-      /**
-       * sign-up middleware
-       */
-      router.post('/auth/:resource/sign-up', async (req, res, next) => {
-        try {
-          if (!authLocalResources.includes(req.params.resource)) return next();
-          const resource = resources[req.params.resource];
-          const [userField, passField, permissions] = resource.auth.local;
-          const userValue = req.body[userField];
-          const passValue = req.body[passField];
-          if (!userValue || !passValue) {
-            return res.sendStatus(400);
-          }
-          const oldResource = await db.collection(req.params.resource).findOne({
-            [userField]: userValue,
-          });
-
-          if (oldResource) return res.sendStatus(403);
-
-          const $token = await jwt.sign(
-            { [userField]: userValue, resource: req.params.resource, permissions },
-            jwtSecret,
-          );
-          const insert = {
-            ...req.body,
-            ...permissions ? { permissions } : {},
-            [passField]: await bcrypt.hash(passValue, bcryptRounds),
-            _id: ObjectId().toString(),
-          };
-          await db.collection(req.params.resource).insertOne(insert);
-
-          return res.status(200).send({
-            ...omit(insert, passValue),
-            $token,
-          });
-        } catch (error) {
-          next(error);
-        }
-      });
-      /**
-       * log-in middleware
-       */
-      router.use(passport.initialize());
-      generateLocalStrategies(authLocalResources, config, db);
-      authLocalResources.map((resourceName) => {
-        router.post(
-          `/auth/${resourceName}/log-in`,
-          passport.authenticate(`local-${resourceName}`, { session: false }),
-          (req, res) => res.json(req.user),
-        );
-      });
-    }
-  }
+  generateAuthLocalHandlers(config, router, db);
 
   /**
    * Permission endpoints
    */
   generateJwtPermissionRoutes(config, router);
-
 
   /**
    * Generate Validation endpoints
@@ -176,30 +102,10 @@ module.exports = (config, db) => {
   /**
    * Email endpoints
    */
-  if (config.nodemailer) {
-    const { resources, nodemailer } = config;
-    if (!resources) throw new Error('config.resources Option is necessary when nodemailer is set to true');
-    const Nodemailer = require('nodemailer'); // eslint-disable-line
-    const transport = Nodemailer.createTransport(nodemailer);
-
-    const emailResources = Array.isArray(resources)
-      ? []
-      : Object.keys(resources).filter(item => get(resources[item], 'email'));
-    router.post(['/:resource', '/:resource/:id'], (req, res, next) => {
-      if (!emailResources.includes(req.params.resource)) return next();
-      const resource = resources[req.params.resource];
-      transport.sendMail({
-        from: 'email@email.com',
-        to: resource.email.to,
-        text: 'Text',
-        html: htmlEmailTemplate(req.path, req.body),
-        title: resource.email.title || `An email from moserApi POST /${req.params.resource}`,
-      }).then(() => next()).catch(next);
-    });
-  }
+  generateNodemailerHandlers(config, router);
 
   /**
-   * Routes
+   * Routes, retrieve resources
    */
   router.get('/:resource', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.get`) === false) return next();
@@ -264,10 +170,25 @@ module.exports = (config, db) => {
     if (!result.value) return next(HttpError(404, 'Resource not found'));
     return res.sendStatus(204);
   }));
+  /**
+   * Routes, Execute permissions
+   */
+
+  // pending
+
+  /**
+   * Routes, Execute logic handlers
+   */
+
+  // pending
+
+  /**
+   * get outputs
+   */
   router.use(['/:resource/:id', '/:resource'], (req, res, next) => {
     const { resources } = res.locals;
     if (!resources) return next();
-    res.json(getOut(
+    return res.json(getOut(
       req.params.resource,
       resources,
       config,
