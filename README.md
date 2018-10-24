@@ -9,14 +9,14 @@ Hyper-Heavily inspired on [json-server](https://github.com/typicode/json-server)
 
 Install mongo Server
 
-```
+```bash
 npm install -g moser
 ```
 
 Start Mongo Server
 
 ```bash
-docker run -d -p 27017:27017 mongo # if you have docker but no mongodb 
+docker run -d -p 27017:27017 mongo # if you have docker but no mongodb
 moser --mongo mongodb://localhost:27017
 ```
 
@@ -120,6 +120,12 @@ GET /companies$populate=employees
   // employees are populated"
   a.equal(r.body[0].employees.length, 2);
   a.equal(r.body[1].employees.length, 1);
+```
+
+To do the opposite, add parent resources use `$fill` in the query.
+
+```curl
+GET /employees$fill=employees
 ```
 
 ## Extras
@@ -316,42 +322,7 @@ module.exports= {
 
 #### Advanced: especial permission and filters (NOT IMPLEMENTED YET)
 
-you can define special permissions that can be reused across your logic.
-
-```js
-{
-  resources:{
-    secrets:{
-      permissions:[['$custom','secrets:write']]
-    }
-  }
-  permissions:{
-    $custom:({resource, user, req })=>{
-      return truthyValue // pass the permission
-      return falsyValue // oh oh, forbidden
-    }
-  }
-}
-```
-
-But this approach will not work with `GET resources/`, for that reason the filters are implemented, filters are functions that returns mongodb queries.
-
-```js
-{
-  resources:{
-    secrets:{
-      get: {permissions:[['$filter','secrets:write']]}
-    }
-  }
-  permissions:{
-    $custom:({resource, user, req })=>{
-      return truthyValue // pass the permission
-      return falsyValue // oh oh, forbidden
-    }
-  }
-}
-```
-
+coming soon...
 
 ### Input validation and Output Formating
 
@@ -378,15 +349,32 @@ module.exports= {
   },
 }
 ```
-# route logic
 
+### route logic
 
+Is very likely that you'll want to add custom logic for some endpoints. for those cases you can use the do fields, which is an enhanced version of the express middleware:
 
-# Rate limit
+```js
+module.exports= {
+  resources:{
+    dogs:{
+      get:{
+        // notice that could be an async function, and the use of the spread operator
+        do: async ({req, res, next, db, user, resources})=>{
+          // custom logic here
+          return next() // ensure to throw an error or call next, like a normal express middleware
+        }
+      }
+    }
+  }
+}
+```
+
+### Rate limit
 
 coming soon...
 
-# Caching
+### Caching
 
 coming soon...
 
@@ -404,4 +392,4 @@ Coming soon...
 
 ## License
 
-MIT - [Fega](https://github.com/fega)
+MIT - [Fabian Enrique Gutierrez](https://github.com/fega)

@@ -12,6 +12,7 @@ const {
   generateInputValidationRoutes,
   generateRestrictHandlers,
   generateNodemailerHandlers,
+  generateDoHandlers,
 } = require('../lib/middleware');
 const {
   getTextQuery,
@@ -129,7 +130,7 @@ module.exports = (config, db) => {
 
     const insert = {
       ...req.body,
-      _id: ObjectId().toString(),
+      _id: req.body._id || ObjectId().toString(),
     };
     await db.collection(req.params.resource).insertOne(insert);
     res.locals.resources = insert;
@@ -166,9 +167,10 @@ module.exports = (config, db) => {
     if (get(config, `resources.${req.params.resource}.delete`) === false) return next();
     const result = await db
       .collection(req.params.resource)
-      .findOneAndDelete({ _id: req.params.id });
-    if (!result.value) return next(HttpError(404, 'Resource not found'));
-    return res.sendStatus(204);
+      .findOne({ _id: req.params.id });
+    if (!result) return next(HttpError(404, 'Resource not found'));
+    res.locals.resources = result;
+    return next();
   }));
   /**
    * Routes, Execute permissions
@@ -180,11 +182,19 @@ module.exports = (config, db) => {
    * Routes, Execute logic handlers
    */
 
-  // pending
+  generateDoHandlers(config, router, db);
 
   /**
    * get outputs
    */
+  router.delete('/:resource/:id', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.delete`) === false) return next();
+    const result = await db
+      .collection(req.params.resource)
+      .findOneAndDelete({ _id: req.params.id });
+    if (!result.value) return next(HttpError(404, 'Resource not found'));
+    return res.sendStatus(204);
+  }));
   router.use(['/:resource/:id', '/:resource'], (req, res, next) => {
     const { resources } = res.locals;
     if (!resources) return next();

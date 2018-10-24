@@ -52,7 +52,7 @@ test('filters, OK', async () => {
   a.equal(r.body.length, 2);
 });
 test('filters, BAD_REQUEST unsafe filters', async () => {
-  const r = await request(server).get('/comments?$author=tata').expect(400);
+  await request(server).get('/comments?$author=tata').expect(400);
 });
 
 test('?$limit, OK', async () => {
@@ -127,7 +127,7 @@ test('?$query, OK {"name":"Puky"}', async () => {
   a.equal(r.body.length, 3);
 });
 test('?$query, invalid', async () => {
-  const r = await request(server).get('/hippos?$query={"name":"Puky}').expect(400);
+  await request(server).get('/hippos?$query={"name":"Puky}').expect(400);
 });
 
 test('?$sort=name, OK', async () => {
@@ -322,15 +322,16 @@ test('OK', async () => {
 
 suite('Logic handlers, (do fields)');
 test('OK', async () => {
-  const doGet = sinon.spy();
-  const doGetId = sinon.spy();
-  const doPost = sinon.spy();
-  const doPatch = sinon.spy();
-  const doPut = sinon.spy();
-  const doDelete = sinon.spy();
+  const fn = ({ next }) => next();
+  const doGet = sinon.spy(fn);
+  const doGetId = sinon.spy(fn);
+  const doPost = sinon.spy(fn);
+  const doPatch = sinon.spy(fn);
+  const doPut = sinon.spy(fn);
+  const doDelete = sinon.spy(fn);
   const server2 = await createServer({
     resources: {
-      dogs: {
+      zombies: {
         get: {
           do: doGet,
         },
@@ -353,7 +354,24 @@ test('OK', async () => {
     },
   }, db);
 
-  const r = await request(server2).post('/zombies').send({ name: 'Awesome dog' });
+  const _id = 'awesome-id';
+  const r = await request(server2).post('/zombies').send({ name: 'Awesome dog', _id });
+  console.log(r.body);
+  const r1 = await request(server2).get('/zombies');
+  const r2 = await request(server2).get('/zombies/awesome-id');
+  const r3 = await request(server2).patch('/zombies/awesome-id').send({ name: 'Awesome dog' });
+  const r4 = await request(server2).put('/zombies/awesome-id').send({ name: 'Awesome dog' });
+  const r5 = await request(server2).delete('/zombies/awesome-id').send({ name: 'Awesome dog' });
   a.equal(r.status, 200);
+  a.equal(r1.status, 200);
+  a.equal(r2.status, 200);
+  a.equal(r3.status, 200);
+  a.equal(r4.status, 200);
+  a.equal(r5.status, 204);
   a.equal(doPost.calledOnce, true);
+  a.equal(doGet.calledOnce, true);
+  a.equal(doGetId.calledOnce, true);
+  a.equal(doPatch.calledOnce, true);
+  a.equal(doPut.calledOnce, true);
+  a.equal(doDelete.calledOnce, true);
 });

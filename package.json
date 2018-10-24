@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "server.js",
   "scripts": {
@@ -9,8 +9,8 @@
     "dev": "nodemon index.js",
     "lint": "eslint ./"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Fabian Gutierrez <fega.hg@gmail.com>",
+  "license": "MIT",
   "preferGlobal": true,
   "bin": "./index.js",
   "dependencies": {
