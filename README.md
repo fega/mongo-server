@@ -102,7 +102,7 @@ Coming soon...
 
 To include children resources, add `$populate`
 
-```curl
+```http
 GET /companies$populate=employees
 ```
 
@@ -124,7 +124,7 @@ GET /companies$populate=employees
 
 To do the opposite, add parent resources use `$fill` in the query.
 
-```curl
+```http
 GET /employees$fill=employees
 ```
 
