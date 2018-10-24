@@ -39,7 +39,7 @@ You can basically use any routes as you want without need to define them, just b
 
 ### Plural routes
 
-```curl
+```http
 GET    /posts
 GET    /posts/1
 POST   /posts
@@ -52,7 +52,7 @@ DELETE /posts/1
 
 Use `.` to access deep properties
 
-```curl
+```http
 GET /posts?title=json-server&author=typicode
 GET /posts?id=1&id=2
 GET /comments?author.name=typicode
@@ -64,7 +64,7 @@ Use `$page` and optionally `$limit` to paginate returned data.
 
 In the `Link` header you'll get `first`, `prev`, `next` and `last` links.
 
-```curl
+```http
 GET /posts?$page=7
 GET /posts?$page=7&$limit=20
 ```
@@ -75,14 +75,14 @@ _10 items are returned by default_
 
 Add `$sort` and `$order` (ascending order by default)
 
-```curl
+```http
 GET /posts?$sort=views&$order=asc
 GET /posts/1/comments?$sort=votes&$order=asc
 ```
 
 For multiple fields, use the following format:
 
-```curl
+```http
 GET /posts?$sort=user&$sort=views&$order[]=desc$$order[]=asc
 ```
 
@@ -90,7 +90,7 @@ GET /posts?$sort=user&$sort=views&$order[]=desc$$order[]=asc
 
 Use `$query` to send a JSON with any mongodb query
 
-```curl
+```http
 GET /posts?$query={"name":"Puky"}
 ```
 
