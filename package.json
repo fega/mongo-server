@@ -22,7 +22,6 @@
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "express-jwt": "^5.3.1",
-    "express-jwt-permissions": "^1.2.1",
     "express-validation": "^1.0.2",
     "flattenjs": "^1.0.4",
     "helmet": "^3.13.0",
@@ -34,13 +33,11 @@
     "morgan": "^1.9.1",
     "nodemailer": "^4.6.8",
     "passport": "^0.4.0",
-    "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "pluralize": "^7.0.0",
     "pretty-error": "^2.1.1"
   },
   "devDependencies": {
-    "casual": "^1.5.19",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "delay": "^4.0.1",
