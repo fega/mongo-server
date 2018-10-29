@@ -125,7 +125,7 @@ GET /companies$populate=employees
 To do the opposite, add parent resources use `$fill` in the query.
 
 ```http
-GET /employees$fill=employees
+GET /employees$fill=companies
 ```
 
 ## Extras
