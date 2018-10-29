@@ -57,9 +57,9 @@ module.exports = (config, db) => {
     ).toArray();
     return result;
   };
-  const findAndPopulate = async (resource, query) => {
+  const findAndPopulate = async (resource, query, filter = {}) => {
     const {
-      $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, $fill, ...filter
+      $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, $fill, ...$filter
     } = query;
     // Build pipeline
     const pipeline = [{
@@ -68,7 +68,8 @@ module.exports = (config, db) => {
         ...getTextQuery($text),
         ...getRegexQuery($regex),
         ...getRangeQuery($range),
-        ...getFilters(filter),
+        ...getFilters($filter),
+        ...filter,
       },
     }];
     if ($sort) pipeline.push({ $sort: getSort($sort, $order) });
