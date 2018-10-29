@@ -1,37 +1,9 @@
-### Advanced permission handling (permissions and filters)
+# RoadMap
 
-you can define special permissions that can be reused across your logic.
+## Web page
 
-```js
-{
-  resources:{
-    secrets:{
-      permissions:[['$custom','secrets:write']]
-    }
-  }
-  permissions:{
-    $custom:({resource, user, req })=>{
-      return truthyValue // pass the permission
-      return falsyValue // oh oh, forbidden
-    }
-  }
-}
-```
+## Facebook Auth
 
-But this approach will not work with `GET resources/`, for that reason the filters are implemented, filters are functions that returns mongodb queries.
+## Google Auth
 
-```js
-{
-  resources:{
-    secrets:{
-      get: {permissions:[['$filter','secrets:write']]}
-    }
-  }
-  permissions:{
-    $custom:({resource, user, req })=>{
-      return truthyValue // pass the permission
-      return falsyValue // oh oh, forbidden
-    }
-  }
-}
-```
+## Oauth2 Auth

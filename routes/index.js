@@ -13,7 +13,8 @@ const {
   generateRestrictHandlers,
   generateNodemailerHandlers,
   generateDoHandlers,
-} = require('../lib/middleware');
+  generateDynamicPermissionRoutes,
+} = require('../lib/middlewareGeneration');
 const {
   getTextQuery,
   getRegexQuery,
@@ -34,17 +35,19 @@ module.exports = (config, db) => {
    * @param {String} resource resource being query
    * @param {Object} query Query Express Object
    */
-  const find = async (resource, query) => {
+  const find = async (resource, query, filter = {}) => {
     const {
-      $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, $fill, ...filter
+      $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, $fill, ...$filter
     } = query;
+
     const result = await db.collection(resource).find(
       {
         ...getQuery($query),
         ...getTextQuery($text),
         ...getRegexQuery($regex),
         ...getRangeQuery($range),
-        ...getFilters(filter),
+        ...getFilters($filter),
+        ...filter,
       },
       {
         limit: getNumber($limit, config.pagination),
@@ -108,20 +111,11 @@ module.exports = (config, db) => {
   /**
    * Routes, retrieve resources
    */
-  router.get('/:resource', asyncController(async (req, res, next) => {
-    if (get(config, `resources.${req.params.resource}.get`) === false) return next();
-    const { $populate, $fill } = req.query;
 
-    const result = ($populate || $fill)
-      ? await findAndPopulate(req.params.resource, req.query)
-      : await find(req.params.resource, req.query);
-    res.locals.resources = result;
-    return next();
-  }));
   router.get('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.getId`) === false) return next();
     const result = await db.collection(req.params.resource).findOne({ _id: req.params.id });
-    if (!result) return next(HttpError(404, 'Not found'));
+    if (!result) return next(HttpError.NotFound('Not found'));
     res.locals.resources = result;
     return next();
   }));
@@ -145,7 +139,7 @@ module.exports = (config, db) => {
       .findOneAndReplace({ _id: req.params.id }, put, {
         returnOriginal: false,
       });
-    if (!result.value) return next(HttpError(404, 'Resource not found'));
+    if (!result.value) return next(new HttpError.NotFound('Resource not found'));
     res.locals.resources = result.value;
     return next();
   }));
@@ -153,13 +147,13 @@ module.exports = (config, db) => {
     if (get(config, `resources.${req.params.resource}.patch`) === false) return next();
 
     const { _id, ...patch } = req.body;
-    if (!Object.keys(patch).length) return next(HttpError(400, 'Missing body'));
+    if (!Object.keys(patch).length) return next(new HttpError.BadRequest('Missing body'));
     const result = await db
       .collection(req.params.resource)
       .findOneAndUpdate({ _id: req.params.id }, { $set: patch }, {
         returnOriginal: false,
       });
-    if (!result.value) return next(HttpError(404, 'Resource not found'));
+    if (!result.value) return next(new HttpError.NotFound('Resource not found'));
     res.locals.resources = result.value;
     return next();
   }));
@@ -168,16 +162,31 @@ module.exports = (config, db) => {
     const result = await db
       .collection(req.params.resource)
       .findOne({ _id: req.params.id });
-    if (!result) return next(HttpError(404, 'Resource not found'));
+    if (!result) return next(new HttpError.NotFound('Resource not found'));
     res.locals.resources = result;
     return next();
   }));
   /**
-   * Routes, Execute permissions
+   * Routes, Execute dynamic permissions
    */
 
-  // pending
+  generateDynamicPermissionRoutes(config, router);
 
+  /**
+   * Get /:resource is the only endpoint that first execute the routes
+   */
+
+  router.get('/:resource', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.get`) === false) return next();
+    const { $populate, $fill } = req.query;
+    const { filter, query } = req;
+
+    const result = ($populate || $fill)
+      ? await findAndPopulate(req.params.resource, query, filter)
+      : await find(req.params.resource, query, filter);
+    res.locals.resources = result;
+    return next();
+  }));
   /**
    * Routes, Execute logic handlers
    */
@@ -192,7 +201,7 @@ module.exports = (config, db) => {
     const result = await db
       .collection(req.params.resource)
       .findOneAndDelete({ _id: req.params.id });
-    if (!result.value) return next(HttpError(404, 'Resource not found'));
+    if (!result.value) return next(new HttpError.NotFound('Resource not found'));
     return res.sendStatus(204);
   }));
   router.use(['/:resource/:id', '/:resource'], (req, res, next) => {
