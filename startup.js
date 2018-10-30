@@ -10,7 +10,7 @@ const tag = chalk.cyan('[m-server]');
 
 const pe = new (require('pretty-error'))(); //eslint-disable-line
 
-const main = async (programConfig) => {
+const main = async (programConfig = {}) => {
   try {
     // start
     console.log(tag, `Version: ${pkg.version}`);
