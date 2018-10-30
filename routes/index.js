@@ -23,6 +23,7 @@ const {
   getPopulatePipelines,
   unrollPopulatePipeline,
   getOut,
+  getDefaultPost,
 } = require('../lib');
 
 
@@ -101,10 +102,10 @@ module.exports = (config, db) => {
    */
   if (config.resources) {
     const { resources, jwtSecret = 'secret', bcryptRounds = 1 } = config;
+    // eslint-disable-next-line global-require
     const jwt = require('jsonwebtoken');
+    // eslint-disable-next-line global-require
     const bcrypt = require('bcryptjs');
-    // const passport = require('passport');
-    // const local = require('passport-local').Strategy;
 
     const authLocalResources = Object.keys(pickBy(resources, r => get(r, 'auth.local')));
     if (authLocalResources.length) {
@@ -146,19 +147,18 @@ module.exports = (config, db) => {
         } catch (error) {
           next(error);
         }
+        return null;
       });
       /**
        * log-in middleware
        */
       router.use(passport.initialize());
       generateLocalStrategies(authLocalResources, config, db);
-      authLocalResources.map((resourceName) => {
-        router.post(
-          `/auth/${resourceName}/log-in`,
-          passport.authenticate(`local-${resourceName}`, { session: false }),
-          (req, res) => res.json(req.user),
-        );
-      });
+      authLocalResources.map(resourceName => router.post(
+        `/auth/${resourceName}/log-in`,
+        passport.authenticate(`local-${resourceName}`, { session: false }),
+        (req, res) => res.json(req.user),
+      ));
     }
   }
 
@@ -220,18 +220,19 @@ module.exports = (config, db) => {
   }));
   router.post('/:resource/', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.post`) === false) return next();
-
-    const insert = {
-      ...req.body,
-      _id: ObjectId().toString(),
-    };
+    const defaultFn = get(config, `resources.${req.params.resource}.post.default`);
+    const _id = ObjectId().toString();
+    const { body, user } = req;
+    const insert = defaultFn
+      ? ({ ...await getDefaultPost(defaultFn(body, user), user, req, db), _id })
+      : { ...body, _id };
     await db.collection(req.params.resource).insertOne(insert);
     res.locals.resources = insert;
     return next();
   }));
   router.put('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.put`) === false) return next();
-
+    const defaultFn = get(config, `resources.${req.params.resource}.put.default`);
     const { _id, ...put } = req.body;
     const result = await db
       .collection(req.params.resource)
@@ -244,6 +245,7 @@ module.exports = (config, db) => {
   }));
   router.patch('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.patch`) === false) return next();
+    const defaultFn = get(config, `resources.${req.params.resource}.patch.default`);
 
     const { _id, ...patch } = req.body;
     if (!Object.keys(patch).length) return next(HttpError(400, 'Missing body'));
