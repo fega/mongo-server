@@ -3,6 +3,7 @@ const chai = require('chai');
 const asPromised = require('chai-as-promised');
 const request = require('supertest');
 const { generate } = require('randomstring');
+const { ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
 const createServer = require('../server');
@@ -204,6 +205,64 @@ test('GET POST PATCH PUT DELETE /:resources 403 FORBIDDEN, JWT without permissio
   a.equal(r3.status, 403, 'Get /resources/:id failing');
   a.equal(r4.status, 403, 'Get /resources/:id failing');
   a.equal(r5.status, 200, 'Other endpoints are failing');
+});
+test('GET POST PATCH PUT DELETE /:resources dynamic permissions', async () => {
+  const userId = ObjectId().toString();
+  const postId = ObjectId().toString();
+  const { ops: [post] } = await db.collection('posts').insertOne({ author: 'fabian', user_id: userId, _id: postId });
+  await db.collection('posts').insertOne({ author: 'fabian', user_id: userId });
+  await db.collection('posts').insertOne({ author: 'fabian', user_id: userId });
+  await db.collection('posts').insertOne({ author: 'fabian', user_id: 1 });
+  await db.collection('posts').insertOne({ author: 'fabian', user_id: 2 });
+  const { ops: [user] } = await db.collection('posts').insertOne({ author: 'fabian', _id: userId });
+  const token = await jwt.sign({ permissions: ['posts:read'], _id: userId }, 'secret');
+  const header = ['Authorization', `Bearer ${token}`];
+  const s = createServer({
+    resources: {
+      posts: {
+        permissions: ['$custom', '$filter'],
+      },
+    },
+    permissions: {
+      $custom: ({ user: u }) => user._id === u._id,
+    },
+    filters: {
+      $filter: ({ user: u }) => ({ user_id: u._id }),
+    },
+  }, db);
+  // this should pass
+  const r = await request(s).get('/posts').set(...header);
+  const r0 = await request(s).get(`/posts/${postId}`).set(...header);
+  const r1 = await request(s).post('/posts').set(...header);
+  const r2 = await request(s).patch(`/posts/${postId}`).set(...header).send({ hello: 'hello' });
+  const r3 = await request(s).put(`/posts/${postId}`).set(...header);
+  const r4 = await request(s).delete(`/posts/${postId}`).set(...header);
+  a.equal(r.status, 200, 'Get /resources failing');
+  a.equal(r.body.length, 3, 'Get /resources is having a problem with a filter');
+  a.equal(r0.status, 200, 'Get /resources/:id failing');
+  a.equal(r1.status, 200, 'POST /resources failing');
+  a.equal(r2.status, 200, 'PATCH /resources/:id failing');
+  a.equal(r3.status, 200, 'PUT /resources/:id failing');
+  a.equal(r4.status, 204, 'DELETE /resources/:id failing');
+
+
+  const token2 = await jwt.sign({ permissions: ['posts:read'], _id: 2 }, 'secret');
+  const header2 = ['Authorization', `Bearer ${token2}`];
+  const { ops: [post2] } = await db.collection('posts').insertOne({ author: 'fabian', _id: ObjectId().toString() });
+
+  // this should not pass
+  const d = await request(s).get('/posts').set(...header2);
+  const d0 = await request(s).get(`/posts/${post2._id}`).set(...header2);
+  const d1 = await request(s).post('/posts').set(...header2);
+  const d2 = await request(s).patch(`/posts/${post2._id}`).set(...header2).send({ hello: 'hello' });
+  const d3 = await request(s).put(`/posts/${post2._id}`).set(...header2);
+  const d4 = await request(s).delete(`/posts/${post2._id}`).set(...header2);
+  a.equal(d.status, 403, 'Get /resources failing');
+  a.equal(d0.status, 403, 'Get /resources/:id failing');
+  a.equal(d1.status, 403, 'POST /resources failing');
+  a.equal(d2.status, 403, 'PATCH /resources/:id failing');
+  a.equal(d3.status, 403, 'PUT /resources/:id failing');
+  a.equal(d4.status, 403, 'DELETE /resources/:id failing');
 });
 test('GET POST PATCH PUT DELETE /:resources 200 OK', async () => {
   const s = createServer({

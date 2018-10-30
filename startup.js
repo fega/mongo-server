@@ -10,10 +10,11 @@ const tag = chalk.cyan('[m-server]');
 
 const pe = new (require('pretty-error'))(); //eslint-disable-line
 
-const main = async (programConfig) => {
+const main = async (programConfig = {}) => {
   try {
     // start
     console.log(tag, `Version: ${pkg.version}`);
+
     /**
      * Set default config
      */
@@ -22,7 +23,9 @@ const main = async (programConfig) => {
       host: programConfig.host || 'localhost',
       mongo: programConfig.mongo || 'mongodb://localhost:27017',
       db: programConfig.db || 'mongo-server',
+      pagination: programConfig.pagination || 10,
     };
+
     /**
      * read and merge config file
      */
@@ -32,6 +35,7 @@ const main = async (programConfig) => {
       config = { ...config, ...file };
       console.log(tag, 'Config file loaded');
     }
+
     /**
      * NodeMailerConfig
      */
@@ -42,12 +46,14 @@ const main = async (programConfig) => {
         path: '/usr/sbin/sendmail',
       };
     }
+
     /**
      * connecting to mongodb
      */
     console.log(tag, 'connecting to mongodb');
     const db = await connect(config);
     console.log(tag, 'using', chalk.yellow(db.databaseName), 'database');
+
     /**
      * SeedDatabase
      */
@@ -60,6 +66,7 @@ const main = async (programConfig) => {
         console.log(tag, 'Db already have data, skipping');
       }
     }
+
     /**
      * creating the server
      */

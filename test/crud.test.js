@@ -1,6 +1,7 @@
 /* eslint-env node, mocha */
 const chai = require('chai');
 const request = require('supertest');
+const sinon = require('sinon');
 const MailDev = require('maildev');
 const delay = require('delay');
 const asPromised = require('chai-as-promised');
@@ -9,8 +10,8 @@ const mongo = require('../db');
 
 chai.use(asPromised);
 
-const maildev = new MailDev();
-maildev.listen();
+// const maildev = new MailDev();
+// maildev.listen();
 
 const a = chai.assert;
 let db;
@@ -18,6 +19,7 @@ let server;
 before(async () => {
   db = await mongo();
   server = await createServer({
+    pagination: 10,
     port: 3000,
     noListen: true,
     resources: {
@@ -50,7 +52,7 @@ test('filters, OK', async () => {
   a.equal(r.body.length, 2);
 });
 test('filters, BAD_REQUEST unsafe filters', async () => {
-  const r = await request(server).get('/comments?$author=tata').expect(400);
+  await request(server).get('/comments?$author=tata').expect(400);
 });
 
 test('?$limit, OK', async () => {
@@ -125,7 +127,7 @@ test('?$query, OK {"name":"Puky"}', async () => {
   a.equal(r.body.length, 3);
 });
 test('?$query, invalid', async () => {
-  const r = await request(server).get('/hippos?$query={"name":"Puky}').expect(400);
+  await request(server).get('/hippos?$query={"name":"Puky}').expect(400);
 });
 
 test('?$sort=name, OK', async () => {
@@ -342,4 +344,59 @@ test('OK, default option', async () => {
   a.exists(r.body.updatedAt);
   a.exists(r.body.createdAt);
   a.exists(r.body.__v);
+});
+suite('Logic handlers, (do fields)');
+test('OK', async () => {
+  const fn = ({ next }) => next();
+  const doGet = sinon.spy(fn);
+  const doGetId = sinon.spy(fn);
+  const doPost = sinon.spy(fn);
+  const doPatch = sinon.spy(fn);
+  const doPut = sinon.spy(fn);
+  const doDelete = sinon.spy(fn);
+  const server2 = await createServer({
+    resources: {
+      zombies: {
+        get: {
+          do: doGet,
+        },
+        getId: {
+          do: doGetId,
+        },
+        post: {
+          do: doPost,
+        },
+        patch: {
+          do: doPatch,
+        },
+        put: {
+          do: doPut,
+        },
+        delete: {
+          do: doDelete,
+        },
+      },
+    },
+  }, db);
+
+  const _id = 'awesome-id';
+  const r = await request(server2).post('/zombies').send({ name: 'Awesome dog', _id });
+  console.log(r.body);
+  const r1 = await request(server2).get('/zombies');
+  const r2 = await request(server2).get('/zombies/awesome-id');
+  const r3 = await request(server2).patch('/zombies/awesome-id').send({ name: 'Awesome dog' });
+  const r4 = await request(server2).put('/zombies/awesome-id').send({ name: 'Awesome dog' });
+  const r5 = await request(server2).delete('/zombies/awesome-id').send({ name: 'Awesome dog' });
+  a.equal(r.status, 200);
+  a.equal(r1.status, 200);
+  a.equal(r2.status, 200);
+  a.equal(r3.status, 200);
+  a.equal(r4.status, 200);
+  a.equal(r5.status, 204);
+  a.equal(doPost.calledOnce, true);
+  a.equal(doGet.calledOnce, true);
+  a.equal(doGetId.calledOnce, true);
+  a.equal(doPatch.calledOnce, true);
+  a.equal(doPut.calledOnce, true);
+  a.equal(doDelete.calledOnce, true);
 });

@@ -125,7 +125,7 @@ GET /companies$populate=employees
 To do the opposite, add parent resources use `$fill` in the query.
 
 ```http
-GET /employees$fill=companies
+GET /employees$fill=employees
 ```
 
 ## Extras
@@ -320,44 +320,9 @@ module.exports= {
 }
 ```
 
-#### Advanced permission handling (permissions and filters)
+#### Advanced: especial permission and filters (NOT IMPLEMENTED YET)
 
-you can define special permissions that can be reused across your logic.
-
-```js
-{
-  resources:{
-    secrets:{
-      permissions:[['$custom','secrets:write']]
-    }
-  }
-  permissions:{
-    $custom:({resources, user, req, HttpError })=>{
-      return truthyValue // pass the permission
-      return falsyValue // oh oh, forbidden
-      throw new HttpError.notFound() // you can throw errors using the http-errors package
-    }
-  }
-}
-```
-
-But this approach will not work with `GET resources/`, for that reason the filters are implemented, filters are functions that returns mongodb queries.
-
-```js
-{
-  resources:{
-    secrets:{
-      get: {permissions:[['$filter','secrets:write']]}
-    }
-  }
-  permissions:{
-    $custom:({resources, user, req })=>{
-      return truthyValue // pass the permission
-      return falsyValue // oh oh, forbidden
-    }
-  }
-}
-```
+coming soon...
 
 ### Input validation and Output Formating
 
