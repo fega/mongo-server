@@ -319,7 +319,32 @@ test('OK', async () => {
   await delay(500);
   a.equal(r.status, 200);
 });
+test('OK, default option', async () => {
+  const server2 = await createServer({
+    resources: {
+      giraffes: {
+        post: {
+          default: () => ({
+            $timestamps: true,
+            $version: true,
+            $changelog: true,
+          }),
+        },
+      },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
 
+  const r = await request(server2).post('/giraffes').send({ name: 'Awesome Giraffe' });
+  await delay(500);
+  a.equal(r.status, 200);
+
+  a.exists(r.body.updatedAt);
+  a.exists(r.body.createdAt);
+  a.exists(r.body.__v);
+});
 suite('Logic handlers, (do fields)');
 test('OK', async () => {
   const fn = ({ next }) => next();

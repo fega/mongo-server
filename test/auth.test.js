@@ -343,7 +343,7 @@ test('validation OK', async () => {
       posts: {
         patch: {
         },
-        out: (resource, user) => ({
+        out: resource => ({
           id: resource._id,
           extra: 'extra',
         }),

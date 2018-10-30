@@ -26,6 +26,7 @@ const {
   getPopulatePipelines,
   unrollPopulatePipeline,
   getOut,
+  getDefaultPost,
 } = require('../lib');
 
 module.exports = (config, db) => {
@@ -92,6 +93,7 @@ module.exports = (config, db) => {
   /**
    * Auth local endpoints
    */
+
   generateAuthLocalHandlers(config, router, db);
 
   /**
@@ -123,17 +125,20 @@ module.exports = (config, db) => {
   router.post('/:resource/', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.post`) === false) return next();
 
-    const insert = {
-      ...req.body,
-      _id: req.body._id || ObjectId().toString(),
-    };
+    const defaultFn = get(config, `resources.${req.params.resource}.post.default`);
+    const _id = req.body._id || ObjectId().toString();
+    const { body, user } = req;
+    const insert = defaultFn
+      ? ({ ...await getDefaultPost(defaultFn(body, user), user, req, db), _id })
+      : { ...body, _id };
+
     await db.collection(req.params.resource).insertOne(insert);
     res.locals.resources = insert;
     return next();
   }));
   router.put('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.put`) === false) return next();
-
+    const defaultFn = get(config, `resources.${req.params.resource}.put.default`);
     const { _id, ...put } = req.body;
     const result = await db
       .collection(req.params.resource)
@@ -146,6 +151,7 @@ module.exports = (config, db) => {
   }));
   router.patch('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.patch`) === false) return next();
+    const defaultFn = get(config, `resources.${req.params.resource}.patch.default`);
 
     const { _id, ...patch } = req.body;
     if (!Object.keys(patch).length) return next(new HttpError.BadRequest('Missing body'));

@@ -1,10 +1,11 @@
+/* eslint-disable */
 module.exports = {
   resources: {
     posts: {
       post: false, // ✔️
       patch: false, // ✔️
       delete: false, // ✔️
-      restrictFields: true,
+      restrict: true,
       restrictQuery: true,
       csrf: true,
       rateLimit: true,
@@ -15,8 +16,8 @@ module.exports = {
       apicache: '1 hour',
       // webhook: (resource,user)=>{},
       pdf: { title: (resources, user) => '', content: (resources, user) => '' },
-      email: { to: ['fega.hg@gmail.com'] }, // ✔️
-      // email: ['fega.hg@gmail.com'],
+      email: { to: ['fega.hg@gmail.com'] }, // ✔️       // email: ['fega.hg@gmail.com'],
+
       file: { field: 'file' }, // ✔️
       in: {// ✔️
         body: null, // Joi schema here// ✔️
@@ -28,7 +29,7 @@ module.exports = {
       permissions: [
         ['admin'], // allow if user is admin // ✔️
         ['posts:read', 'posts:write'], // allow if user have posts:read and post:write// ✔️
-        ['$ONWER'], // allow if resource is part of resource_id or resource_ids in the target resource// ✔️
+        ['$ONWER'], // allow if resource is part of resource_id or resource_ids in the target resource
         ['$VERIFIED'], // allow if user is already verified by email or phone code
         (resource, tokenPayload) => { resource.user_id.equals(tokenPayload._id); }, // userId is equals to resource.user_id
       ],
@@ -36,7 +37,7 @@ module.exports = {
     users: {
       auth: {
         local: ['email', 'password'], // ✔️
-        jwt: ['_id', 'permissions'],
+        jwt: ['_id', 'permissions'], // ✔️
         restoreEmail: true,
         phoneCode: true,
         facebook: { // same for google and twitter, github, linkedin
