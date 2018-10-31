@@ -6,8 +6,14 @@ const { generate } = require('randomstring');
 const { ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
+const date = require('date.js');
 const createServer = require('../server');
 const mongo = require('../db');
+
+const rand = (length, current) => {
+  const _current = current || '';
+  return length ? rand(--length, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'.charAt(Math.floor(Math.random() * 60)) + _current) : _current;
+};
 
 chai.use(asPromised);
 
@@ -17,12 +23,12 @@ let db;
 after(async () => {
   // await db.dropDatabase();
 });
-
-
-suite('local auth');
 before(async () => {
   db = await mongo();
 });
+
+suite('local auth');
+
 test("POST /auth/:resource/sign-up, resource doesn't have login", async () => {
   const s = createServer({
     resources: {
@@ -127,6 +133,307 @@ test('LOGIN FLOW', async () => {
   a.equal(r1.body.extraField, 'OK');
 });
 test('Should never leak the password');
+
+suite('magic link auth');
+test("POST /auth/:resource/magic-link, resource doesn't have magic links", async () => {
+  const s = createServer({
+    resources: {
+      users: {},
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).post('/auth/users/magic-link');
+  a.equal(r.status, 404);
+});
+test('POST /auth/:resource/magic-link, missing body fields', async () => {
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).post('/auth/users/magic-link');
+  a.equal(r.status, 400);
+});
+test('POST /auth/:resource/magic-link, invalid email', async () => {
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s)
+    .post('/auth/users/magic-link')
+    .send({
+      email: 'fega.blablabla',
+    });
+  a.equal(r.status, 400);
+});
+test('POST /auth/:resource/magic-link, maxAmount of tokens', async () => {
+  const email = `${ObjectId()}@gmail.com`;
+  const exp = date('in 10 days');
+  await db.collection('moser-magic-links').insertOne({ email, exp });
+  await db.collection('moser-magic-links').insertOne({ email, exp });
+  await db.collection('moser-magic-links').insertOne({ email, exp });
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s)
+    .post('/auth/users/magic-link')
+    .send({
+      email,
+    });
+  a.equal(r.status, 429);
+});
+test('POST /auth/:resource/magic-link, OK', async () => {
+  const email = `${ObjectId()}@gmail.com`;
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+    host: 'localhost:3000',
+    root: '/',
+  }, db);
+  const r = await request(s)
+    .post('/auth/users/magic-link')
+    .send({
+      email,
+    });
+  a.equal(r.status, 200);
+});
+
+test("GET /auth/:resource/magic-link/:token, resource doesn't have magic links", async () => {
+  const s = createServer({
+    resources: {
+      users: {},
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get('/auth/users/magic-link/token');
+  a.equal(r.status, 404);
+});
+test('GET /auth/:resource/magic-link/:token, BAD_REQUEST wrong token', async () => {
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get('/auth/users/magic-link/an-id');
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'Wrong Token');
+});
+test('GET /auth/:resource/magic-link/:token, NOT_FOUND, token not found', async () => {
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-link/${rand(74)}`);
+  a.equal(r.status, 404);
+  a.equal(r.body.message, 'Token not found');
+});
+test('GET /auth/:resource/magic-link/:token, BAD_REQUEST, expired token', async () => {
+  const token = rand(74);
+  await db.collection('moser-magic-links').insertOne({ token, exp: date('in two days'), status: 'VERIFIED' });
+
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-link/${token}`);
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'Token already used');
+});
+test('GET /auth/:resource/magic-link/:token, BAD_REQUEST, user not found', async () => {
+  const token = rand(74);
+  await db.collection('moser-magic-links').insertOne({ token, exp: date('in two days') });
+
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-link/${token}`);
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'User is not on db anymore');
+});
+test('GET /auth/:resource/magic-link/:token, OK', async () => {
+  const token = rand(74);
+  const email = `${ObjectId()}@gmail.com`;
+  const user = { _id: ObjectId().toString(), email };
+  await db.collection('moser-magic-links').insertOne({ token, exp: date('in two days'), email });
+  await db.collection('users').insertOne(user);
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-link/${token}`);
+  a.equal(r.status, 200);
+  const u = await db.collection('users').findOne({ _id: user._id });
+  const t = await db.collection('moser-magic-links').findOne({ token });
+  a.isTrue(u.permissions.includes('email:verified'), 'Permission not added to user');
+  a.equal(t.status, 'VERIFIED', 'Status no added to token');
+});
+test('GET /auth/:resource/magic-token/:searchToken, resource doesnt have magic links', async () => {
+  const s = createServer({
+    resources: {
+      users: {},
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get('/auth/users/magic-token/a search token');
+  a.equal(r.status, 404);
+});
+test('GET /auth/:resource/magic-token/:searchToken, invalid token', async () => {
+  const token = rand(74);
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get('/auth/users/magic-token/a search token');
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'Wrong Token');
+});
+test('GET /auth/:resource/magic-token/:searchToken, token not found', async () => {
+  const token = rand(74);
+
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-token/${token}`);
+  a.equal(r.status, 404);
+  a.equal(r.body.message, 'Token not found');
+});
+test('GET /auth/:resource/magic-token/:searchToken, token expired', async () => {
+  const token = rand(74);
+  await db.collection('moser-magic-links').insertOne({ search: token, exp: date('two days ago'), status: 'VERIFIED' });
+
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-token/${token}`);
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'Token expired');
+});
+test('GET /auth/:resource/magic-token/:searchToken, token not verified', async () => {
+  const token = rand(74);
+  await db.collection('moser-magic-links').insertOne({ search: token, exp: date('in two days') });
+
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-token/${token}`);
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'Token not verified');
+});
+test('GET /auth/:resource/magic-token/:searchToken, token already retrieved', async () => {
+  const token = rand(74);
+  await db.collection('moser-magic-links').insertOne({ search: token, exp: date('in two days'), status: 'RETRIEVED' });
+
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-token/${token}`);
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'Token already used');
+});
+test('GET /auth/:resource/magic-token/:searchToken, user not in db', async () => {
+  const token = rand(74);
+  await db.collection('moser-magic-links').insertOne({ search: token, exp: date('in two days'), status: 'VERIFIED' });
+
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-token/${token}`);
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'User is not on db anymore');
+});
+test('GET /auth/:resource/magic-token/:searchToken, OK', async () => {
+  const token = rand(74);
+  const email = `${ObjectId()}@gmail.com`;
+  await db.collection('moser-magic-links').insertOne({
+    search: token, exp: date('in two days'), status: 'VERIFIED', email,
+  });
+  const user = { _id: ObjectId().toString(), email };
+  await db.collection('users').insertOne(user);
+
+  const s = createServer({
+    resources: {
+      users: { auth: { magicLink: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+    jwtSecret: 'secret',
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-token/${token}`);
+  a.equal(r.status, 200);
+  a.exists(r.body.$token);
+});
 
 
 suite('Permissions');

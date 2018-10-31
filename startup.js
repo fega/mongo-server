@@ -20,7 +20,7 @@ const main = async (programConfig = {}) => {
      */
     let config = {
       port: programConfig.port || 3000,
-      host: programConfig.host || 'localhost',
+      host: programConfig.host || 'http://localhost:3000',
       mongo: programConfig.mongo || 'mongodb://localhost:27017',
       db: programConfig.db || 'mongo-server',
       pagination: programConfig.pagination || 10,

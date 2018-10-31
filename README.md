@@ -155,6 +155,8 @@ module.exports= {
   port: 3000,
   // REST api root, default "/"
   root: "/",
+  // hostname
+  host: 'http://localhost:3000'
   // mongodb url default: "mongodb://localhost:27088"
   mongo: 'mongodb://localhost:27088',
   // database name

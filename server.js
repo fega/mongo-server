@@ -59,11 +59,19 @@ module.exports = (config, db) => {
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
     res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
     const status = err.status || 500;
     res.status(status);
     if (status === 500) console.error(err);
-    res.send(res.locals.error);
+    const error = {
+      status,
+      message: err.message,
+      error: ['development', 'test'].includes(req.app.get('env')) ? err : undefined,
+    };
+    res.send({
+      status,
+      message: err.message,
+      error: req.app.get('env') === 'development' ? err : undefined,
+    });
   });
   if (!config.noListen) app.listen(config.port, () => console.log(tag, `server listen on port ${chalk.yellow(config.port)}`));
   return app;

@@ -14,6 +14,7 @@ const {
   generateNodemailerHandlers,
   generateDoHandlers,
   generateDynamicPermissionRoutes,
+  generateMagicLinkHandlers,
 } = require('../lib/middlewareGeneration');
 const {
   getTextQuery,
@@ -93,9 +94,8 @@ module.exports = (config, db) => {
   /**
    * Auth local endpoints
    */
-
   generateAuthLocalHandlers(config, router, db);
-
+  generateMagicLinkHandlers(config, router, db);
   /**
    * Permission endpoints
    */

@@ -32,7 +32,7 @@ module.exports={
     user:{
       auth:{
         magicLink:{
-          do: ()=>{
+          doValidate: ()=>{
             /* custom logic here when the user */
           }
           emailField: 'email' //how the user will be created/find on mongodb
@@ -40,6 +40,9 @@ module.exports={
           max: 3, // max active magic links
           redirectTo: '' //
           template: ({req,res,user,token})=>`html email template`
+          doGenerate:()=>{
+
+          }
         }
       }
     }
