@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "server.js",
   "scripts": {
@@ -51,7 +51,7 @@
     "nodemon": "^1.18.5",
     "proxyquire": "^2.1.0",
     "randomstring": "^1.1.5",
-    "sinon": "^7.1.0",
+    "sinon": "^7.1.1",
     "supertest": "^3.3.0"
   }
 }

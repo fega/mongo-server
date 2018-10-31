@@ -51,7 +51,11 @@ const main = async (programConfig = {}) => {
      * connecting to mongodb
      */
     console.log(tag, 'connecting to mongodb');
-    const db = await connect(config);
+    const db = await connect(config).catch((error) => {
+      console.error(tag, 'error connecting to mongodb');
+      console.error(error);
+      process.exit(1);
+    });
     console.log(tag, 'using', chalk.yellow(db.databaseName), 'database');
 
     /**
