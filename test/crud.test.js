@@ -381,7 +381,6 @@ test('OK', async () => {
 
   const _id = 'awesome-id';
   const r = await request(server2).post('/zombies').send({ name: 'Awesome dog', _id });
-  console.log(r.body);
   const r1 = await request(server2).get('/zombies');
   const r2 = await request(server2).get('/zombies/awesome-id');
   const r3 = await request(server2).patch('/zombies/awesome-id').send({ name: 'Awesome dog' });
