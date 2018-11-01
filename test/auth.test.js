@@ -272,7 +272,7 @@ test('GET /auth/:resource/magic-link/:token, BAD_REQUEST, expired token', async 
 });
 test('GET /auth/:resource/magic-link/:token, BAD_REQUEST, user not found', async () => {
   const token = rand(74);
-  await db.collection('moser-magic-links').insertOne({ token, exp: date('in two days') });
+  await db.collection('moser-magic-links').insertOne({ email: 'jump', token, exp: date('in two days') });
 
   const s = createServer({
     resources: {
@@ -398,7 +398,12 @@ test('GET /auth/:resource/magic-token/:searchToken, token already retrieved', as
 });
 test('GET /auth/:resource/magic-token/:searchToken, user not in db', async () => {
   const token = rand(74);
-  await db.collection('moser-magic-links').insertOne({ search: token, exp: date('in two days'), status: 'VERIFIED' });
+  await db.collection('moser-magic-links').insertOne({
+    email: 'jump',
+    search: token,
+    exp: date('in two days'),
+    status: 'VERIFIED',
+  });
 
   const s = createServer({
     resources: {
@@ -409,6 +414,7 @@ test('GET /auth/:resource/magic-token/:searchToken, user not in db', async () =>
     },
   }, db);
   const r = await request(s).get(`/auth/users/magic-token/${token}`);
+  console.log(r.body);
   a.equal(r.status, 400);
   a.equal(r.body.message, 'User is not on db anymore');
 });
