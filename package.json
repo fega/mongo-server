@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.14.4",
+  "version": "0.14.5",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "server.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "flattenjs": "^1.0.4",
     "helmet": "^3.14.0",
     "http-errors": "^1.7.1",
-    "joi": "^14.0.2",
+    "joi": "^14.0.3",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
     "mongodb": "^3.1.8",

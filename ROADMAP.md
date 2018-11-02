@@ -32,15 +32,33 @@ module.exports={
     user:{
       auth:{
         magicLink:{
-          doValidate: ()=>{
-            /* custom logic here when the user */
-          }
-          emailField: 'email' //how the user will be created/find on mongodb
-          exp: '15 min' // magic link expiration
-          max: 3, // max active magic links
-          redirectTo: '' //
-          template: ({req,res,user,token})=>`html email template`
-          doGenerate:()=>{
+          // field to check in request and user document
+          emailField: 'email',
+          // where to store the magic links in the db
+          collection: 'moser-magic-links',
+          // max tokens actives allowed per user
+          max: 3,
+          // how many time the tokens will be active
+          exp: 'in one day',
+          // where to redirect if the user is not found
+          redirectNotFound: null,
+          // where to redirect if the token was already used
+          redirectAlreadyUsed: null,
+          // where to redirect on success
+          redirectSuccess: null,
+          // function to execute on verify
+          doVerify: null,
+          // function to execute on token generation          
+          doGenerate: null,
+          // function to execute on token retrieve
+          doRetrieve: null,
+          // email options as nodemailer sendMail function https://nodemailer.com/about/
+          email: Object.assign({}, {
+            from: 'email@email.com',
+            text: (user, token, url) => `${url}`,
+            html: (user, token, url) => `${url}`,
+            subject: 'Hey! use this link to login in our app',
+          }),
 
           }
         }
