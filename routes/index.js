@@ -136,15 +136,14 @@ module.exports = (config, db) => {
   }));
   router.put('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.put`) === false) return next();
-    const defaultFn = get(config, `resources.${req.params.resource}.put.default`);
+
     const { _id, ...put } = req.body;
     const result = await db
       .collection(req.params.resource)
-      .findOneAndReplace({ _id: req.params.id }, put, {
-        returnOriginal: false,
-      });
-    if (!result.value) return next(new HttpError.NotFound('Resource not found'));
-    res.locals.resources = result.value;
+      .findOne({ _id: req.params.id });
+
+    if (!result) return next(new HttpError.NotFound('Resource not found'));
+    res.locals.resources = result;
     return next();
   }));
   router.patch('/:resource/:id', asyncController(async (req, res, next) => {
@@ -155,11 +154,9 @@ module.exports = (config, db) => {
     if (!Object.keys(patch).length) return next(new HttpError.BadRequest('Missing body'));
     const result = await db
       .collection(req.params.resource)
-      .findOneAndUpdate({ _id: req.params.id }, { $set: patch }, {
-        returnOriginal: false,
-      });
-    if (!result.value) return next(new HttpError.NotFound('Resource not found'));
-    res.locals.resources = result.value;
+      .findOne({ _id: req.params.id });
+    if (!result) return next(new HttpError.NotFound('Resource not found'));
+    res.locals.resources = result;
     return next();
   }));
   router.delete('/:resource/:id', asyncController(async (req, res, next) => {
@@ -185,34 +182,74 @@ module.exports = (config, db) => {
   /**
    * Routes, execute action
    */
+
   router.post('/:resource/', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.post`) === false) return next();
-    await db.collection(req.params.resource).insertOne(res.locals.resources);
+
+    await db
+      .collection(req.params.resource)
+      .insertOne(res.locals.resources);
+
+    return next();
+  }));
+  router.put('/:resource/:id', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.put`) === false) return next();
+    const defaultFn = get(config, `resources.${req.params.resource}.put.default`);
+    const { _id, ...put } = req.body;
+
+    const result = await db
+      .collection(req.params.resource)
+      .findOneAndReplace({ _id: req.params.id }, put, {
+        returnOriginal: false,
+      });
+
+    if (!result.value) return next(new HttpError.NotFound('Resource not found'));
+    res.locals.resources = result.value;
+    return next();
+  }));
+  router.patch('/:resource/:id', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.patch`) === false) return next();
+    const defaultFn = get(config, `resources.${req.params.resource}.patch.default`);
+
+    const { _id, ...patch } = req.body;
+    if (!Object.keys(patch).length) return next(new HttpError.BadRequest('Missing body'));
+
+    const result = await db
+      .collection(req.params.resource)
+      .findOneAndUpdate({ _id: req.params.id }, { $set: patch }, {
+        returnOriginal: false,
+      });
+
+    if (!result.value) return next(new HttpError.NotFound('Resource not found'));
+    res.locals.resources = result.value;
     return next();
   }));
   router.get('/:resource', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.get`) === false) return next();
+
     const { $populate, $fill } = req.query;
     const { filter, query } = req;
 
     const result = ($populate || $fill)
       ? await findAndPopulate(req.params.resource, query, filter)
       : await find(req.params.resource, query, filter);
+
     res.locals.resources = result;
     return next();
   }));
+  router.delete('/:resource/:id', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.delete`) === false) return next();
 
+    await db
+      .collection(req.params.resource)
+      .deleteOne({ _id: req.params.id });
+
+    return res.sendStatus(204);
+  }));
 
   /**
    * get outputs
    */
-  router.delete('/:resource/:id', asyncController(async (req, res, next) => {
-    if (get(config, `resources.${req.params.resource}.delete`) === false) return next();
-    await db
-      .collection(req.params.resource)
-      .deleteOne({ _id: req.params.id });
-    return res.sendStatus(204);
-  }));
   router.use(['/:resource/:id', '/:resource'], (req, res, next) => {
     const { resources } = res.locals;
     if (!resources) return next();
