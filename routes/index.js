@@ -114,7 +114,6 @@ module.exports = (config, db) => {
   /**
    * Routes, retrieve resources
    */
-
   router.get('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.getId`) === false) return next();
     const result = await db.collection(req.params.resource).findOne({ _id: req.params.id });
@@ -132,7 +131,6 @@ module.exports = (config, db) => {
       ? ({ ...await getDefaultPost(defaultFn(body, user), user, req, db), _id })
       : { ...body, _id };
 
-    await db.collection(req.params.resource).insertOne(insert);
     res.locals.resources = insert;
     return next();
   }));
@@ -173,16 +171,25 @@ module.exports = (config, db) => {
     res.locals.resources = result;
     return next();
   }));
+
   /**
    * Routes, Execute dynamic permissions
    */
-
   generateDynamicPermissionRoutes(config, router);
 
   /**
-   * Get /:resource is the only endpoint that first execute the routes
+   * Routes, Execute logic handlers
    */
+  generateDoHandlers(config, router, db);
 
+  /**
+   * Routes, execute action
+   */
+  router.post('/:resource/', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.post`) === false) return next();
+    await db.collection(req.params.resource).insertOne(res.locals.resources);
+    return next();
+  }));
   router.get('/:resource', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.get`) === false) return next();
     const { $populate, $fill } = req.query;
@@ -194,21 +201,16 @@ module.exports = (config, db) => {
     res.locals.resources = result;
     return next();
   }));
-  /**
-   * Routes, Execute logic handlers
-   */
 
-  generateDoHandlers(config, router, db);
 
   /**
    * get outputs
    */
   router.delete('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.delete`) === false) return next();
-    const result = await db
+    await db
       .collection(req.params.resource)
-      .findOneAndDelete({ _id: req.params.id });
-    if (!result.value) return next(new HttpError.NotFound('Resource not found'));
+      .deleteOne({ _id: req.params.id });
     return res.sendStatus(204);
   }));
   router.use(['/:resource/:id', '/:resource'], (req, res, next) => {
