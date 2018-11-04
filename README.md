@@ -156,7 +156,7 @@ module.exports= {
   // REST api root, default "/"
   root: "/",
   // hostname
-  host: 'http://localhost:3000'
+  host: 'http://localhost:3000',
   // mongodb url default: "mongodb://localhost:27088"
   mongo: 'mongodb://localhost:27088',
   // database name
@@ -175,6 +175,8 @@ module.exports= {
   middleware: [myFunction],
   // default pagination limit
   pagination: 10,
+  // custom error handler
+  errorHandler: (req.res,next,err)=>{/* custom error handler */}
 }
 ```
 

@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.14.7",
+  "version": "0.15.0",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "server.js",
   "scripts": {
@@ -12,7 +12,7 @@
   "author": "Fabian Gutierrez <fega.hg@gmail.com>",
   "license": "MIT",
   "preferGlobal": true,
-  "bin": "./index.js",
+  "bin": "./bin/cli.js",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "chalk": "^2.4.1",
@@ -37,7 +37,8 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pluralize": "^7.0.0",
-    "pretty-error": "^2.1.1"
+    "pretty-error": "^2.1.1",
+    "ramda": "^0.25.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",

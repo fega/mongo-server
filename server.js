@@ -57,6 +57,7 @@ module.exports = (config, db) => {
   app.use((req, res, next) => { next(createError(404)); });
 
   // eslint-disable-next-line no-unused-vars
+  if (config.errorHandler) app.use(config.errorHandler);
   app.use((err, req, res, next) => {
     res.locals.message = err.message;
     const status = err.status || 500;
@@ -67,11 +68,7 @@ module.exports = (config, db) => {
       message: err.message,
       error: ['development', 'test'].includes(req.app.get('env')) ? err : undefined,
     };
-    res.send({
-      status,
-      message: err.message,
-      error: req.app.get('env') === 'development' ? err : undefined,
-    });
+    res.send(error);
   });
   if (!config.noListen) app.listen(config.port, () => console.log(tag, `server listen on port ${chalk.yellow(config.port)}`));
   return app;

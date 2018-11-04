@@ -53,14 +53,14 @@ module.exports = {
   },
   host: 'localhost',
   engine: true,
-  port: 3000, // ✔️
-  cors: '*', // ✔️
-  gzip: true, // ✔️
+  port: 3000,
+  cors: '*',
+  gzip: true,
   forceSeed: false,
-  mongo: 'mongodb://localhost:27017', // ✔️
-  middleware: [], // ✔️
-  restrict: true, // ✔️
-  nodemailer: { // ✔️
+  mongo: 'mongodb://localhost:27017',
+  middleware: [],
+  restrict: true,
+  nodemailer: {
     service: 'MailDev',
   },
   raven: {},

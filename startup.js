@@ -8,8 +8,6 @@ const { isDbEmpty, seedDb } = require('./lib/mongodb');
 
 const tag = chalk.cyan('[m-server]');
 
-const pe = new (require('pretty-error'))(); //eslint-disable-line
-
 const main = async (programConfig = {}) => {
   try {
     // start
