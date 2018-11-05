@@ -307,6 +307,7 @@ test('GET /auth/:resource/magic-link/:token, OK', async () => {
   a.isTrue(u.permissions.includes('email:verified'), 'Permission not added to user');
   a.equal(t.status, 'VERIFIED', 'Status no added to token');
 });
+
 test('GET /auth/:resource/magic-token/:searchToken, resource doesnt have magic links', async () => {
   const s = createServer({
     resources: {
@@ -440,6 +441,171 @@ test('GET /auth/:resource/magic-token/:searchToken, OK', async () => {
   const r = await request(s).get(`/auth/users/magic-token/${token}`);
   a.equal(r.status, 200);
   a.exists(r.body.$token);
+});
+
+suite('magic CODE auth');
+test("POST /auth/:resource/magic-link, resource doesn't have magic links", async () => {
+  const s = createServer({
+    resources: {
+      users: {},
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).post('/auth/users/magic-code');
+  a.equal(r.status, 404);
+});
+test('POST /auth/:resource/magic-link, missing body fields', async () => {
+  const s = createServer({
+    resources: {
+      users: { auth: { magicCode: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).post('/auth/users/magic-code');
+  a.equal(r.status, 400);
+});
+test('POST /auth/:resource/magic-code, invalid email', async () => {
+  const s = createServer({
+    resources: {
+      users: { auth: { magicCode: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s)
+    .post('/auth/users/magic-code')
+    .send({
+      email: 'fega.blablabla',
+    });
+  a.equal(r.status, 400);
+});
+test('POST /auth/:resource/magic-code, maxAmount of tokens', async () => {
+  const email = `${ObjectId()}@gmail.com`;
+  const exp = date('in 10 days');
+  await db.collection('moser-magic-codes').insertOne({ email, exp });
+  await db.collection('moser-magic-codes').insertOne({ email, exp });
+  await db.collection('moser-magic-codes').insertOne({ email, exp });
+  const s = createServer({
+    resources: {
+      users: { auth: { magicCode: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s)
+    .post('/auth/users/magic-code')
+    .send({
+      email,
+    });
+  a.equal(r.status, 429);
+});
+test('POST /auth/:resource/magic-code, OK', async () => {
+  const email = `${ObjectId()}@gmail.com`;
+  const s = createServer({
+    resources: {
+      users: { auth: { magicCode: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+    host: 'localhost:3000',
+    root: '/',
+  }, db);
+  const r = await request(s)
+    .post('/auth/users/magic-code')
+    .send({
+      email,
+    });
+  console.log(r.body);
+  a.equal(r.status, 200);
+});
+
+test("GET /auth/:resource/magic-code/:token, resource doesn't have magic links", async () => {
+  const s = createServer({
+    resources: {
+      users: {},
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get('/auth/users/magic-code/token');
+  a.equal(r.status, 404);
+});
+test('GET /auth/:resource/magic-code/:token, NOT_FOUND, token not found', async () => {
+  const s = createServer({
+    resources: {
+      users: { auth: { magicCode: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-code/${rand(74)}`);
+  a.equal(r.status, 404);
+  a.equal(r.body.message, 'Token not found');
+});
+test('GET /auth/:resource/magic-code/:token, BAD_REQUEST, expired token', async () => {
+  const token = rand(74);
+  await db.collection('moser-magic-codes').insertOne({ token, exp: date('in two days'), status: 'VERIFIED' });
+
+  const s = createServer({
+    resources: {
+      users: { auth: { magicCode: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-code/${token}`);
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'Token already used');
+});
+test('GET /auth/:resource/magic-code/:token, BAD_REQUEST, user not found', async () => {
+  const token = rand(74);
+  await db.collection('moser-magic-codes').insertOne({ email: 'jump', token, exp: date('in two days') });
+
+  const s = createServer({
+    resources: {
+      users: { auth: { magicCode: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-code/${token}`);
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'User is not on db anymore');
+});
+test('GET /auth/:resource/magic-code/:token, OK', async () => {
+  const token = rand(74);
+  const email = `${ObjectId()}@gmail.com`;
+  const user = { _id: ObjectId().toString(), email };
+  await db.collection('moser-magic-codes').insertOne({ token, exp: date('in two days'), email });
+  await db.collection('users').insertOne(user);
+  const s = createServer({
+    resources: {
+      users: { auth: { magicCode: {} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+    jwtSecret: 'secret',
+  }, db);
+  const r = await request(s).get(`/auth/users/magic-code/${token}`);
+  a.equal(r.status, 200);
+  a.exists(r.body.state);
+  a.exists(r.body.$token);
+  const u = await db.collection('users').findOne({ _id: user._id });
+  const t = await db.collection('moser-magic-codes').findOne({ token });
+  a.isTrue(u.permissions.includes('email:verified'), 'Permission not added to user');
+  a.equal(t.status, 'VERIFIED', 'Status no added to token');
 });
 
 

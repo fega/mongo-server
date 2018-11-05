@@ -15,6 +15,7 @@ const {
   generateDoHandlers,
   generateDynamicPermissionRoutes,
   generateMagicLinkHandlers,
+  generateMagicCodeHandlers,
 } = require('../lib/middlewareGeneration');
 const {
   getTextQuery,
@@ -96,6 +97,7 @@ module.exports = (config, db) => {
    */
   generateAuthLocalHandlers(config, router, db);
   generateMagicLinkHandlers(config, router, db);
+  generateMagicCodeHandlers(config, router, db);
   /**
    * Permission endpoints
    */

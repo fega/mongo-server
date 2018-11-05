@@ -10,16 +10,14 @@
 
 
 
-        <mj-text font-size="20px" font-family="helvetica" align="center">This is a magic email!, just click in the following button to login in the app</mj-text>
+        <mj-text font-size="20px" font-family="helvetica" align="center">This is your login code!, just use it in the app</mj-text>
+
         <mj-divider border-color="#white"></mj-divider>
 
-        <mj-button font-size="25px" href="${url}">Active my magic login</mj-button>
+        <mj-text font-size="50px" font-family="helvetica" align="center">{{ token }}</mj-text>
+
         <mj-divider border-color="#white"></mj-divider>
 
-        <mj-text font-size="20px" font-family="helvetica" align="center">If the button isn't working, just open the url below</mj-text>
-
-
-        <mj-text font-size="20px" font-family="helvetica" color="blue" align="center">${url}</mj-text>
 
         <mj-text font-size="20px" font-family="helvetica" align="center">If you don't know the reason of this email just ignore it </mj-text>
 
