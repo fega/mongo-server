@@ -508,7 +508,7 @@ test('POST /auth/:resource/magic-code, maxAmount of tokens', async () => {
     });
   a.equal(r.status, 429);
 });
-test.only('POST /auth/:resource/magic-code, OK', async () => {
+test('POST /auth/:resource/magic-code, OK', async () => {
   const email = `${ObjectId()}@gmail.com`;
   const s = createServer({
     resources: {
