@@ -443,6 +443,9 @@ test('GET /auth/:resource/magic-token/:searchToken, OK', async () => {
   a.exists(r.body.$token);
 });
 
+/**
+ * MAGIC CODE
+ */
 suite('magic CODE auth');
 test("POST /auth/:resource/magic-link, resource doesn't have magic links", async () => {
   const s = createServer({
@@ -535,7 +538,7 @@ test("GET /auth/:resource/magic-code/:token, resource doesn't have magic links",
       service: 'MailDev',
     },
   }, db);
-  const r = await request(s).get('/auth/users/magic-code/token');
+  const r = await request(s).get('/auth/users/magic-code/email/token');
   a.equal(r.status, 404);
 });
 test('GET /auth/:resource/magic-code/:token, NOT_FOUND, token not found', async () => {
@@ -547,13 +550,15 @@ test('GET /auth/:resource/magic-code/:token, NOT_FOUND, token not found', async 
       service: 'MailDev',
     },
   }, db);
-  const r = await request(s).get(`/auth/users/magic-code/${rand(74)}`);
+  const r = await request(s).get(`/auth/users/magic-code/email/${rand(4)}`);
   a.equal(r.status, 404);
   a.equal(r.body.message, 'Token not found');
 });
 test('GET /auth/:resource/magic-code/:token, BAD_REQUEST, expired token', async () => {
   const token = rand(74);
-  await db.collection('moser-magic-codes').insertOne({ token, exp: date('in two days'), status: 'VERIFIED' });
+  await db.collection('moser-magic-codes').insertOne({
+    token, exp: date('in two days'), status: 'VERIFIED', email: 'email',
+  });
 
   const s = createServer({
     resources: {
@@ -563,7 +568,7 @@ test('GET /auth/:resource/magic-code/:token, BAD_REQUEST, expired token', async 
       service: 'MailDev',
     },
   }, db);
-  const r = await request(s).get(`/auth/users/magic-code/${token}`);
+  const r = await request(s).get(`/auth/users/magic-code/email/${token}`);
   a.equal(r.status, 400);
   a.equal(r.body.message, 'Token already used');
 });
@@ -579,11 +584,11 @@ test('GET /auth/:resource/magic-code/:token, BAD_REQUEST, user not found', async
       service: 'MailDev',
     },
   }, db);
-  const r = await request(s).get(`/auth/users/magic-code/${token}`);
+  const r = await request(s).get(`/auth/users/magic-code/jump/${token}`);
   a.equal(r.status, 400);
   a.equal(r.body.message, 'User is not on db anymore');
 });
-test('GET /auth/:resource/magic-code/:token, OK', async () => {
+test('GET /auth/:resource/magic-code/email/:token, OK', async () => {
   const token = rand(74);
   const email = `${ObjectId()}@gmail.com`;
   const user = { _id: ObjectId().toString(), email };
@@ -598,7 +603,7 @@ test('GET /auth/:resource/magic-code/:token, OK', async () => {
     },
     jwtSecret: 'secret',
   }, db);
-  const r = await request(s).get(`/auth/users/magic-code/${token}`);
+  const r = await request(s).get(`/auth/users/magic-code/${email}/${token}`);
   a.equal(r.status, 200);
   a.exists(r.body.state);
   a.exists(r.body.$token);
