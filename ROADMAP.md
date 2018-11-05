@@ -12,6 +12,19 @@
 
 ## Magic Code auth
 
+This Auth strategy creates and send a magic code to the email provided by the client
+
+```http
+
+POST /auth/magic-code/
+{
+  "email":"user@email.com"
+}
+
+GET /auth/magic-code/:email/:token
+
+```
+
 ## Magic link auth
 
 This Auth strategy creates and send a magic link to the email provided by the client
@@ -23,9 +36,9 @@ POST /auth/magic-link/
   "email":"user@email.com"
 }
 
-GET /auth/magic-link/verify/:token
+GET /auth/magic-link/:token
 
-GET /auth/magic-link/get/:token
+GET /auth/magic-token/:token
 ```
 
 ```javascript

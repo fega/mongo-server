@@ -508,7 +508,7 @@ test('POST /auth/:resource/magic-code, maxAmount of tokens', async () => {
     });
   a.equal(r.status, 429);
 });
-test('POST /auth/:resource/magic-code, OK', async () => {
+test.only('POST /auth/:resource/magic-code, OK', async () => {
   const email = `${ObjectId()}@gmail.com`;
   const s = createServer({
     resources: {
@@ -534,8 +534,12 @@ test('POST /auth/:resource/magic-code, OK', async () => {
   a.equal(r.status, 200);
   a.isTrue(r.body.userCreated);
   const u = await db.collection('users').findOne({ email });
+  const t = await db.collection('moser-magic-codes').findOne({ email });
   a.exists(u, 'user not created or found');
   a.exists(u.createdAt, 'Default function not executed');
+  console.log(t);
+  a.exists(t, 'token not created');
+  a.exists(t.token, 'token not created');
 });
 
 test("GET /auth/:resource/magic-code/:token, resource doesn't have magic links", async () => {
