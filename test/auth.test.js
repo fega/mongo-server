@@ -512,7 +512,13 @@ test('POST /auth/:resource/magic-code, OK', async () => {
   const email = `${ObjectId()}@gmail.com`;
   const s = createServer({
     resources: {
-      users: { auth: { magicCode: {} } },
+      users: {
+        auth: {
+          magicCode: {
+            default: user => ({ ...user, $timestamps: true }),
+          },
+        },
+      },
     },
     nodemailer: {
       service: 'MailDev',
@@ -525,8 +531,11 @@ test('POST /auth/:resource/magic-code, OK', async () => {
     .send({
       email,
     });
-  console.log(r.body);
   a.equal(r.status, 200);
+  a.isTrue(r.body.userCreated);
+  const u = await db.collection('users').findOne({ email });
+  a.exists(u, 'user not created or found');
+  a.exists(u.createdAt, 'Default function not executed');
 });
 
 test("GET /auth/:resource/magic-code/:token, resource doesn't have magic links", async () => {
