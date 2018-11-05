@@ -10,6 +10,8 @@
 
 ## Email verification
 
+## Magic Code auth
+
 ## Magic link auth
 
 This Auth strategy creates and send a magic link to the email provided by the client
