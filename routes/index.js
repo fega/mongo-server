@@ -101,7 +101,7 @@ module.exports = (config, db) => {
   /**
    * Permission endpoints
    */
-  generateJwtPermissionRoutes(config, router);
+  generateJwtPermissionRoutes(config, router, db);
 
   /**
    * Generate Validation endpoints
