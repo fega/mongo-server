@@ -239,6 +239,15 @@ test('OK', async () => {
   const r = await request(server).get('/parrots/paco').expect(200);
   a.equal(r.body.name, 'Paco');
 });
+test('?$fill, OK', async () => {
+  const v = await db.collection('parrots').insertOne({ _id: 'paquirris', name: 'Paca' });
+  console.log(v);
+  const v2 = await db.collection('parrots').insertOne({ _id: 'pacarris', name: 'Paco', parrot_id: 'paquirris' });
+  const r = await request(server).get('/parrots/pacarris?$fill=parrots').expect(200);
+  a.equal(r.status, 200);
+  a.equal(r.body.name, 'Paco');
+  a.equal(r.body.parrots[0].name, 'Paca');
+});
 test('NOT_FOUND', async () => {
   const r = await request(server).get('/parrots/puki').expect(404);
 });

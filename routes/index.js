@@ -118,11 +118,23 @@ module.exports = (config, db) => {
    */
   router.get('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.getId`) === false) return next();
-    const result = await db.collection(req.params.resource).findOne({ _id: req.params.id });
+
+    const { $populate, $fill } = req.query;
+    const { query } = req;
+    console.log(req.query);
+    console.log(req.query);
+    console.log(req.query);
+    console.log(req.query);
+    const result = ($populate || $fill)
+      ? (await findAndPopulate(req.params.resource, { $populate, $fill }, { _id: req.params.id }))[0]
+      : await db.collection(req.params.resource).findOne({ _id: req.params.id });
+
+    console.log(result);
     if (!result) return next(HttpError.NotFound('Not found'));
     res.locals.resources = result;
     return next();
   }));
+
   router.post('/:resource/', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.post`) === false) return next();
 
@@ -170,12 +182,27 @@ module.exports = (config, db) => {
     res.locals.resources = result;
     return next();
   }));
-
   /**
    * Routes, Execute dynamic permissions
    */
   generateDynamicPermissionRoutes(config, router);
 
+  /**
+   * this is the only route that is handled after the permission
+   */
+  router.get('/:resource', asyncController(async (req, res, next) => {
+    if (get(config, `resources.${req.params.resource}.get`) === false) return next();
+
+    const { $populate, $fill } = req.query;
+    const { filter, query } = req;
+
+    const result = ($populate || $fill)
+      ? await findAndPopulate(req.params.resource, query, filter)
+      : await find(req.params.resource, query, filter);
+
+    res.locals.resources = result;
+    return next();
+  }));
   /**
    * Routes, Execute logic handlers
    */
@@ -224,19 +251,6 @@ module.exports = (config, db) => {
 
     if (!result.value) return next(new HttpError.NotFound('Resource not found'));
     res.locals.resources = result.value;
-    return next();
-  }));
-  router.get('/:resource', asyncController(async (req, res, next) => {
-    if (get(config, `resources.${req.params.resource}.get`) === false) return next();
-
-    const { $populate, $fill } = req.query;
-    const { filter, query } = req;
-
-    const result = ($populate || $fill)
-      ? await findAndPopulate(req.params.resource, query, filter)
-      : await find(req.params.resource, query, filter);
-
-    res.locals.resources = result;
     return next();
   }));
   router.delete('/:resource/:id', asyncController(async (req, res, next) => {

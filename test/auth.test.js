@@ -687,7 +687,7 @@ test('GET POST PATCH PUT DELETE /:resources 403 FORBIDDEN, JWT without permissio
       },
     },
   }, db);
-  const token = await jwt.sign({ permissions: ['random'] }, 'secret');
+  const token = await jwt.sign({ permissions: ['random'], resource: 'users' }, 'secret');
   const header = ['Authorization', `Bearer ${token}`];
   const r = await request(s).get('/posts').set(...header);
   const r0 = await request(s).get('/posts/an-id').set(...header);
@@ -713,7 +713,7 @@ test('GET POST PATCH PUT DELETE /:resources dynamic permissions', async () => {
   await db.collection('posts').insertOne({ author: 'fabian', user_id: 1 });
   await db.collection('posts').insertOne({ author: 'fabian', user_id: 2 });
   const { ops: [user] } = await db.collection('posts').insertOne({ author: 'fabian', _id: userId });
-  const token = await jwt.sign({ permissions: ['posts:read'], _id: userId }, 'secret');
+  const token = await jwt.sign({ permissions: ['posts:read'], _id: userId, resource: 'users' }, 'secret');
   const header = ['Authorization', `Bearer ${token}`];
   const s = createServer({
     resources: {
@@ -744,7 +744,7 @@ test('GET POST PATCH PUT DELETE /:resources dynamic permissions', async () => {
   a.equal(r4.status, 204, 'DELETE /resources/:id failing');
 
 
-  const token2 = await jwt.sign({ permissions: ['posts:read'], _id: 2 }, 'secret');
+  const token2 = await jwt.sign({ permissions: ['posts:read'], _id: 2, resource: 'users' }, 'secret');
   const header2 = ['Authorization', `Bearer ${token2}`];
   const { ops: [post2] } = await db.collection('posts').insertOne({ author: 'fabian', _id: ObjectId().toString() });
 
@@ -774,7 +774,7 @@ test('GET POST PATCH PUT DELETE /:resources 200 OK', async () => {
       restrict: true,
     },
   }, db);
-  const token = await jwt.sign({ permissions: ['posts:read'] }, 'secret');
+  const token = await jwt.sign({ permissions: ['posts:read'], resource: 'users' }, 'secret');
   const header = ['Authorization', `Bearer ${token}`];
   const r = await request(s).get('/posts').set(...header);
   const r0 = await request(s).get('/posts/an-id').set(...header);

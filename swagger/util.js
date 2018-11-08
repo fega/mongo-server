@@ -155,7 +155,6 @@ const describeEndpoint = (resource) => {
 };
 
 const describeResource = (resource) => {
-  console.log('HEREEE');
   const result = pipe(
     pickBy(truthy),
     pickEndpoindProperties,
