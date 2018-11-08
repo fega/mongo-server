@@ -121,15 +121,10 @@ module.exports = (config, db) => {
 
     const { $populate, $fill } = req.query;
     const { query } = req;
-    console.log(req.query);
-    console.log(req.query);
-    console.log(req.query);
-    console.log(req.query);
     const result = ($populate || $fill)
       ? (await findAndPopulate(req.params.resource, { $populate, $fill }, { _id: req.params.id }))[0]
       : await db.collection(req.params.resource).findOne({ _id: req.params.id });
 
-    console.log(result);
     if (!result) return next(HttpError.NotFound('Not found'));
     res.locals.resources = result;
     return next();
