@@ -2,10 +2,10 @@
 module.exports = {
   resources: {
     posts: {
-      post: false, // ✔️
-      patch: false, // ✔️
-      delete: false, // ✔️
-      restrict: true,
+      post: false,    // ✔️
+      patch: false,   // ✔️
+      delete: false,  // ✔️
+      restrict: true, // ✔️
       restrictQuery: true,
       csrf: true,
       rateLimit: true,
@@ -20,8 +20,8 @@ module.exports = {
 
       file: { field: 'file' }, // ✔️
       in: {// ✔️
-        body: null, // Joi schema here// ✔️
-        query: null, // Joi schema here// ✔️
+        body: null,   // Joi schema here// ✔️
+        query: null,  // Joi schema here// ✔️
         params: null, // Joi schema here// ✔️
       },
       out: (resource, tokenPayload) => ({ ...resource, requestedBy: tokenPayload._id }),
@@ -51,23 +51,23 @@ module.exports = {
     },
     comments: true,
   },
-  host: 'localhost',
+  host: 'localhost',  // ✔️
   engine: true,
-  port: 3000,
-  cors: '*',
-  gzip: true,
+  port: 3000,         // ✔️
+  cors: '*',          // ✔️
+  compress: true,     // ✔️
   forceSeed: false,
-  mongo: 'mongodb://localhost:27017',
-  middleware: [],
-  restrict: true,
-  nodemailer: {
+  mongo: 'mongodb://localhost:27017', // ✔️
+  middleware: [],     // ✔️
+  restrict: true,     // ✔️
+  nodemailer: {       // ✔️
     service: 'MailDev',
   },
-  raven: {},
-  morgan: {},
+  raven: {},          // ✔️
+  morgan: {},         // ✔️
   sitemap: true,
   robotsTxt: true,
   docs: true,
   reCaptcha: true,
-  pagination: 10,  // default pagination
+  pagination: 10,     // ✔️
 };

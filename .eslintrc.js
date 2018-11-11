@@ -3,6 +3,7 @@ module.exports = {
     rules: {
         "no-console": "off",
         "no-underscore-dangle": "off",
-        "prefer-arrow-callback": "off"
+        "prefer-arrow-callback": "off",
+        "global-require": "off"
     }
 };

@@ -4,6 +4,7 @@ const path = require('path');
 const logger = require('morgan');
 const chalk = require('chalk');
 const indexRouter = require('./routes/index');
+const errorHandler = require('./lib/middleware/errorHandler');
 
 const tag = chalk.cyan('[m-server]');
 
@@ -17,7 +18,7 @@ module.exports = (config, db) => {
   /**
    * Enable morgan http logger
    */
-  if (process.env.NODE_ENV !== 'test') app.use(logger('dev'));
+  if (process.env.NODE_ENV !== 'test') app.use(logger(config.morgan || 'dev'));
 
   /**
    * enable compression if config.compress is present
@@ -31,7 +32,7 @@ module.exports = (config, db) => {
   app.use(express.urlencoded({ extended: false }));
 
   /**
-   * Ebable cors module
+   * Enable cors module
    */
   if (config.cors) app.use(require('cors')(config.cors));
 
@@ -39,6 +40,15 @@ module.exports = (config, db) => {
    * Enable helmet module
    */
   if (config.helmet) app.use(require('helmet')(config.helmet));
+
+  /**
+   * Raven RequestHandler
+   */
+  if (config.raven) {
+    const Raven = require('raven');
+    Raven.config(config.raven).install();
+    app.use(Raven.requestHandler());
+  }
 
   /**
    * Enable static file serving
@@ -54,22 +64,26 @@ module.exports = (config, db) => {
    * REST API mount
    */
   app.use(config.root || '/', indexRouter(config, db));
+
+  /**
+   * 404 handler
+   */
   app.use((req, res, next) => { next(createError(404)); });
 
-  // eslint-disable-next-line no-unused-vars
+  /**
+   * Raven
+   */
+  if (config.raven) {
+    const Raven = require('raven');
+    app.use(Raven.errorHandler());
+  }
+
+  /**
+   * error handler
+   */
   if (config.errorHandler) app.use(config.errorHandler);
-  app.use((err, req, res, next) => {
-    res.locals.message = err.message;
-    const status = err.status || 500;
-    res.status(status);
-    if (status === 500) console.error(err);
-    const error = {
-      status,
-      message: err.message,
-      error: ['development', 'test'].includes(req.app.get('env')) ? err : undefined,
-    };
-    res.send(error);
-  });
+  app.use(errorHandler);
+
   if (!config.noListen) app.listen(config.port, () => console.log(tag, `server listen on port ${chalk.yellow(config.port)}`));
   return app;
 };

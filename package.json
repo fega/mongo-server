@@ -39,7 +39,8 @@
     "pluralize": "^7.0.0",
     "pretty-error": "^2.1.1",
     "ramda": "^0.25.0",
-    "randomstring": "^1.1.5"
+    "randomstring": "^1.1.5",
+    "raven": "^2.6.4"
   },
   "devDependencies": {
     "chai": "^4.2.0",
