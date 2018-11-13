@@ -4,22 +4,22 @@
       <mj-column>
 
 
-        <mj-text font-size="30px" color="#F45E43" font-family="helvetica" align="center">${appName}</mj-text>
+        <mj-text font-size="30px" color="#F45E43" font-family="helvetica" align="center">${config.appName}</mj-text>
 
         <mj-divider border-color="#F45E43"></mj-divider>
 
 
 
-        <mj-text font-size="20px" font-family="helvetica" align="center">This is your login code!, just use it in the app</mj-text>
+        <mj-text font-size="20px" font-family="helvetica" align="center">This is your verification code to enter ${config.appName}.</mj-text>
 
         <mj-divider border-color="#white"></mj-divider>
 
-        <mj-text font-size="50px" font-family="helvetica" align="center">{{ token }}</mj-text>
+        <mj-text font-size="50px" font-family="helvetica" align="center">${token}</mj-text>
 
         <mj-divider border-color="#white"></mj-divider>
 
 
-        <mj-text font-size="20px" font-family="helvetica" align="center">If you don't know the reason of this email just ignore it </mj-text>
+        <mj-text font-size="20px" font-family="helvetica" align="center">If you do not know what this is, simply ignore it.</mj-text>
 
         <mj-divider border-color="#F45E43"></mj-divider>
 
