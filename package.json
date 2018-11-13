@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "server.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "flattenjs": "^1.0.4",
     "helmet": "^3.15.0",
     "http-errors": "^1.7.1",
-    "joi": "^14.0.4",
+    "joi": "^14.0.6",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
     "mongodb": "^3.1.9",
@@ -46,7 +46,7 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "delay": "^4.1.0",
-    "eslint": "^5.8.0",
+    "eslint": "^5.9.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
     "maildev": "^1.0.0-rc3",
