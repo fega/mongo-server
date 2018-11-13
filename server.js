@@ -2,7 +2,7 @@ const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
-const chalk = require('chalk');
+const chalk = require('chalk').default;
 const indexRouter = require('./routes/index');
 const errorHandler = require('./lib/middleware/errorHandler');
 

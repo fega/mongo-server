@@ -1,4 +1,5 @@
-const chalk = require('chalk');
+
+const chalk = require('chalk').default;
 const path = require('path');
 const { findKey } = require('lodash');
 const pkg = require('./package');
@@ -7,6 +8,7 @@ const createServer = require('./server');
 const { isDbEmpty, seedDb } = require('./lib/mongodb');
 
 const tag = chalk.cyan('[m-server]');
+
 
 const main = async (programConfig = {}) => {
   try {
