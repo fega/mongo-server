@@ -6,6 +6,7 @@ const connect = require('../db');
 
 const main = proxyquire('../startup', {
   '/config': {
+    noListen: true,
     seed: { posts: () => [{}] },
     resources: {
       users: {
