@@ -53,7 +53,7 @@ module.exports = (config, db) => {
   /**
    * Enable static file serving
    */
-  app.use(config.staticRoot || '/', express.static(path.join(__dirname, config.static || 'public')));
+  app.use(config.staticRoot || '/', express.static(path.join(process.cwd(), config.static || 'public')));
 
   /**
    * Custom middleware

@@ -415,7 +415,6 @@ test('GET /auth/:resource/magic-token/:searchToken, user not in db', async () =>
     },
   }, db);
   const r = await request(s).get(`/auth/users/magic-token/${token}`);
-  console.log(r.body);
   a.equal(r.status, 400);
   a.equal(r.body.message, 'User is not on db anymore');
 });
@@ -537,7 +536,6 @@ test('POST /auth/:resource/magic-code, OK', async () => {
   const t = await db.collection('moser-magic-codes').findOne({ email });
   a.exists(u, 'user not created or found');
   a.exists(u.createdAt, 'Default function not executed');
-  console.log(t);
   a.exists(t, 'token not created');
   a.exists(t.token, 'token not created');
 });

@@ -241,7 +241,6 @@ test('OK', async () => {
 });
 test('?$fill, OK', async () => {
   const v = await db.collection('parrots').insertOne({ _id: 'paquirris', name: 'Paca' });
-  console.log(v);
   const v2 = await db.collection('parrots').insertOne({ _id: 'pacarris', name: 'Paco', parrot_id: 'paquirris' });
   const r = await request(server).get('/parrots/pacarris?$fill=parrots').expect(200);
   a.equal(r.status, 200);

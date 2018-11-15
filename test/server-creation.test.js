@@ -58,9 +58,10 @@ test('have NO helmet', () => {
   a.notExists(cors);
 });
 test('have serveStatic non default url', () => {
-  const cors = server._router.stack.find(m => m.name === 'serveStatic');
-  a.exists(cors);
-  a.deepEqual(cors.regexp, /^\/static\/?(?=\/|$)/i);
+  const staticMid = server._router.stack.find(m => m.name === 'serveStatic');
+  a.exists(staticMid);
+  console.log(staticMid);
+  a.deepEqual(staticMid.regexp, /^\/static\/?(?=\/|$)/i);
 });
 test('have default serveStatic', () => {
   const cors = serverEmpty._router.stack.find(m => m.name === 'serveStatic');
