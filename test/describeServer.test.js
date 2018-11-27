@@ -31,13 +31,13 @@ test('describeServer({rootProperties})', () => {
     middleware: [],
     pagination: 10,
   }), {
-      port: 3000,
-      root: '/',
-      host: 'http://localhost:3000',
-      static: 'public',
-      staticRoot: '/',
-      pagination: 10,
-    });
+    port: 3000,
+    root: '/',
+    host: 'http://localhost:3000',
+    static: 'public',
+    staticRoot: '/',
+    pagination: 10,
+  });
 });
 test('describeServer({resources:{}})', () => {
   a.deepEqual(ds({ resources: {} }), { resources: {} });
@@ -53,6 +53,9 @@ test('describeServer({resources:{dogs:{endpoints}}})', () => {
   a.deepEqual(ds({
     resources: {
       dogs: {
+        out: (resource, user) => ({
+          name: resource.name,
+        }),
         get: {},
         getId: {},
         notHelpful: {},
@@ -60,12 +63,15 @@ test('describeServer({resources:{dogs:{endpoints}}})', () => {
       cats: false,
     },
   }), {
-      resources: {
-        dogs: {
-          get: {},
-          getId: {},
+    resources: {
+      dogs: {
+        out: {
+          name: { type: 'string' },
         },
-
+        get: {},
+        getId: {},
       },
-    });
+
+    },
+  });
 });

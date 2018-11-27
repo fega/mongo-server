@@ -12,11 +12,11 @@
 
         <mj-text font-size="20px" font-family="helvetica" align="center">This is your verification code to enter ${config.appName}.</mj-text>
 
-        <mj-divider border-color="#white"></mj-divider>
+        <mj-divider border-color="white"></mj-divider>
 
         <mj-text font-size="50px" font-family="helvetica" align="center">${token}</mj-text>
 
-        <mj-divider border-color="#white"></mj-divider>
+        <mj-divider border-color="white"></mj-divider>
 
 
         <mj-text font-size="20px" font-family="helvetica" align="center">If you do not know what this is, simply ignore it.</mj-text>

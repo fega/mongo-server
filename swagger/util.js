@@ -149,18 +149,32 @@ exports.generateDefinitions = (config) => {
 };
 
 const pickRootProperties = pick(['resources', 'root', 'port', 'host', 'static', 'staticRoot', 'pagination', 'restricted']);
-const pickEndpoindProperties = pick(['get', 'getId', 'put', 'patch', 'delete', 'post']);
-const describeEndpoint = (resource) => {
-
+const pickEndpointProperties = pick(['get', 'getId', 'put', 'patch', 'delete', 'post']);
+const describeOut = (resource) => {
+  if (!resource.out) return {};
+  let out1;
+  try {
+    out1 = resource.out({}, {});
+  } catch (error) {
+    out1 = {};
+  }
+  return { out: mapValues(out1, v => ({ type: 'string' })) };
 };
+const describeEndpoint = resource => ({});
 
 const describeResource = (resource) => {
-  const result = pipe(
+  const methods = pipe(
     pickBy(truthy),
-    pickEndpoindProperties,
+    pickEndpointProperties,
     map(describeEndpoint),
   )(resource);
-  return result;
+
+  const out = describeOut(resource);
+
+  return {
+    ...methods,
+    ...out,
+  };
 };
 
 const describeResources = config => ((!config.resources)
