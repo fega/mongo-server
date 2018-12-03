@@ -1,6 +1,6 @@
 /* eslint-env node, mocha */
 const chai = require('chai');
-
+const { give } = require('loy');
 const { describeServer: ds } = require('../swagger/util');
 
 const a = chai.assert;
@@ -53,25 +53,63 @@ test('describeServer({resources:{dogs:{endpoints}}})', () => {
   a.deepEqual(ds({
     resources: {
       dogs: {
-        out: (resource, user) => ({
+        out: resource => ({
           name: resource.name,
+          horses: resource.horses,
+          horses_id: resource.horses_id,
+          horses_ids: resource.horses_id,
+          created_at: resource.created_at,
+          updatedAt: resource.updatedAt,
         }),
         get: {},
         getId: {},
         notHelpful: {},
       },
       cats: false,
+      horses: {
+        out: resource => ({
+          hello: give(resource.hello).as('string').description('a field').ok(),
+        }),
+      },
     },
   }), {
     resources: {
       dogs: {
         out: {
-          name: { type: 'string' },
+          name: { models: [String] },
+          horses: {
+            models: [['horses']],
+          },
+          horses_id: {
+            models: [String],
+            description: 'A horse Id',
+          },
+          horses_ids: {
+            models: [String],
+            description: 'An array of horse Ids',
+          },
+          createdAt: {
+            models: [Date],
+            description: 'Horse date of creation',
+          },
+          updatedAt: {
+            models: [Date],
+            description: 'Horse date of latest update',
+          },
         },
         get: {},
         getId: {},
       },
-
+      horses: {
+        out: {
+          hello: {
+            examples: [],
+            models: ['string'],
+            permissions: [],
+            description: 'a field',
+          },
+        },
+      },
     },
   });
 });

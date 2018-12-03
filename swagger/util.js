@@ -8,6 +8,7 @@ const {
   pick,
 } = require('ramda');
 const { singular } = require('pluralize');
+const { describe } = require('loy');
 
 const { assign } = Object;
 const truthy = v => !!v;
@@ -152,13 +153,8 @@ const pickRootProperties = pick(['resources', 'root', 'port', 'host', 'static', 
 const pickEndpointProperties = pick(['get', 'getId', 'put', 'patch', 'delete', 'post']);
 const describeOut = (resource) => {
   if (!resource.out) return {};
-  let out1;
-  try {
-    out1 = resource.out({}, {});
-  } catch (error) {
-    out1 = {};
-  }
-  return { out: mapValues(out1, v => ({ type: 'string' })) };
+
+  return { out: describe(resource.out) };
 };
 const describeEndpoint = resource => ({});
 
