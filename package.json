@@ -1,18 +1,21 @@
 {
   "name": "moser",
-  "version": "0.17.6",
+  "version": "0.17.7",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "server.js",
   "scripts": {
     "test": "NODE_ENV=test mocha ./test/**/*.test.js --exit --ui qunit --timeout 5000",
     "test:watch": "NODE_ENV=test mocha --exit --watch --ui qunit --timeout 5000",
     "dev": "nodemon index.js",
-    "lint": "eslint ./"
+    "lint": "eslint ./",
+    "start": "node server.js"
   },
   "author": "Fabian Gutierrez <fega.hg@gmail.com>",
   "license": "MIT",
   "preferGlobal": true,
-  "bin": "./bin/cli.js",
+  "bin": {
+    "moser": "./bin/cli.js"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "chalk": "^2.4.1",
@@ -39,7 +42,7 @@
     "passport-local": "^1.0.0",
     "pluralize": "^7.0.0",
     "pretty-error": "^2.1.1",
-    "ramda": "^0.26.0",
+    "ramda": "^0.26.1",
     "randomstring": "^1.1.5",
     "raven": "^2.6.4"
   },
@@ -56,5 +59,34 @@
     "proxyquire": "^2.1.0",
     "sinon": "^7.1.1",
     "supertest": "^3.3.0"
-  }
+  },
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fega/mongo-server.git"
+  },
+  "keywords": [
+    "mongo",
+    "express",
+    "server",
+    "development",
+    "lean",
+    "quick",
+    "mock",
+    "quick",
+    "prototype",
+    "prototyping",
+    "mongodb",
+    "rest",
+    "api",
+    "framework"
+  ],
+  "bugs": {
+    "url": "https://github.com/fega/mongo-server/issues"
+  },
+  "homepage": "https://github.com/fega/mongo-server#readme"
 }
