@@ -50,13 +50,24 @@ DELETE /posts/1
 
 ### Filter
 
+You can filter by any field=value
 Use `.` to access deep properties
 
 ```http
-GET /posts?title=json-server&author=typicode
+GET /posts?title=moser&author=fega
 GET /posts?id=1&id=2
-GET /comments?author.name=typicode
+GET /comments?author.name=fega
 ```
+
+
+### Filter Fields
+
+You can use `$select` to return only the fields that you need.
+```http
+GET /posts?$select[]=author&$select[]=_id
+GET /posts?$select=name
+```
+
 
 ### Paginate
 

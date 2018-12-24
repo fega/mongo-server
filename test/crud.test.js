@@ -51,6 +51,15 @@ test('filters, OK', async () => {
   const r = await request(server).get('/comments?author=tata').expect(200);
   a.equal(r.body.length, 2);
 });
+test('$select, OK', async () => {
+  await db.collection('durians').insertOne({ author: 'fabian' });
+  await db.collection('durians').insertOne({ author: 'fabian' });
+  await db.collection('durians').insertOne({ author: 'tata' });
+  await db.collection('durians').insertOne({ author: 'tata' });
+  const r = await request(server).get('/durians?$select=author').expect(200);
+  a.equal(r.body.length, 4);
+  a.deepEqual(r.body[0], { author: 'fabian' });
+});
 test('filters, BAD_REQUEST unsafe filters', async () => {
   await request(server).get('/comments?$author=tata').expect(400);
 });
