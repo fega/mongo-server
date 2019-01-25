@@ -1,5 +1,5 @@
 const {
-  mapValues, mapKeys, capitalize,
+  mapValues, mapKeys, capitalize, clone, isObject,
 } = require('lodash');
 const {
   pickBy,
@@ -9,10 +9,10 @@ const {
 } = require('ramda');
 const { singular } = require('pluralize');
 const { describe } = require('loy');
+const Joi = require('Joi');
 
 const { assign } = Object;
 const truthy = v => !!v;
-
 exports.generateTags = (config) => {
   const resources = Object.keys(config.resources);
   const r = resources.map(resource => ({
@@ -149,27 +149,118 @@ exports.generateDefinitions = (config) => {
   };
 };
 
-const pickRootProperties = pick(['resources', 'root', 'port', 'host', 'static', 'staticRoot', 'pagination', 'restricted']);
+const extraDescriptions = (description, key) => {
+  const copy = clone(description);
+  if (key.endsWith('_id') && !description.description) {
+    copy.description = `A ${singular(key.replace('_id', ''))} Id`;
+  }
+  if (key.endsWith('_ids') && !description.description) {
+    copy.description = `An array of ${singular(key.replace('_ids', ''))} Ids`;
+  }
+  if (key === 'updatedAt' && !description.description) {
+    copy.description = 'Date of latest update of resource';
+  }
+  if (key === 'createdAt' && !description.description) {
+    copy.description = 'Creation date of resource';
+  }
+  return copy;
+};
+
+const generateExtraDescriptions = (outObj) => {
+  const out = clone(outObj);
+  Object.keys(outObj).forEach((key) => {
+    out[key] = extraDescriptions(out[key], key);
+  });
+  return out;
+};
+
+const pickRootProperties = pick(['resources', 'root', 'port', 'host', 'static', 'staticRoot', 'pagination', 'restricted', 'appName']);
 const pickEndpointProperties = pick(['get', 'getId', 'put', 'patch', 'delete', 'post']);
 const describeOut = (resource) => {
   if (!resource.out) return {};
+  const preOut = describe(resource.out);
+  const out = generateExtraDescriptions(preOut);
 
-  return { out: describe(resource.out) };
+  return { out };
 };
-const describeEndpoint = resource => ({});
+const describeEndpoint = (resource) => {
+  if (Array.isArray(resource)) {
+    return {
+      permissions: resource,
+    };
+  }
+  if (isObject(resource)) {
+    const result = {};
+    if (resource.permissions) result.permissions = resource.permissions;
+    return result;
+  }
+};
 
-const describeResource = (resource) => {
+const describeAuth = (resource) => {
+  if (!resource.auth) return {};
+
+  const auth = {};
+
+  if (resource.auth.local) {
+    auth.local = {
+      userField: resource.auth.local[0],
+      passwordField: resource.auth.local[1],
+    };
+  }
+  if (resource.auth.magicLink) {
+    auth.magicLink = {
+      emailField: resource.auth.magicLink.emailField || 'email',
+    };
+  }
+  if (resource.auth.magicCode) {
+    auth.magicCode = {
+      emailField: resource.auth.magicCode.emailField || 'email',
+    };
+  }
+  return { auth };
+};
+
+const describeIn = (resource) => {
+  if (!resource.in) return {};
+
+  const $in = {};
+
+  if (resource.in.body) {
+    $in.body = Joi.describe(resource.in.body);
+  }
+  if (resource.in.query) {
+    $in.query = Joi.describe(resource.in.query);
+  }
+  if (resource.in.params) {
+    $in.params = Joi.describe(resource.in.params);
+  }
+  return { in: $in };
+};
+
+const describePermissions = (resource) => {
+  if (resource.permissions) {
+    return { permissions: resource.permissions };
+  }
+  return {};
+};
+
+const describeResource = (resource, name) => {
   const methods = pipe(
     pickBy(truthy),
     pickEndpointProperties,
     map(describeEndpoint),
   )(resource);
 
-  const out = describeOut(resource);
-
+  const out = describeOut(resource, name);
+  const auth = describeAuth(resource, name);
+  const $in = describeIn(resource, name);
+  const permissions = describePermissions(resource);
   return {
     ...methods,
     ...out,
+    ...auth,
+    ...$in,
+    ...permissions,
   };
 };
 

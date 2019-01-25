@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.18.1",
+  "version": "0.20.0",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "server.js",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "chalk": "^2.4.1",
+    "chalk": "^2.4.2",
     "commander": "^2.19.0",
     "compression": "^1.7.3",
     "cookie-parser": "^1.4.3",
@@ -31,13 +31,13 @@
     "flattenjs": "^1.0.4",
     "helmet": "^3.15.0",
     "http-errors": "^1.7.1",
-    "joi": "^14.3.0",
+    "joi": "^14.3.1",
     "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.11",
     "loy": "0.0.2",
-    "mongodb": "^3.1.10",
+    "mongodb": "^3.1.13",
     "morgan": "^1.9.1",
-    "nodemailer": "^4.7.0",
+    "nodemailer": "^5.1.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pluralize": "^7.0.0",
@@ -50,15 +50,15 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "delay": "^4.1.0",
-    "eslint": "^5.11.0",
+    "eslint": "^5.12.1",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-import": "^2.15.0",
     "maildev": "^1.0.0-rc3",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.9",
     "proxyquire": "^2.1.0",
-    "sinon": "^7.2.2",
-    "supertest": "^3.3.0"
+    "sinon": "^7.2.3",
+    "supertest": "^3.4.2"
   },
   "directories": {
     "doc": "docs",

@@ -6,6 +6,7 @@ const pkg = require('./package');
 const connect = require('./db');
 const createServer = require('./server');
 const { isDbEmpty, seedDb } = require('./lib/mongodb');
+const { describeServer } = require('./swagger/util');
 
 const tag = chalk.cyan('[m-server]');
 
@@ -70,9 +71,16 @@ const main = async (programConfig = {}) => {
     }
 
     /**
+     * Server description
+     */
+    config.description = describeServer(config);
+
+    /**
      * creating the server
      */
-    createServer(config, db);
+    const app = await createServer(config, db);
+
+    return { app, db };
   } catch (error) {
     throw error;
   }

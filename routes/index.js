@@ -33,6 +33,9 @@ const {
 
 module.exports = (config, db) => {
   const router = express.Router();
+  router.get('/moser-docs/description', (req, res) => {
+    res.send(config.description);
+  });
   /**
    * Executes a simple query
    * @param {String} resource resource being query
@@ -112,6 +115,10 @@ module.exports = (config, db) => {
    * Email endpoints
    */
   generateNodemailerHandlers(config, router);
+
+
+  router.get('/$docs/swagger', () => { });
+  router.get('/$docs/swagger.json', () => { });
 
   /**
    * Routes, retrieve resources

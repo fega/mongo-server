@@ -1,5 +1,6 @@
 /* eslint-env node, mocha */
 const chai = require('chai');
+const Joi = require('joi');
 const { give } = require('loy');
 const { describeServer: ds } = require('../swagger/util');
 
@@ -51,19 +52,42 @@ test('describeServer({resources:{dogs:false}})', () => {
 });
 test('describeServer({resources:{dogs:{endpoints}}})', () => {
   a.deepEqual(ds({
+    appName: 'Doggy',
     resources: {
       dogs: {
+        permissions: ['dogs'],
+        in: {
+          body: {
+            name: Joi.string(),
+          },
+          query: {
+            hello: Joi.string(),
+          },
+          params: {
+            hello: Joi.string(),
+          },
+        },
+        auth: {
+          local: ['user', 'password'],
+          magicLink: {
+          },
+          magicCode: {
+
+          },
+        },
         out: resource => ({
           name: resource.name,
           horses: resource.horses,
           horses_id: resource.horses_id,
           horses_ids: resource.horses_id,
-          created_at: resource.created_at,
+          createdAt: resource.createdAt,
           updatedAt: resource.updatedAt,
         }),
         get: {},
         getId: {},
         notHelpful: {},
+        patch: false,
+        delete: ['admin'],
       },
       cats: false,
       horses: {
@@ -73,12 +97,65 @@ test('describeServer({resources:{dogs:{endpoints}}})', () => {
       },
     },
   }), {
+    appName: 'Doggy',
+
     resources: {
       dogs: {
+        delete: {
+          permissions: ['admin'],
+        },
+        permissions: ['dogs'],
+        in: {
+          body: {
+            children: {
+              name: {
+                invalids: [
+                  '',
+                ],
+                type: 'string',
+              },
+            },
+            type: 'object',
+          },
+          query: {
+            children: {
+              hello: {
+                invalids: [
+                  '',
+                ],
+                type: 'string',
+              },
+            },
+            type: 'object',
+          },
+          params: {
+            children: {
+              hello: {
+                invalids: [
+                  '',
+                ],
+                type: 'string',
+              },
+            },
+            type: 'object',
+          },
+        },
+        auth: {
+          local: {
+            userField: 'user',
+            passwordField: 'password',
+          },
+          magicLink: {
+            emailField: 'email',
+          },
+          magicCode: {
+            emailField: 'email',
+          },
+        },
         out: {
           name: { models: [String] },
           horses: {
-            models: [['horses']],
+            models: [String],
           },
           horses_id: {
             models: [String],
@@ -90,11 +167,11 @@ test('describeServer({resources:{dogs:{endpoints}}})', () => {
           },
           createdAt: {
             models: [Date],
-            description: 'Horse date of creation',
+            description: 'Creation date of resource',
           },
           updatedAt: {
             models: [Date],
-            description: 'Horse date of latest update',
+            description: 'Date of latest update of resource',
           },
         },
         get: {},
