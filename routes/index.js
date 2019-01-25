@@ -116,10 +116,6 @@ module.exports = (config, db) => {
    */
   generateNodemailerHandlers(config, router);
 
-
-  router.get('/$docs/swagger', () => { });
-  router.get('/$docs/swagger.json', () => { });
-
   /**
    * Routes, retrieve resources
    */
