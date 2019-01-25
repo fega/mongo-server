@@ -9,7 +9,7 @@ const {
 } = require('ramda');
 const { singular } = require('pluralize');
 const { describe } = require('loy');
-const Joi = require('Joi');
+const Joi = require('joi');
 
 const { assign } = Object;
 const truthy = v => !!v;
