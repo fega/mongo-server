@@ -6,7 +6,7 @@ Get a full REST API with **zero coding** in **less than 30 seconds** \(seriously
 
 ### Documentation
 
-📖 [Read Documentation](https://nomadas.gitbook.io/mongo)
+📖[ Read Documentation](https://nomadas.gitbook.io/mongo-server/)
 
 ### Features
 
