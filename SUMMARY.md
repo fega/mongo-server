@@ -6,8 +6,8 @@
 ## Basics
 
 * [Routing and Queries](basics/routing-and-queries.md)
-* [Route logic](basics/route-logic.md)
 * [Restrict endpoints](basics/restrict-endpoints.md)
+* [Route logic](basics/route-logic.md)
 * [Default values](basics/untitled.md)
 * [Input validation and Output Formatting](basics/input-validation-and-output-formatting.md)
 
