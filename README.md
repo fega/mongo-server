@@ -2,8 +2,7 @@
 
 ![Mongo-server](https://i.imgur.com/DJgIHcL.png)
 
-Get a full REST API with __zero coding__ in __less than 30 seconds__ (seriously)
-Hyper-Heavily inspired on [json-server](https://github.com/typicode/json-server)
+Get a full REST API with **zero coding** in **less than 30 seconds** \(seriously\) Hyper-Heavily inspired on [json-server](https://github.com/typicode/json-server)
 
 ## Getting started
 
@@ -22,16 +21,16 @@ moser --mongo mongodb://localhost:27017
 
 Now if you go to [http://localhost:3000/posts/](http://localhost:3000/posts/), you'll get
 
-```json
+```javascript
 []
 ```
 
 Also when doing requests, it's good to know that:
 
-- If you make POST, PUT, PATCH or DELETE requests, changes will be stored on mongodb.
-- Your request body JSON should be object enclosed, just like the GET output. (for example `{"name": "Foobar"}`)
-- Id values are not mutable. Any `id` value in the body of your PUT or PATCH request will be ignored. Only a value set in a POST request will be respected, but only if not already taken.
-- id values are currently saved as plain text, this probably will change in the future
+* If you make POST, PUT, PATCH or DELETE requests, changes will be stored on mongodb.
+* Your request body JSON should be object enclosed, just like the GET output. \(for example `{"name": "Foobar"}`\)
+* Id values are not mutable. Any `id` value in the body of your PUT or PATCH request will be ignored. Only a value set in a POST request will be respected, but only if not already taken.
+* id values are currently saved as plain text, this probably will change in the future
 
 ## Routes
 
@@ -50,8 +49,7 @@ DELETE /posts/1
 
 ### Filter
 
-You can filter by any field=value
-Use `.` to access deep properties
+You can filter by any field=value Use `.` to access deep properties
 
 ```http
 GET /posts?title=moser&author=fega
@@ -59,15 +57,14 @@ GET /posts?id=1&id=2
 GET /comments?author.name=fega
 ```
 
-
 ### Filter Fields
 
 You can use `$select` to return only the fields that you need.
+
 ```http
 GET /posts?$select[]=author&$select[]=_id
 GET /posts?$select=name
 ```
-
 
 ### Paginate
 
@@ -84,7 +81,7 @@ _10 items are returned by default_
 
 ### Sort
 
-Add `$sort` and `$order` (ascending order by default)
+Add `$sort` and `$order` \(ascending order by default\)
 
 ```http
 GET /posts?$sort=views&$order=asc
@@ -117,7 +114,7 @@ To include children resources, add `$populate`
 GET /companies$populate=employees
 ```
 
-``` js
+```javascript
   // create two companies
   await db.collection('companies').insertOne({ _id: 1, name: 'corp' });
   await db.collection('companies').insertOne({ _id: 2, name: 'inc' });
@@ -125,7 +122,7 @@ GET /companies$populate=employees
   await db.collection('employees').insertOne({ _id: 1, name: 'Foobio', company_id: 1 });
   // this employee works for both!, notice the "s" on company_ids!
   await db.collection('employees').insertOne({ _id: 2, name: 'Barfy', company_ids: [1, 2] });
-  
+
   const r = await request(server).get('/companies?$populate=employees').expect(200);
 
   // employees are populated"
@@ -160,7 +157,7 @@ Usage: mongodb-server [options]
 
 You can also set options in a `js` or `json` configuration file.
 
-```js
+```javascript
 module.exports= {
   // Port, default 3000
   port: 3000,
@@ -201,7 +198,7 @@ module.exports= {
 
 You can restrict the endpoints for only what you provided using the restrict option in your config file:
 
-```js
+```javascript
 module.exports= {
   restrict: true,
   resources: ['users','dogs']
@@ -215,10 +212,9 @@ module.exports= {
 
 ### Defaults
 
-With Defaults, you can assign default properties on resource creation / update,
-if the function result includes  the keys `$owner`, `$timestamps` or `$changelog` `$version`, it will trigger special behaviors
+With Defaults, you can assign default properties on resource creation / update, if the function result includes the keys `$owner`, `$timestamps` or `$changelog` `$version`, it will trigger special behaviors
 
-```js
+```javascript
 module.exports= {
   resources: {
     dogs: {
@@ -240,7 +236,7 @@ module.exports= {
 
 You can create a mailing service that sends you an email when a POST request hit the specified resource, using a nodemailer instance:
 
-```js
+```javascript
 module.exports= {
     resources: {
       dogs: {
@@ -264,7 +260,7 @@ This option could be helpful for landing pages.
 
 You can seed your database using libraries like faker JS and Casual
 
-```js
+```javascript
 const casual= require('casual')
 module.exports= {
     resources: {
@@ -286,9 +282,9 @@ module.exports= {
 
 ### Login and Authentication
 
-The majority of systems needs a way to identify and authenticate user, with Moser you can activate an auth system based on JWT just adding  one option in your config file
+The majority of systems needs a way to identify and authenticate user, with Moser you can activate an auth system based on JWT just adding one option in your config file
 
-```js
+```javascript
 module.exports= {
   resources: {
     users:{
@@ -308,7 +304,7 @@ using this you can call the endpoint `POST /auth/users/sign-up` to create an use
 
 You can protect your resources using the permissions field
 
-```js
+```javascript
 module.exports= {
   resources: {
     users:{
@@ -341,11 +337,11 @@ module.exports= {
 }
 ```
 
-#### Advanced permission handling (permissions and filters)
+#### Advanced permission handling \(permissions and filters\)
 
 you can define special permissions that can be reused across your logic.
 
-```js
+```javascript
 {
   resources:{
     secrets:{
@@ -364,7 +360,7 @@ you can define special permissions that can be reused across your logic.
 
 But this approach will not work with `GET resources/`, for that reason the filters are implemented, filters are functions that returns mongodb queries.
 
-```js
+```javascript
 {
   resources:{
     secrets:{
@@ -382,9 +378,9 @@ But this approach will not work with `GET resources/`, for that reason the filte
 
 ### Input validation and Output Formating
 
-In a production environment you should never trust in your incoming data,so here you can validate the incoming data easily using the Joi library (you need to install it):
+In a production environment you should never trust in your incoming data,so here you can validate the incoming data easily using the Joi library \(you need to install it\):
 
-```js
+```javascript
 const postsIn = {
   // you can restrict the body (only in PUT PATCH and POST requests)
   body: {
@@ -410,7 +406,7 @@ module.exports= {
 
 Is very likely that you'll want to add custom logic for some endpoints. for those cases you can use the do fields, which is an enhanced version of the express middleware:
 
-```js
+```javascript
 module.exports= {
   resources:{
     dogs:{
@@ -434,7 +430,7 @@ You can access to a JSON description of the server configuration using:
 GET    /moser-docs/description
 ```
 
-This was added in order to create an admin panel automatically (feature in development) but maybe you can find useful for any other task.
+This was added in order to create an admin panel automatically \(feature in development\) but maybe you can find useful for any other task.
 
 ### Rate limit
 
@@ -459,3 +455,4 @@ Coming soon...
 ## License
 
 MIT - [Fabian Enrique Gutierrez](https://github.com/fega)
+

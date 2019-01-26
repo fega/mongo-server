@@ -1,12 +1,12 @@
-# RoadMap
+# Roadmap
 
 ## Web page
 
-## Facebook Auth
+## Facebook Auth
 
 ## Google Auth
 
-## Oauth2 Auth
+## Oauth2 Auth
 
 ## Email verification
 
@@ -15,14 +15,12 @@
 This Auth strategy creates and send a magic code to the email provided by the client
 
 ```http
-
 POST /auth/magic-code/
 {
   "email":"user@email.com"
 }
 
 GET /auth/magic-code/:email/:token
-
 ```
 
 ## Magic link auth
@@ -30,7 +28,6 @@ GET /auth/magic-code/:email/:token
 This Auth strategy creates and send a magic link to the email provided by the client
 
 ```http
-
 POST /auth/magic-link/
 {
   "email":"user@email.com"
@@ -80,7 +77,7 @@ module.exports={
       }
     }
   }
-  
-}
 
+}
 ```
+
