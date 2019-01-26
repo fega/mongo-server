@@ -60,7 +60,6 @@ test('have NO helmet', () => {
 test('have serveStatic non default url', () => {
   const staticMid = server._router.stack.find(m => m.name === 'serveStatic');
   a.exists(staticMid);
-  console.log(staticMid);
   a.deepEqual(staticMid.regexp, /^\/static\/?(?=\/|$)/i);
 });
 test('have default serveStatic', () => {

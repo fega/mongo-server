@@ -3,8 +3,59 @@ const chai = require('chai');
 const Joi = require('joi');
 const { give } = require('loy');
 const { describeServer: ds } = require('../swagger/util');
+const { swagger } = require('../swagger/generator');
 
 const a = chai.assert;
+
+const superConfig = {
+  appName: 'Doggy',
+  resources: {
+    dogs: {
+      description: 'Dog resources',
+      permissions: ['dogs'],
+      in: {
+        body: {
+          name: Joi.string(),
+        },
+        query: {
+          hello: Joi.string(),
+        },
+        params: {
+          hello: Joi.string(),
+        },
+      },
+      auth: {
+        local: ['user', 'password'],
+        magicLink: {
+        },
+        magicCode: {
+
+        },
+      },
+      out: resource => ({
+        name: resource.name,
+        horses: resource.horses,
+        horses_id: resource.horses_id,
+        horses_ids: resource.horses_id,
+        createdAt: resource.createdAt,
+        updatedAt: resource.updatedAt,
+      }),
+      get: {},
+      getId: {},
+      notHelpful: {},
+      patch: false,
+      delete: ['admin'],
+    },
+    cats: false,
+    horses: {
+      out: resource => ({
+        hello: give(resource.hello).as('string').description('a field').ok(),
+      }),
+      getId: true,
+    },
+    dragons: true,
+  },
+};
 
 
 suite('describeServer()');
@@ -50,61 +101,18 @@ test('describeServer({resources:{dogs:false}})', () => {
     },
   }), { resources: {} });
 });
-test('describeServer({resources:{dogs:{endpoints}}})', () => {
-  a.deepEqual(ds({
-    appName: 'Doggy',
-    resources: {
-      dogs: {
-        permissions: ['dogs'],
-        in: {
-          body: {
-            name: Joi.string(),
-          },
-          query: {
-            hello: Joi.string(),
-          },
-          params: {
-            hello: Joi.string(),
-          },
-        },
-        auth: {
-          local: ['user', 'password'],
-          magicLink: {
-          },
-          magicCode: {
-
-          },
-        },
-        out: resource => ({
-          name: resource.name,
-          horses: resource.horses,
-          horses_id: resource.horses_id,
-          horses_ids: resource.horses_id,
-          createdAt: resource.createdAt,
-          updatedAt: resource.updatedAt,
-        }),
-        get: {},
-        getId: {},
-        notHelpful: {},
-        patch: false,
-        delete: ['admin'],
-      },
-      cats: false,
-      horses: {
-        out: resource => ({
-          hello: give(resource.hello).as('string').description('a field').ok(),
-        }),
-      },
-    },
-  }), {
+test('describeServer(superConfig)', () => {
+  a.deepEqual(ds(superConfig), {
     appName: 'Doggy',
 
     resources: {
       dogs: {
+        description: 'Dog resources',
         delete: {
           permissions: ['admin'],
         },
         permissions: ['dogs'],
+        put: {},
         in: {
           body: {
             children: {
@@ -153,7 +161,13 @@ test('describeServer({resources:{dogs:{endpoints}}})', () => {
           },
         },
         out: {
-          name: { models: [String] },
+          name: {
+            invalids: [
+              '',
+            ],
+            type: 'string',
+            models: [String],
+          },
           horses: {
             models: [String],
           },
@@ -178,6 +192,11 @@ test('describeServer({resources:{dogs:{endpoints}}})', () => {
         getId: {},
       },
       horses: {
+        delete: {},
+        get: {},
+        getId: {},
+        patch: {},
+        put: {},
         out: {
           hello: {
             examples: [],
@@ -187,6 +206,31 @@ test('describeServer({resources:{dogs:{endpoints}}})', () => {
           },
         },
       },
+      dragons: {
+        get: {},
+        getId: {},
+        put: {},
+        patch: {},
+        delete: {},
+      },
+
     },
+  });
+});
+
+test('generate.swagger(superConfig)', () => {
+  a.deepEqual(swagger(superConfig), {
+    swagger: '2.0',
+    info: {
+      description: 'Rest api',
+      version: '1.0.0',
+      title: 'Doggy',
+      host: undefined,
+      basePath: '/',
+    },
+    schemes: [
+      'https',
+      'http',
+    ],
   });
 });

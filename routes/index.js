@@ -43,7 +43,8 @@ module.exports = (config, db) => {
    */
   const find = async (resource, query, filter = {}) => {
     const {
-      $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, $fill, $select, ...$filter
+      $limit, $page, $sort, $order, $populate, $range,
+      $text, $regex, $query, $fill, $select, ...$filter
     } = query;
     const result = await db.collection(resource).find(
       {
@@ -64,7 +65,8 @@ module.exports = (config, db) => {
   };
   const findAndPopulate = async (resource, query, filter = {}) => {
     const {
-      $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, $fill, $select, ...$filter
+      $limit, $page, $sort, $order, $populate, $range,
+      $text, $regex, $query, $fill, $select, ...$filter
     } = query;
     // Build pipeline
     const pipeline = [{
@@ -131,7 +133,6 @@ module.exports = (config, db) => {
     res.locals.resources = result;
     return next();
   }));
-
   router.post('/:resource/', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.post`) === false) return next();
 

@@ -1,11 +1,8 @@
 const {
-  mapValues, mapKeys, capitalize, clone, isObject,
+  mapValues, mapKeys, capitalize, clone, isObject, get,
 } = require('lodash');
 const {
-  pickBy,
-  pipe,
-  map,
-  pick,
+  pickBy, pipe, map, pick,
 } = require('ramda');
 const { singular } = require('pluralize');
 const { describe } = require('loy');
@@ -13,18 +10,6 @@ const Joi = require('joi');
 
 const { assign } = Object;
 const truthy = v => !!v;
-exports.generateTags = (config) => {
-  const resources = Object.keys(config.resources);
-  const r = resources.map(resource => ({
-    name: resource,
-    description: `${resource} endpoints`,
-  }));
-  r.push({
-    name: 'Auth',
-    description: 'Authorization and authentication endpoints',
-  });
-  return r;
-};
 
 exports.generatePaths = (config) => {
   const { resources } = config;
@@ -122,9 +107,6 @@ exports.generatePaths = (config) => {
   };
   return { ...r, ...r2, ...r3 };
 };
-exports.generateSecurityDefinitions = (config) => {
-
-};
 
 
 exports.generateDefinitions = (config) => {
@@ -178,16 +160,31 @@ const generateExtraDescriptions = (outObj) => {
   return out;
 };
 
+const completeOutWithIn = (name, outObj, ins) => {
+  const mixin = get(ins, 'in.body.children');
+  if (!mixin) return outObj;
+
+  const out = clone(outObj);
+  Object.keys(outObj).forEach((key) => {
+    out[key] = Object.assign({}, mixin[key], out[key]);
+  });
+  return out;
+};
+
 const pickRootProperties = pick(['resources', 'root', 'port', 'host', 'static', 'staticRoot', 'pagination', 'restricted', 'appName']);
 const pickEndpointProperties = pick(['get', 'getId', 'put', 'patch', 'delete', 'post']);
-const describeOut = (resource) => {
+const describeOut = (resource, name, ins) => {
   if (!resource.out) return {};
   const preOut = describe(resource.out);
-  const out = generateExtraDescriptions(preOut);
-
+  const preOut2 = generateExtraDescriptions(preOut);
+  const out = completeOutWithIn(name, preOut2, ins);
   return { out };
 };
 const describeEndpoint = (resource) => {
+  if (resource === true) {
+    return {};
+  }
+
   if (Array.isArray(resource)) {
     return {
       permissions: resource,
@@ -248,23 +245,32 @@ const describePermissions = (resource) => {
   return {};
 };
 
+
 const describeResource = (resource, name) => {
+  const _resource = Object.assign({}, {
+    get: {},
+    getId: {},
+    put: {},
+    patch: {},
+    delete: {},
+  }, resource);
   const methods = pipe(
     pickBy(truthy),
     pickEndpointProperties,
     map(describeEndpoint),
-  )(resource);
+  )(_resource);
 
-  const out = describeOut(resource, name);
+  const ins = describeIn(resource, name);
+  const out = describeOut(resource, name, ins);
   const auth = describeAuth(resource, name);
-  const $in = describeIn(resource, name);
   const permissions = describePermissions(resource);
   return {
     ...methods,
     ...out,
     ...auth,
-    ...$in,
+    ...ins,
     ...permissions,
+    ...resource.description ? { description: resource.description } : {},
   };
 };
 
@@ -284,4 +290,58 @@ const describeResources = config => ((!config.resources)
 exports.describeServer = (config) => {
   const result = pipe(pickRootProperties, describeResources)(config);
   return result;
+};
+
+/**
+ * Generates Swagger tags
+ * @param {object} config Moser Object
+ */
+exports.generateTags = (config) => {
+  const resources = Object.keys(config.resources);
+  if (!resources) return [];
+
+  const r = resources.map(resource => ({
+    name: resource,
+    description: config.resources[resource] || `${capitalize(resource)} endpoints`,
+  }));
+  const haveAuth = resources.some(resource => get(config.resources[resource], 'auth'));
+  if (haveAuth) {
+    r.push({
+      name: 'Auth',
+      description: 'Authorization and authentication endpoints',
+    });
+  }
+  return r;
+};
+
+
+const generateLocalAuthDefinitions = () => {
+
+};
+
+
+/**
+ * Generates security definitions
+ */
+exports.generateSecurityDefinitions = (config) => {
+  const securityDefinitions = {
+    PostMagicLink: {
+      type: 'object',
+      properties: {
+        search: {
+          type: 'string',
+          description: 'search token',
+        },
+      },
+    },
+    GetMagicToken: {
+      type: 'object',
+      properties: {
+        $token: {
+          type: 'string',
+          description: 'User JWT token',
+        },
+      },
+    },
+  };
 };

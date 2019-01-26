@@ -2,8 +2,8 @@ const express = require('express');
 const { mapValues, mapKeys, capitalize } = require('lodash');
 const { singular } = require('pluralize');
 const swaggerUi = require('swagger-ui-express');
-const pkg = require('../../package');
-const moserConfig = require('../../main');
+const pkg = require('../package');
+const moserConfig = require('../main');
 const {
   generateDelete, generateGet, generateGetId, generatePatch, generatePost, generatePut,
   getDefinition,

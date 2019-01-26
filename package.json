@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "server.js",
   "scripts": {
@@ -44,7 +44,8 @@
     "pretty-error": "^2.1.1",
     "ramda": "^0.26.1",
     "randomstring": "^1.1.5",
-    "raven": "^2.6.4"
+    "raven": "^2.6.4",
+    "swagger-ui-express": "^4.0.2"
   },
   "devDependencies": {
     "chai": "^4.2.0",
