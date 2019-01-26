@@ -27,6 +27,9 @@ before(async () => {
         out: resource => ({ ...resource, extraField: true }),
       },
     },
+    settings: {
+      restrictWhereQuery: true,
+    },
   }, db);
 });
 after(async () => {
@@ -138,6 +141,12 @@ test('?$query, OK {"name":"Puky"}', async () => {
 test('?$query, invalid', async () => {
   await request(server).get('/hippos?$query={"name":"Puky}').expect(400);
 });
+test('?$where, invalid', async () => {
+  const r = await request(server).get('/hippos?$query={"$where":"Puky"}');
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'Invalid $where inside $query parameter');
+});
+
 
 test('?$sort=name, OK', async () => {
   await db.collection('robots').insertOne({ name: 4 });

@@ -45,10 +45,9 @@ module.exports = (config, db) => {
     const {
       $limit, $page, $sort, $order, $populate, $range, $text, $regex, $query, $fill, $select, ...$filter
     } = query;
-
     const result = await db.collection(resource).find(
       {
-        ...getQuery($query),
+        ...getQuery($query, config),
         ...getTextQuery($text),
         ...getRegexQuery($regex),
         ...getRangeQuery($range),
@@ -70,7 +69,7 @@ module.exports = (config, db) => {
     // Build pipeline
     const pipeline = [{
       $match: {
-        ...getQuery($query),
+        ...getQuery($query, config),
         ...getTextQuery($text),
         ...getRegexQuery($regex),
         ...getRangeQuery($range),

@@ -25,6 +25,10 @@ const main = async (programConfig = {}) => {
       mongo: programConfig.mongo || 'mongodb://localhost:27017',
       db: programConfig.db || 'mongo-server',
       pagination: programConfig.pagination || 10,
+      settings: {
+        restrictWhereQuery: true,
+        ...(programConfig.settings || {}),
+      },
     };
 
     /**

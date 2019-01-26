@@ -187,7 +187,13 @@ module.exports= {
   // default pagination limit
   pagination: 10,
   // custom error handler
-  errorHandler: (req.res,next,err)=>{/* custom error handler */}
+  errorHandler: (req.res,next,err)=>{/* custom error handler */},
+
+  // extra settings
+  settings:{
+    // avoid $where queries (To Avoid noSQL attacks), is enabled by default
+    restrictWhereQuery: true
+  }
 }
 ```
 

@@ -122,6 +122,10 @@ exports.generatePaths = (config) => {
   };
   return { ...r, ...r2, ...r3 };
 };
+exports.generateSecurityDefinitions = (config) => {
+
+};
+
 
 exports.generateDefinitions = (config) => {
   const { resources } = config;
