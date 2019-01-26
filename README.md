@@ -31,6 +31,12 @@ Get a full REST API with **zero coding** in **less than 30 seconds** \(seriously
   * [x] CORS
   * [ ] CSRF \(coming soon\).
 
+## Some use cases
+
+* [x] Quick Product prototyping
+* [x] Headless CMS
+* [x] test REST API
+
 ## License
 
 MIT - [Fabian Enrique Gutierrez](https://github.com/fega)
