@@ -108,7 +108,6 @@ exports.generatePaths = (config) => {
   return { ...r, ...r2, ...r3 };
 };
 
-
 exports.generateDefinitions = (config) => {
   const { resources } = config;
   const r = mapKeys(mapValues(resources, (v, k) => getDefinition(k, v)), (v, k) => `${capitalize(singular(k))}Output`);
@@ -299,10 +298,10 @@ exports.describeServer = (config) => {
 exports.generateTags = (config) => {
   const resources = Object.keys(config.resources);
   if (!resources) return [];
-
+  // const r = [];
   const r = resources.map(resource => ({
     name: resource,
-    description: config.resources[resource] || `${capitalize(resource)} endpoints`,
+    description: config.resources[resource].description || `${capitalize(resource)} endpoints`,
   }));
   const haveAuth = resources.some(resource => get(config.resources[resource], 'auth'));
   if (haveAuth) {

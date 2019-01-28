@@ -7,7 +7,7 @@ const connect = require('./db');
 const createServer = require('./server');
 const { isDbEmpty, seedDb } = require('./lib/mongodb');
 const { describeServer } = require('./swagger/util');
-
+const { swagger } = require('./swagger/generator');
 const tag = chalk.cyan('[m-server]');
 
 
@@ -78,6 +78,7 @@ const main = async (programConfig = {}) => {
      * Server description
      */
     config.description = describeServer(config);
+    config.swagger = swagger(config);
 
     /**
      * creating the server

@@ -1,24 +1,27 @@
 const swaggerUi = require('swagger-ui-express');
 const { generateTags, describeServer } = require('./util');
+const generateDefinitions = require('./definitions');
+const generatePaths = require('./paths/index');
+
 
 const swagger = (config) => {
-  // const description = describeServer(config);
+  const description = describeServer(config);
   const result = {
     swagger: '2.0',
     info: {
-      description: config.description || 'Rest api',
+      // description: config.description || 'Rest api',
       version: config.version || '1.0.0',
       title: config.appName || 'Moser',
-      host: config.host,
+      host: config.host || 'http://localhost:3000',
       basePath: config.root || '/',
     },
     schemes: [
       'https',
       'http',
     ],
-    // tags: generateTags(config),
-    // paths: generatePaths(config),
-    // definitions: generateDefinitions(config),
+    tags: generateTags(config),
+    paths: generatePaths(config),
+    definitions: generateDefinitions(description),
     // securityDefinitions: {
     //   permissions: {
     //     type: 'apiKey',
@@ -30,12 +33,12 @@ const swagger = (config) => {
     //   },
     // },
   };
-  return result;
+  return JSON.parse(JSON.stringify(result));
 };
 
-const getMiddleware = config => [
+const getMiddleware = swaggerDef => [
   swaggerUi.serve,
-  swaggerUi.setup(swagger(config)),
+  swaggerUi.setup(swaggerDef),
 ];
 
 module.exports = {

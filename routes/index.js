@@ -1,4 +1,4 @@
-
+const swaggerUi = require('swagger-ui-express');
 const express = require('express');
 const { ObjectId } = require('mongodb');
 const HttpError = require('http-errors');
@@ -6,6 +6,7 @@ const {
   get,
 } = require('lodash');
 const { asyncController } = require('./util');
+const swagger = require('../swagger/generator');
 const {
   generateAuthLocalHandlers,
   generateJwtPermissionRoutes,
@@ -31,11 +32,17 @@ const {
   getDefaultPost,
 } = require('../lib');
 
+
 module.exports = (config, db) => {
   const router = express.Router();
   router.get('/moser-docs/description', (req, res) => {
     res.send(config.description);
   });
+  router.get('/moser-docs/swagger.json', (req, res) => {
+    res.send(config.swagger);
+  });
+  router.use('/moser-docs/swagger/', swaggerUi.serve);
+  router.get('/moser-docs/swagger/', swaggerUi.setup(JSON.parse(JSON.stringify(config.swagger))));
   /**
    * Executes a simple query
    * @param {String} resource resource being query
