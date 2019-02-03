@@ -1,7 +1,7 @@
 const swaggerUi = require('swagger-ui-express');
 const { generateTags, describeServer } = require('./util');
 const generateDefinitions = require('./definitions');
-const generatePaths = require('./paths/index');
+const generatePaths = require('./paths');
 
 
 const swagger = (config) => {
@@ -20,18 +20,19 @@ const swagger = (config) => {
       'http',
     ],
     tags: generateTags(config),
-    paths: generatePaths(config),
+    paths: generatePaths(description),
     definitions: generateDefinitions(description),
-    // securityDefinitions: {
-    //   permissions: {
-    //     type: 'apiKey',
-    //     authorizationUrl: 'http://herd.fyi/auth/users/magic-link',
-    //     in: 'header',
-    //     scopes: {
-    //       'email:verified': 'Email verified',
-    //     },
-    //   },
-    // },
+    securityDefinitions: {
+      permissions: {
+        type: 'apiKey',
+        authorizationUrl: `http://${config.host || 'localhost: 3000'} / auth / users / magic - link`,
+        in: 'header',
+        name: 'Authorization',
+        scopes: {
+          'email:verified': 'Email verified',
+        },
+      },
+    },
   };
   return JSON.parse(JSON.stringify(result));
 };

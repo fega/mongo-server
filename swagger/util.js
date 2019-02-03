@@ -136,6 +136,7 @@ exports.generateDefinitions = (config) => {
 
 const extraDescriptions = (description, key) => {
   const copy = clone(description);
+
   if (key.endsWith('_id') && !description.description) {
     copy.description = `A ${singular(key.replace('_id', ''))} Id`;
   }
@@ -147,6 +148,9 @@ const extraDescriptions = (description, key) => {
   }
   if (key === 'createdAt' && !description.description) {
     copy.description = 'Creation date of resource';
+  }
+  if (key === '_id' && !description.description) {
+    copy.description = 'Resource Id';
   }
   return copy;
 };

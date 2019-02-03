@@ -12,7 +12,7 @@ const getSecurity = (resourceConfig, requestType) => {
     ...get(resourceConfig, `${requestType}.permissions`) || [],
     ...get(resourceConfig, 'permissions') || [],
   ];
-  if (permissions) {
+  if (permissions.length) {
     return {
       security: {
         permissions,
@@ -88,13 +88,6 @@ const getIdParameters = (key, resourceConfig, requestType) => {
   }
   return [];
 };
-const getParameterType = (name, describeObj) => {
-  const value = get(describeObj, 'type');
-  if (value === 'number') {
-    if (get(describeObj, 'rules[0].name') === 'integer') return 'integer';
-  }
-  return value;
-};
 const getParameterDescription = (name, value) => {
   if (value) return value;
   if (name.includes('_id')) {
@@ -103,22 +96,22 @@ const getParameterDescription = (name, value) => {
   return undefined;
 };
 const getParameter = (name, described) => pickBy({
-  name,
+  name: 'body',
   in: 'body',
-  require: get(described, 'flags.presence'),
-  type: getParameterType(name, described),
-  enum: get(described, 'valids'),
+  schema: {
+    $ref: `#/definitions/${singular(capitalize(name))}Input`,
+  },
+  // require: get(described, 'flags.presence'),
+  // type: getParameterType(name, described),
+  // enum: get(described, 'valids'),
   description: getParameterDescription(name, get(described, 'description')),
 }, v => v);
 const getBodyParameters = (key, resourceConfig, requestType) => {
   const described = get(resourceConfig, 'in.body');
   if (!described) return [];
 
-  const fields = Object.keys(described);
-
-
   if (['post', 'put', 'patch'].includes(requestType)) {
-    return fields.map(name => getParameter(name, described[name]));
+    return [getParameter(key, resourceConfig)];
   }
   return [];
 };
@@ -160,13 +153,26 @@ const getQueryParameters = (key, resourceConfig, requestType) => {
       description: 'Populates a resource type with their parents, more info here https://github.com/fega/mongo-server#relationships',
       type: 'string',
     }, {
+      name: '$select',
+      in: 'query',
+      description: 'Only returns the selected fields',
+      type: 'string',
+    }, {
       name: 'filters',
       in: 'query',
       description: 'filters a response you can use any valid resource field name as parameter name, more info: https://github.com/fega/mongo-server#filter',
       type: 'string',
     }];
   }
-  return [];
+  if (requestType === 'delete') {
+    return [];
+  }
+  return [{
+    name: '$select',
+    in: 'query',
+    description: 'Only returns the selected fields',
+    type: 'string',
+  }];
 };
 const getParameters = (key, resourceConfig, requestType) => ({
   parameters: [
@@ -176,19 +182,160 @@ const getParameters = (key, resourceConfig, requestType) => ({
   ],
 });
 
-const getGetAnsPostPathObject = (resource, name) => {
-  if (!get(resource, 'get')) return {};
+// AUTH ROUTES
+const getLocalLoginPath = (resource, name) => `/auth/${plural(name)}/log-in`;
+const getLocalLoginRoute = (resource, name) => ({
+  post: {
+    summary: `${capitalize(name)} resource Log In route`,
+
+    tags: ['Auth'],
+    parameters: [{
+      name: resource.auth.local.passwordField,
+      description: 'password field',
+      in: 'body',
+      type: 'string',
+      required: true,
+    }, {
+      name: resource.auth.local.userField,
+      description: 'username or email field',
+      in: 'body',
+      type: 'string',
+      format: 'email',
+      required: true,
+    }],
+    responses: {
+      200: {
+        description: 'User logged',
+      },
+    },
+  },
+});
+
+const getLocalSignInPath = (resource, name) => `/auth/${plural(name)}/sign-up`;
+const getLocalSignInRoute = (resource, name) => ({
+  post: {
+    summary: `${capitalize(name)} resource Create account route`,
+
+    tags: ['Auth'],
+
+    parameters: [{
+      name: resource.auth.passwordField,
+      description: 'password field',
+      in: 'body',
+      type: 'string',
+      required: true,
+    }, {
+      name: resource.auth.usernameField,
+      description: 'username or email field',
+      in: 'body',
+      type: 'string',
+      format: 'email',
+      required: true,
+    }],
+    responses: {
+      200: {
+        description: 'User logged',
+      },
+    },
+  },
+});
+
+const getLocalAuthRoutes = (resources) => {
+  const filtered = pickBy(resources, value => get(value, 'auth.local'));
+  const loginRoutes = mapKeys(
+    mapValues(filtered, getLocalSignInRoute),
+    getLocalSignInPath,
+  );
+  const signInRoutes = mapKeys(
+    mapValues(filtered, getLocalLoginRoute),
+    getLocalLoginPath,
+  );
+  return { ...loginRoutes, ...signInRoutes };
+};
+const getMagicCodesRoutes = (resources) => {
+  const filtered = pickBy(resources, value => get(value, 'auth.local'));
+};
+
+const getMagicLinksRoutes = () => {
+
+};
+
+const getPasswordRecoveryRoutes = () => {
+
+};
+
+// ROUTES
+const getGetAndPostPathObject = (resource, name) => {
+  const haveGet = get(resource, 'get');
+  const havePost = get(resource, 'post');
+
+  if (!haveGet && !havePost) return {};
+
 
   return {
-    get: {
+    get: haveGet ? {
       tags: [name],
       produces,
       ...getSecurity(resource, 'get'),
       ...getResponses(name, getResponses, 'get'),
       ...getParameters(name, resource, 'get'),
-    },
+    } : undefined,
+    post: havePost ? {
+      tags: [name],
+      produces,
+      ...getSecurity(resource, 'post'),
+      ...getResponses(name, getResponses, 'post'),
+      ...getParameters(name, resource, 'post'),
+    } : undefined,
   };
 };
+
+const getGetIdPatchPutAndDeletePathObject = (resource, name) => {
+  const haveGetId = get(resource, 'getId');
+  const havePatch = get(resource, 'patch');
+  const havePut = get(resource, 'put');
+  const haveDelete = get(resource, 'put');
+
+  return {
+    get: haveGetId ? {
+      tags: [name],
+      produces,
+      ...getSecurity(resource, 'getId'),
+      ...getResponses(name, getResponses, 'getId'),
+      ...getParameters(name, resource, 'getId'),
+    } : undefined,
+
+    patch: havePatch ? {
+      tags: [name],
+      produces,
+      ...getSecurity(resource, 'patch'),
+      ...getResponses(name, getResponses, 'patch'),
+      ...getParameters(name, resource, 'patch'),
+    } : undefined,
+
+
+    put: havePut ? {
+      tags: [name],
+      produces,
+      ...getSecurity(resource, 'put'),
+      ...getResponses(name, getResponses, 'put'),
+      ...getParameters(name, resource, 'put'),
+    } : undefined,
+
+
+    delete: haveDelete ? {
+      tags: [name],
+      produces,
+      ...getSecurity(resource, 'delete'),
+      ...getResponses(name, getResponses, 'delete'),
+      ...getParameters(name, resource, 'delete'),
+    } : undefined,
+  };
+};
+
+const geAuthRoutes = resources => ({
+  ...getLocalAuthRoutes(resources),
+});
 
 const getGetPath = (resource, name) => `/${plural(name)}`;
 const getIdGetPath = (resource, name) => `/${plural(name)}/{id}`;
@@ -197,8 +344,14 @@ module.exports = (description) => {
 
   if (!resources) return {};
 
-  const getPaths = mapKeys(mapValues(resources, getGetAnsPostPathObject), getGetPath);
-  const getIdPaths = mapKeys(mapValues(resources, getGetAnsPostPathObject), getIdGetPath);
-
-  return { ...getPaths, ...getIdPaths };
+  const getPaths = mapKeys(
+    mapValues(resources, getGetAndPostPathObject),
+    getGetPath,
+  );
+  const getIdPaths = mapKeys(
+    mapValues(resources, getGetIdPatchPutAndDeletePathObject),
+    getIdGetPath,
+  );
+  const authPaths = geAuthRoutes(resources);
+  return { ...getPaths, ...getIdPaths, ...authPaths };
 };

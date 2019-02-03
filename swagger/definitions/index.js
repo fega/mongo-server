@@ -1,4 +1,3 @@
-const Joi = require('joi');
 const { singular } = require('pluralize');
 const {
   mapKeys, mapValues, get, capitalize,
@@ -46,16 +45,80 @@ const {
 //   return result;
 // };
 
+const getType = (value) => {
+  if (value.rules && value.rules.some(rule => rule.name === 'integer')) {
+    return 'integer';
+  }
+  return value.type || 'string';
+};
+const getMin = (value) => {
+  if (
+    value.type === 'number'
+    && value.rules
+    && value.rules.some(rule => rule.name === 'min')
+  ) {
+    return value.rules.find(rule => rule.name === 'min').arg;
+  }
+  return undefined;
+};
+const getMax = (value) => {
+  if (
+    value.type === 'number'
+    && value.rules
+    && value.rules.some(rule => rule.name === 'max')
+  ) {
+    return value.rules.find(rule => rule.name === 'max').arg;
+  }
+  return undefined;
+};
+const getFormat = (value, name) => {
+  if (value.rules && value.rules.some(rule => rule.name === 'alphanum')) {
+    return 'alphanum';
+  }
+  if (value.rules && value.rules.some(rule => rule.name === 'uri')) {
+    return 'uri';
+  }
+  if (value.rules && value.rules.some(rule => rule.name === 'url')) {
+    return 'url';
+  }
+  return undefined;
+};
+const getMaxLength = (value) => {
+  if (
+    value.type === 'string'
+    && value.rules
+    && value.rules.some(rule => rule.name === 'max')
+  ) {
+    return value.rules.find(rule => rule.name === 'max').arg;
+  }
+  return undefined;
+};
+const getMinLength = (value) => {
+  if (
+    value.type === 'string'
+    && value.rules
+    && value.rules.some(rule => rule.name === 'min')
+  ) {
+    return value.rules.find(rule => rule.name === 'min').arg;
+  }
+  return undefined;
+};
+
 const generateInputDefinition = (resource) => {
   if (!get(resource, 'in.body.children')) return {};
   const { children } = resource.in.body;
   const result = {
     type: 'object',
     properties: mapValues(children, (value, name) => ({
-      type: value.type,
+      type: getType(value),
       description: value.description || `${capitalize(name)} field`,
       enum: get(value, 'valids'),
       required: get('value.flags.presence') === 'required',
+      minimum: getMin(value),
+      maximum: getMax(value),
+      format: getFormat(value, name),
+      maxLength: getMaxLength(value),
+      minLength: getMinLength(value),
     })),
   };
 
@@ -67,10 +130,14 @@ const generateOutputDefinition = (resource) => {
   const result = {
     type: 'object',
     properties: mapValues(out, (value, name) => ({
-      type: value.type || 'string',
+      type: getType(value),
       description: value.description || `${capitalize(name)} field`,
       enum: get(value, 'valids'),
-      required: get('value.flags.presence') === 'required',
+      minimum: getMin(value),
+      maximum: getMax(value),
+      format: getFormat(value, name),
+      maxLength: getMaxLength(value),
+      minLength: getMinLength(value),
     })),
   };
 
