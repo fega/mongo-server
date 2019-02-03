@@ -2,7 +2,7 @@
   "name": "moser",
   "version": "0.23.0",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha ./test/**/*.test.js --exit --ui qunit --timeout 5000",
     "test:watch": "NODE_ENV=test mocha --exit --watch --ui qunit --timeout 5000",

@@ -8,6 +8,7 @@ const createServer = require('./server');
 const { isDbEmpty, seedDb } = require('./lib/mongodb');
 const { describeServer } = require('./swagger/util');
 const { swagger } = require('./swagger/generator');
+
 const tag = chalk.cyan('[m-server]');
 
 

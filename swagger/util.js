@@ -300,8 +300,9 @@ exports.describeServer = (config) => {
  * @param {object} config Moser Object
  */
 exports.generateTags = (config) => {
+
+  if (!config.resources) return [];
   const resources = Object.keys(config.resources);
-  if (!resources) return [];
   // const r = [];
   const r = resources.map(resource => ({
     name: resource,
