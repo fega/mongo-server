@@ -84,6 +84,11 @@ module.exports = (config, db) => {
   if (config.errorHandler) app.use(config.errorHandler);
   app.use(errorHandler);
 
-  if (!config.noListen) app.listen(config.port, () => console.log(tag, `server listen on port ${chalk.yellow(config.port)}`));
+  if (!config.noListen) {
+    app.listen(config.port, () => {
+      if (config.silent) return;
+      console.log(tag, `server listen on port ${chalk.yellow(config.port)}`);
+    });
+  }
   return app;
 };

@@ -7,6 +7,7 @@ const connect = require('../db');
 const main = proxyquire('../startup', {
   '/config': {
     noListen: true,
+    silent: true,
     seed: { posts: () => [{}] },
     resources: {
       users: {
@@ -30,6 +31,7 @@ test('seed, db already filled', async () => {
   const db = await connect();
   await db.collection('hello').insert({});
   await main({
+    silent: true,
     config: '/config',
   });
   const u = await db.collection('users').countDocuments();
@@ -40,6 +42,7 @@ test('seed, db empty', async () => {
   const db = await connect();
   await db.dropDatabase();
   await main({
+    silent: true,
     config: '/config',
   });
   const u = await db.collection('users').countDocuments();

@@ -13,9 +13,13 @@ const tag = chalk.cyan('[m-server]');
 
 
 const main = async (programConfig = {}) => {
+  const log = (...str) => {
+    if (programConfig.silent) return;
+    console.log(tag, ...str);
+  };
   try {
     // start
-    console.log(tag, `Version: ${pkg.version}`);
+    log(`Version: ${pkg.version}`);
 
     /**
      * Set default config
@@ -38,10 +42,10 @@ const main = async (programConfig = {}) => {
      * read and merge config file
      */
     if (programConfig.config) {
-      console.log(tag, 'Reading config file');
+      log('Reading config file');
       const file = require(path.resolve(programConfig.config)); // eslint-disable-line
       config = { ...config, ...file };
-      console.log(tag, 'Config file loaded');
+      log('Config file loaded');
     }
 
     /**
@@ -58,23 +62,23 @@ const main = async (programConfig = {}) => {
     /**
      * connecting to mongodb
      */
-    console.log(tag, 'connecting to mongodb');
+    log('connecting to mongodb');
     const db = await connect(config).catch((error) => {
-      console.error(tag, 'error connecting to mongodb');
-      console.error(error);
+      log(tag, 'error connecting to mongodb');
+      log(error);
       process.exit(1);
     });
-    console.log(tag, 'using', chalk.yellow(db.databaseName), 'database');
+    log('using', chalk.yellow(db.databaseName), 'database');
 
     /**
      * SeedDatabase
      */
     if (config.seed) {
-      console.log(tag, 'Seeding Db');
+      log('Seeding Db');
       const isEmpty = await isDbEmpty(db);
-      if (config.forceSeed) console.log(tag, 'Db seeding will be forced');
+      if (config.forceSeed) log('Db seeding will be forced');
       if (config.forceSeed || isEmpty) await seedDb(db, config);
-      else console.log(tag, 'Db already have data, skipping');
+      else log('Db already have data, skipping');
     }
 
     /**

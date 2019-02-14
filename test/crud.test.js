@@ -20,6 +20,7 @@ let server;
 before(async () => {
   db = await mongo();
   server = await createServer({
+    silent: true,
     pagination: 10,
     port: 3000,
     noListen: true,
@@ -317,6 +318,7 @@ test('?soft, OK');
 suite('POST /:resourceWithEmailEnabled/:id');
 test('missing resources item', async () => {
   a.throws(() => createServer({
+    silent: true,
     nodemailer: {
       service: 'MailDev',
     },
@@ -324,6 +326,7 @@ test('missing resources item', async () => {
 });
 test('resources field is present', async () => {
   createServer({
+    silent: true,
     resources: {
       dogs: { email: { to: ['fega.hg@gmail.com'] } },
     },
@@ -334,6 +337,7 @@ test('resources field is present', async () => {
 });
 test('OK', async () => {
   const server2 = await createServer({
+    silent: true,
     resources: {
       dogs: { email: { to: ['fega.hg@gmail.com'] } },
     },
@@ -348,6 +352,7 @@ test('OK', async () => {
 });
 test('OK, default option', async () => {
   const server2 = await createServer({
+    silent: true,
     resources: {
       giraffes: {
         post: {
@@ -382,6 +387,7 @@ test('OK', async () => {
   const doPut = sinon.spy(fn);
   const doDelete = sinon.spy(fn);
   const server2 = await createServer({
+    silent: true,
     resources: {
       zombies: {
         get: {

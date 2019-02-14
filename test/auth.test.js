@@ -31,6 +31,7 @@ suite('local auth');
 
 test("POST /auth/:resource/sign-up, resource doesn't have login", async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: {},
     },
@@ -40,6 +41,7 @@ test("POST /auth/:resource/sign-up, resource doesn't have login", async () => {
 });
 test('POST /auth/:resource/sign-up,missing body fields', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { local: ['email', 'password'] } },
       posts: {},
@@ -50,6 +52,7 @@ test('POST /auth/:resource/sign-up,missing body fields', async () => {
 });
 test('POST /auth/:resource/sign-up, resource already exists login', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { local: ['email', 'password'] } },
       posts: {},
@@ -66,6 +69,7 @@ test('POST /auth/:resource/sign-up, resource already exists login', async () => 
 });
 test('POST /auth/:resource/sign-up, resource have login', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { local: ['email', 'password', ['posts:read']] } },
       posts: {},
@@ -88,6 +92,7 @@ test('POST /auth/:resource/sign-up, resource have login', async () => {
 });
 test('POST /auth/:resource/log-in, user doesnt exists', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { local: ['email', 'password'] } },
       posts: {},
@@ -105,6 +110,7 @@ test('POST /auth/:resource/log-in, user doesnt exists', async () => {
 });
 test('LOGIN FLOW', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { local: ['email', 'password', ['post:read']] } },
       posts: {},
@@ -137,6 +143,7 @@ test('Should never leak the password');
 suite('magic link auth');
 test("POST /auth/:resource/magic-link, resource doesn't have magic links", async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: {},
     },
@@ -149,6 +156,7 @@ test("POST /auth/:resource/magic-link, resource doesn't have magic links", async
 });
 test('POST /auth/:resource/magic-link, missing body fields', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -161,6 +169,7 @@ test('POST /auth/:resource/magic-link, missing body fields', async () => {
 });
 test('POST /auth/:resource/magic-link, invalid email', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -182,6 +191,7 @@ test('POST /auth/:resource/magic-link, maxAmount of tokens', async () => {
   await db.collection('moser-magic-links').insertOne({ email, exp });
   await db.collection('moser-magic-links').insertOne({ email, exp });
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -199,6 +209,7 @@ test('POST /auth/:resource/magic-link, maxAmount of tokens', async () => {
 test('POST /auth/:resource/magic-link, OK', async () => {
   const email = `${ObjectId()}@gmail.com`;
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -218,6 +229,7 @@ test('POST /auth/:resource/magic-link, OK', async () => {
 
 test("GET /auth/:resource/magic-link/:token, resource doesn't have magic links", async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: {},
     },
@@ -230,6 +242,7 @@ test("GET /auth/:resource/magic-link/:token, resource doesn't have magic links",
 });
 test('GET /auth/:resource/magic-link/:token, BAD_REQUEST wrong token', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -243,6 +256,7 @@ test('GET /auth/:resource/magic-link/:token, BAD_REQUEST wrong token', async () 
 });
 test('GET /auth/:resource/magic-link/:token, NOT_FOUND, token not found', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -259,6 +273,7 @@ test('GET /auth/:resource/magic-link/:token, BAD_REQUEST, expired token', async 
   await db.collection('moser-magic-links').insertOne({ token, exp: date('in two days'), status: 'VERIFIED' });
 
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -275,6 +290,7 @@ test('GET /auth/:resource/magic-link/:token, BAD_REQUEST, user not found', async
   await db.collection('moser-magic-links').insertOne({ email: 'jump', token, exp: date('in two days') });
 
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -293,6 +309,7 @@ test('GET /auth/:resource/magic-link/:token, OK', async () => {
   await db.collection('moser-magic-links').insertOne({ token, exp: date('in two days'), email });
   await db.collection('users').insertOne(user);
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -310,6 +327,7 @@ test('GET /auth/:resource/magic-link/:token, OK', async () => {
 
 test('GET /auth/:resource/magic-token/:searchToken, resource doesnt have magic links', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: {},
     },
@@ -323,6 +341,7 @@ test('GET /auth/:resource/magic-token/:searchToken, resource doesnt have magic l
 test('GET /auth/:resource/magic-token/:searchToken, invalid token', async () => {
   const token = rand(74);
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -338,6 +357,7 @@ test('GET /auth/:resource/magic-token/:searchToken, token not found', async () =
   const token = rand(74);
 
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -354,6 +374,7 @@ test('GET /auth/:resource/magic-token/:searchToken, token expired', async () => 
   await db.collection('moser-magic-links').insertOne({ search: token, exp: date('two days ago'), status: 'VERIFIED' });
 
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -370,6 +391,7 @@ test('GET /auth/:resource/magic-token/:searchToken, token not verified', async (
   await db.collection('moser-magic-links').insertOne({ search: token, exp: date('in two days') });
 
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -386,6 +408,7 @@ test('GET /auth/:resource/magic-token/:searchToken, token already retrieved', as
   await db.collection('moser-magic-links').insertOne({ search: token, exp: date('in two days'), status: 'RETRIEVED' });
 
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -407,6 +430,7 @@ test('GET /auth/:resource/magic-token/:searchToken, user not in db', async () =>
   });
 
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -428,6 +452,7 @@ test('GET /auth/:resource/magic-token/:searchToken, OK', async () => {
   await db.collection('users').insertOne(user);
 
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicLink: {} } },
     },
@@ -448,6 +473,7 @@ test('GET /auth/:resource/magic-token/:searchToken, OK', async () => {
 suite('magic CODE auth');
 test("POST /auth/:resource/magic-link, resource doesn't have magic links", async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: {},
     },
@@ -460,6 +486,7 @@ test("POST /auth/:resource/magic-link, resource doesn't have magic links", async
 });
 test('POST /auth/:resource/magic-link, missing body fields', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicCode: {} } },
     },
@@ -472,6 +499,7 @@ test('POST /auth/:resource/magic-link, missing body fields', async () => {
 });
 test('POST /auth/:resource/magic-code, invalid email', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicCode: {} } },
     },
@@ -493,6 +521,7 @@ test('POST /auth/:resource/magic-code, maxAmount of tokens', async () => {
   await db.collection('moser-magic-codes').insertOne({ email, exp });
   await db.collection('moser-magic-codes').insertOne({ email, exp });
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicCode: {} } },
     },
@@ -510,6 +539,7 @@ test('POST /auth/:resource/magic-code, maxAmount of tokens', async () => {
 test('POST /auth/:resource/magic-code, OK', async () => {
   const email = `${ObjectId()}@gmail.com`;
   const s = createServer({
+    silent: true,
     resources: {
       users: {
         auth: {
@@ -542,6 +572,7 @@ test('POST /auth/:resource/magic-code, OK', async () => {
 
 test("GET /auth/:resource/magic-code/:token, resource doesn't have magic links", async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: {},
     },
@@ -554,6 +585,7 @@ test("GET /auth/:resource/magic-code/:token, resource doesn't have magic links",
 });
 test('GET /auth/:resource/magic-code/:token, NOT_FOUND, token not found', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicCode: {} } },
     },
@@ -572,6 +604,7 @@ test('GET /auth/:resource/magic-code/:token, BAD_REQUEST, expired token', async 
   });
 
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicCode: {} } },
     },
@@ -588,6 +621,7 @@ test('GET /auth/:resource/magic-code/:token, BAD_REQUEST, user not found', async
   await db.collection('moser-magic-codes').insertOne({ email: 'jump', token, exp: date('in two days') });
 
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicCode: {} } },
     },
@@ -606,6 +640,7 @@ test('GET /auth/:resource/magic-code/email/:token, OK', async () => {
   await db.collection('moser-magic-codes').insertOne({ token, exp: date('in two days'), email });
   await db.collection('users').insertOne(user);
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { magicCode: {} } },
     },
@@ -628,6 +663,7 @@ test('GET /auth/:resource/magic-code/email/:token, OK', async () => {
 suite('Permissions');
 test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, no user', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { local: ['email', 'password'] } },
       posts: {
@@ -652,6 +688,7 @@ test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, no user', async ()
 });
 test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, Invalid JWT', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { local: ['email', 'password'] } },
       posts: {
@@ -678,6 +715,7 @@ test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, Invalid JWT', asyn
 });
 test('GET POST PATCH PUT DELETE /:resources 403 FORBIDDEN, JWT without permissions', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { local: ['email', 'password'] } },
       posts: {
@@ -714,6 +752,7 @@ test('GET POST PATCH PUT DELETE /:resources dynamic permissions', async () => {
   const token = await jwt.sign({ permissions: ['posts:read'], _id: userId, resource: 'users' }, 'secret');
   const header = ['Authorization', `Bearer ${token}`];
   const s = createServer({
+    silent: true,
     resources: {
       posts: {
         permissions: ['$custom', '$filter'],
@@ -762,6 +801,7 @@ test('GET POST PATCH PUT DELETE /:resources dynamic permissions', async () => {
 });
 test('GET POST PATCH PUT DELETE /:resources 200 OK', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       users: { auth: { local: ['email', 'password'] } },
       posts: {
@@ -794,6 +834,7 @@ test('GET POST PATCH PUT DELETE /:resources 200 OK', async () => {
 suite('IN validation');
 test('validation OK', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       posts: {
         patch: {
@@ -835,6 +876,7 @@ test('validation OK', async () => {
 suite('OUT validation');
 test('validation OK', async () => {
   const s = createServer({
+    silent: true,
     resources: {
       posts: {
         patch: {

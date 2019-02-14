@@ -19,11 +19,14 @@ after(async () => {
 suite('configuration');
 before(async () => {
   db = await mongo();
-  serverEmpty = await createServer({}, db);
+  serverEmpty = await createServer({
+    silent: true,
+  }, db);
   function personalizedMiddleware(req, res, next) {
     next();
   }
   server = await createServer({
+    silent: true,
     port: 3000,
     noListen: true,
     compress: {},
@@ -75,6 +78,7 @@ test('Have personalized Middleware', () => {
 test('Restrict Option Error', async () => {
   a.throws(() => {
     createServer({
+      silent: true,
       noListen: true,
       restrict: true,
     });
@@ -82,6 +86,7 @@ test('Restrict Option Error', async () => {
 });
 test('Restrict Option', async () => {
   const restrictedServer = await createServer({
+    silent: true,
     noListen: true,
     restrict: true,
     resources: {
