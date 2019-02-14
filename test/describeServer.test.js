@@ -101,7 +101,7 @@ test('describeServer({resources:{dogs:false}})', () => {
     },
   }), { resources: {} });
 });
-test('describeServer(superConfig)', () => {
+test.skip('describeServer(superConfig)', () => {
   a.deepEqual(ds(superConfig), {
     appName: 'Doggy',
 
@@ -218,7 +218,7 @@ test('describeServer(superConfig)', () => {
   });
 });
 
-test.only('generate.swagger(superConfig)', () => {
+test.skip('generate.swagger(superConfig)', () => {
   const r = swagger(superConfig);
   // console.log(JSON.stringify(r.definitions, null, 2));
   a.deepEqual(r, {

@@ -42,7 +42,7 @@ module.exports = (config, db) => {
     res.send(config.swagger);
   });
   router.use('/moser-docs/swagger/', swaggerUi.serve);
-  router.get('/moser-docs/swagger/', swaggerUi.setup(JSON.parse(JSON.stringify(config.swagger))));
+  // router.get('/moser-docs/swagger  /', swaggerUi.setup(JSON.parse(JSON.stringify(config.swagger))));
   /**
    * Executes a simple query
    * @param {String} resource resource being query

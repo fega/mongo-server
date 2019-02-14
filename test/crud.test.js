@@ -10,8 +10,9 @@ const mongo = require('../db');
 
 chai.use(asPromised);
 
-// const maildev = new MailDev();
-// maildev.listen();
+const maildev = new MailDev();
+maildev.on('error', console.error);
+maildev.listen();
 
 const a = chai.assert;
 let db;
