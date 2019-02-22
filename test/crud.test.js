@@ -65,8 +65,12 @@ test('$select, OK', async () => {
   a.equal(r.body.length, 4);
   a.deepEqual(r.body[0], { author: 'fabian' });
 });
+
 test('filters, BAD_REQUEST unsafe filters', async () => {
   await request(server).get('/comments?$author=tata').expect(400);
+});
+test('flags, OK', async () => {
+  await request(server).get('/comments?$$author=tata').expect(200);
 });
 
 test('?$limit, OK', async () => {

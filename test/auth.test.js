@@ -660,6 +660,29 @@ test('GET /auth/:resource/magic-code/email/:token, OK', async () => {
 });
 
 
+suite('facebook auth');
+
+test('GET /auth/:resource/facebook, resource doesnt have facebook auth', async () => {
+  const s = createServer({
+    silent: true,
+    resources: {
+      users: {},
+    },
+  }, db);
+  const r = await request(s).get('/auth/users/facebook');
+  a.equal(r.status, 404);
+});
+test('GET /auth/:resource/facebook, resource doesnt have facebook auth', async () => {
+  const s = createServer({
+    silent: true,
+    resources: {
+      users: {},
+    },
+  }, db);
+  const r = await request(s).get('/auth/users/facebook');
+  a.equal(r.status, 404);
+});
+
 suite('Permissions');
 test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, no user', async () => {
   const s = createServer({
