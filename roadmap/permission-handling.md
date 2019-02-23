@@ -45,7 +45,7 @@ you can define special permissions that can be reused across your logic.
     secrets:{
       permissions:[['$custom','secrets:write']]
     }
-  }
+  },
   permissions:{
     $custom:({resources, user, req, HttpError })=>{
       return truthyValue // pass the permission
@@ -62,13 +62,18 @@ But this approach will not work with `GET resources/`, for that reason the filte
 {
   resources:{
     secrets:{
-      get: {permissions:[['$filter','secrets:write']]}
+      get: {permissions:[['$custom','secrets:write']]}
     }
-  }
+  },
   permissions:{
     $custom:({resources, user, req })=>{
       return truthyValue // pass the permission
       return falsyValue // oh oh, forbidden
+    }
+  },
+  filters:{
+    $custom:({})=>{
+      return {isPublic:true}
     }
   }
 }

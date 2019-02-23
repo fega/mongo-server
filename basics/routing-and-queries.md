@@ -101,6 +101,14 @@ GET /companies$populate=employees
 To do the opposite, add parent resources use `$fill` in the query.
 
 ```http
-GET /employees$fill=companies
+GET /employees?$fill=companies
+```
+
+### Flags
+
+Sometimes you want to pass some data that are neither queries or filters, to be user in the route logic, permissions or filters. you can use them with query flags: 
+
+```http
+GET /employees?$$flag=someData&$$anotherFlag=moreData
 ```
 
