@@ -4,6 +4,7 @@ const Joi = require('joi');
 const { give } = require('loy');
 const { describeServer: ds } = require('../swagger/util');
 const { swagger } = require('../swagger/generator');
+const swaggerResult = require('./swagger.super.json');
 
 const a = chai.assert;
 
@@ -16,6 +17,7 @@ const superConfig = {
       in: {
         body: {
           name: Joi.string(),
+          array: Joi.array().items(Joi.string()),
         },
         query: {
           hello: Joi.string(),
@@ -122,8 +124,23 @@ test.skip('describeServer(superConfig)', () => {
                 ],
                 type: 'string',
               },
+              array: {
+                flags: {
+                  sparse: false,
+                },
+                items: [
+                  {
+                    invalids: [
+                      '',
+                    ],
+                    type: 'string',
+                  },
+                ],
+                type: 'array',
+              },
             },
             type: 'object',
+
           },
           query: {
             children: {
@@ -218,101 +235,7 @@ test.skip('describeServer(superConfig)', () => {
   });
 });
 
-test.skip('generate.swagger(superConfig)', () => {
+test('generate.swagger(superConfig)', () => {
   const r = swagger(superConfig);
-  // console.log(JSON.stringify(r.definitions, null, 2));
-  a.deepEqual(r, {
-    swagger: '2.0',
-    info: {
-      description: 'Rest api',
-      version: '1.0.0',
-      title: 'Doggy',
-      basePath: '/',
-    },
-    schemes: [
-      'https',
-      'http',
-    ],
-    definitions: {
-      DogInput: {
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string',
-            description: 'Name field',
-            required: false,
-          },
-        },
-      },
-      HorseInput: {},
-      DragonInput: {},
-      DogOutput: {
-        type: 'object',
-        properties: {
-          name: {
-            type: 'string',
-            description: 'Name field',
-            required: false,
-          },
-          horses: {
-            type: 'string',
-            description: 'Horses field',
-            required: false,
-          },
-          horses_id: {
-            type: 'string',
-            description: 'A horse Id',
-            required: false,
-          },
-          horses_ids: {
-            type: 'string',
-            description: 'An array of horse Ids',
-            required: false,
-          },
-          createdAt: {
-            type: 'string',
-            description: 'Creation date of resource',
-            required: false,
-          },
-          updatedAt: {
-            type: 'string',
-            description: 'Date of latest update of resource',
-            required: false,
-          },
-        },
-      },
-      HorseOutput: {
-        type: 'object',
-        properties: {
-          hello: {
-            type: 'string',
-            description: 'a field',
-            required: false,
-          },
-        },
-      },
-      DragonOutput: {},
-    },
-    tags: [{
-      description: 'Dog resources',
-      name: 'dogs',
-    },
-    {
-      description: 'Cats endpoints',
-      name: 'cats',
-    },
-    {
-      description: 'Horses endpoints',
-      name: 'horses',
-    },
-    {
-      description: 'Dragons endpoints',
-      name: 'dragons',
-    },
-    {
-      description: 'Authorization and authentication endpoints',
-      name: 'Auth',
-    },
-    ],
-  });
+  a.deepEqual(r, swaggerResult);
 });

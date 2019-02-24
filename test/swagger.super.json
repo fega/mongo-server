@@ -1,0 +1,922 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Doggy",
+    "host": "http://localhost:3000",
+    "basePath": "/"
+  },
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "tags": [
+    {
+      "name": "dogs",
+      "description": "Dog resources"
+    },
+    {
+      "name": "cats",
+      "description": "Cats endpoints"
+    },
+    {
+      "name": "horses",
+      "description": "Horses endpoints"
+    },
+    {
+      "name": "dragons",
+      "description": "Dragons endpoints"
+    },
+    {
+      "name": "Auth",
+      "description": "Authorization and authentication endpoints"
+    }
+  ],
+  "paths": {
+    "/dogs": {
+      "get": {
+        "tags": [
+          "dogs"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": {
+          "permissions": [
+            "dogs"
+          ]
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DogOutput"
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "$page",
+            "in": "query",
+            "description": "Resource pagination's page",
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          },
+          {
+            "name": "$limit",
+            "in": "query",
+            "description": "Quantity of results",
+            "type": "integer",
+            "minimum": 1,
+            "default": 10
+          },
+          {
+            "name": "$sort",
+            "in": "query",
+            "description": "Sort by a field name",
+            "type": "string"
+          },
+          {
+            "name": "$order",
+            "in": "query",
+            "description": "Sort order",
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          {
+            "name": "$populate",
+            "in": "query",
+            "description": "Populates a resource type with their childs, more info here https://github.com/fega/mongo-server#relationships",
+            "type": "string"
+          },
+          {
+            "name": "$fill",
+            "in": "query",
+            "description": "Populates a resource type with their parents, more info here https://github.com/fega/mongo-server#relationships",
+            "type": "string"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "filters a response you can use any valid resource field name as parameter name, more info: https://github.com/fega/mongo-server#filter",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "/horses": {
+      "get": {
+        "tags": [
+          "horses"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/HorseOutput"
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "$page",
+            "in": "query",
+            "description": "Resource pagination's page",
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          },
+          {
+            "name": "$limit",
+            "in": "query",
+            "description": "Quantity of results",
+            "type": "integer",
+            "minimum": 1,
+            "default": 10
+          },
+          {
+            "name": "$sort",
+            "in": "query",
+            "description": "Sort by a field name",
+            "type": "string"
+          },
+          {
+            "name": "$order",
+            "in": "query",
+            "description": "Sort order",
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          {
+            "name": "$populate",
+            "in": "query",
+            "description": "Populates a resource type with their childs, more info here https://github.com/fega/mongo-server#relationships",
+            "type": "string"
+          },
+          {
+            "name": "$fill",
+            "in": "query",
+            "description": "Populates a resource type with their parents, more info here https://github.com/fega/mongo-server#relationships",
+            "type": "string"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "filters a response you can use any valid resource field name as parameter name, more info: https://github.com/fega/mongo-server#filter",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "/dragons": {
+      "get": {
+        "tags": [
+          "dragons"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DragonOutput"
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "$page",
+            "in": "query",
+            "description": "Resource pagination's page",
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          },
+          {
+            "name": "$limit",
+            "in": "query",
+            "description": "Quantity of results",
+            "type": "integer",
+            "minimum": 1,
+            "default": 10
+          },
+          {
+            "name": "$sort",
+            "in": "query",
+            "description": "Sort by a field name",
+            "type": "string"
+          },
+          {
+            "name": "$order",
+            "in": "query",
+            "description": "Sort order",
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          {
+            "name": "$populate",
+            "in": "query",
+            "description": "Populates a resource type with their childs, more info here https://github.com/fega/mongo-server#relationships",
+            "type": "string"
+          },
+          {
+            "name": "$fill",
+            "in": "query",
+            "description": "Populates a resource type with their parents, more info here https://github.com/fega/mongo-server#relationships",
+            "type": "string"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "filters a response you can use any valid resource field name as parameter name, more info: https://github.com/fega/mongo-server#filter",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "/dogs/{id}": {
+      "get": {
+        "tags": [
+          "dogs"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": {
+          "permissions": [
+            "dogs"
+          ]
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/DogOutput"
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of dog",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "dogs"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": {
+          "permissions": [
+            "dogs"
+          ]
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/DogOutput"
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of dog",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/DogInput"
+            },
+            "description": "Dog resources"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "dogs"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "security": {
+          "permissions": [
+            "admin",
+            "dogs"
+          ]
+        },
+        "responses": {
+          "204": {
+            "description": "success, no body"
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of dog",
+            "required": true,
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "/horses/{id}": {
+      "get": {
+        "tags": [
+          "horses"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/HorseOutput"
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of horse",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "horses"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/HorseOutput"
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of horse",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "horses"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/HorseOutput"
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of horse",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "horses"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "success, no body"
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of horse",
+            "required": true,
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "/dragons/{id}": {
+      "get": {
+        "tags": [
+          "dragons"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/DragonOutput"
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of dragon",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "dragons"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/DragonOutput"
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of dragon",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "dragons"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/DragonOutput"
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of dragon",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Only returns the selected fields",
+            "type": "string"
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "dragons"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "success, no body"
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "403": {
+            "description": "forbiden"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of dragon",
+            "required": true,
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "/auth/dogs/sign-up": {
+      "post": {
+        "summary": "Dogs resource Create account route",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "description": "password field",
+            "in": "body",
+            "type": "string",
+            "required": true
+          },
+          {
+            "description": "username or email field",
+            "in": "body",
+            "type": "string",
+            "format": "email",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User logged"
+          }
+        }
+      }
+    },
+    "/auth/dogs/log-in": {
+      "post": {
+        "summary": "Dogs resource Log In route",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "password",
+            "description": "password field",
+            "in": "body",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "user",
+            "description": "username or email field",
+            "in": "body",
+            "type": "string",
+            "format": "email",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User logged"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "DogInput": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name field",
+          "required": false
+        },
+        "array": {
+          "type": "array",
+          "description": "Array field",
+          "required": false,
+          "items": {
+            "type": "string",
+            "required": false
+          }
+        }
+      }
+    },
+    "HorseInput": {},
+    "DragonInput": {},
+    "DogOutput": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name field"
+        },
+        "horses": {
+          "type": "string",
+          "description": "Horses field"
+        },
+        "horses_id": {
+          "type": "string",
+          "description": "A horse Id"
+        },
+        "horses_ids": {
+          "type": "string",
+          "description": "An array of horse Ids"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation date of resource"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Date of latest update of resource"
+        }
+      }
+    },
+    "HorseOutput": {
+      "type": "object",
+      "properties": {
+        "hello": {
+          "type": "string",
+          "description": "a field"
+        }
+      }
+    },
+    "DragonOutput": {}
+  },
+  "securityDefinitions": {
+    "permissions": {
+      "type": "apiKey",
+      "authorizationUrl": "http://localhost: 3000 / auth / users / magic - link",
+      "in": "header",
+      "name": "Authorization",
+      "scopes": {
+        "email:verified": "Email verified"
+      }
+    }
+  }
+}

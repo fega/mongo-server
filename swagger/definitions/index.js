@@ -104,6 +104,27 @@ const getMinLength = (value) => {
   return undefined;
 };
 
+
+const getItems = (value) => {
+  const type = getType(value);
+  if (type === 'array') {
+    const itemValue = value.items[0];
+    return {
+      type: getType(itemValue),
+      description: itemValue.description,
+      enum: get(itemValue, 'valids'),
+      required: get(itemValue, 'flags.presence') === 'required',
+      minimum: getMin(itemValue),
+      maximum: getMax(itemValue),
+      maxLength: getMaxLength(itemValue),
+      minLength: getMinLength(itemValue),
+      items: getItems(itemValue),
+    };
+  }
+  return undefined;
+};
+
+
 const generateInputDefinition = (resource) => {
   if (!get(resource, 'in.body.children')) return {};
   const { children } = resource.in.body;
@@ -113,12 +134,13 @@ const generateInputDefinition = (resource) => {
       type: getType(value),
       description: value.description || `${capitalize(name)} field`,
       enum: get(value, 'valids'),
-      required: get('value.flags.presence') === 'required',
+      required: get(value, 'flags.presence') === 'required',
       minimum: getMin(value),
       maximum: getMax(value),
       format: getFormat(value, name),
       maxLength: getMaxLength(value),
       minLength: getMinLength(value),
+      items: getItems(value),
     })),
   };
 
