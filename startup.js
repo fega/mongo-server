@@ -25,7 +25,7 @@ const main = async (programConfig = {}) => {
      * Set default config
      */
     let config = {
-      // ...programConfig,
+      ...programConfig,
       // noListen: programConfig.noListen || false,
       port: programConfig.port || 3000,
       host: programConfig.host || 'http://localhost:3000',
