@@ -52,14 +52,14 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "delay": "^4.1.0",
-    "eslint": "^5.15.0",
+    "eslint": "^5.15.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
     "maildev": "^1.0.0-rc3",
     "mocha": "^6.0.2",
     "nodemon": "^1.18.10",
     "proxyquire": "^2.1.0",
-    "sinon": "^7.2.5",
+    "sinon": "^7.2.7",
     "supertest": "^3.4.2"
   },
   "directories": {
