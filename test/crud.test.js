@@ -2,7 +2,7 @@
 const chai = require('chai');
 const request = require('supertest');
 const sinon = require('sinon');
-const MailDev = require('maildev');
+// const MailDev = require('maildev');
 const delay = require('delay');
 const asPromised = require('chai-as-promised');
 const createServer = require('../server');
@@ -46,6 +46,185 @@ test('OK', async () => {
   await db.collection('posts').insertOne({ title: 'a title' });
   const r = await request(server).get('/posts').expect(200);
   a.equal(r.body[0].title, 'a title');
+});
+
+test('middlewares, NO middlewares', async () => {
+  const server2 = await createServer({
+    silent: true,
+    resources: {
+      dogs: {
+        middleware: { initial: false },
+      },
+    },
+  }, db);
+  await db.collection('posts').insertOne({ title: 'a title' });
+  const r = await request(server2).get('/posts').expect(200);
+  a.equal(r.body[0].title, 'a title');
+});
+test('middlewares, INITIAL, resource middleware', async () => {
+  let pass = false;
+  let passGet = false;
+  let passPatch = false;
+  let passPost = false;
+  let passPut = false;
+  let passDelete = false;
+  let passGetId = false;
+  db = await mongo();
+  const server2 = await createServer({
+    silent: true,
+    resources: {
+      dogs: {
+        middleware: {
+          initial: [(req, res, next) => {
+            pass = true;
+            next();
+          }],
+        },
+        get: {
+          middleware: { initial: (req, res, next) => { passGet = true; next(); } },
+        },
+        getId: {
+          middleware: { initial: (req, res, next) => { passGetId = true; next(); } },
+
+        },
+        post: {
+          middleware: { initial: (req, res, next) => { passPost = true; next(); } },
+        },
+        patch: {
+          middleware: { initial: (req, res, next) => { passPatch = true; next(); } },
+        },
+        put: {
+          middleware: { initial: (req, res, next) => { passPut = true; next(); } },
+        },
+        delete: {
+          middleware: { initial: (req, res, next) => { passDelete = true; next(); } },
+        },
+      },
+    },
+  }, db);
+  await request(server2).get('/dogs').expect(200);
+  await request(server2).get('/dogs/:id').expect(404);
+  await request(server2).post('/dogs/').expect(200);
+  await request(server2).patch('/dogs/:id').expect(400);
+  await request(server2).put('/dogs/:id').expect(404);
+  await request(server2).delete('/dogs/:id').expect(404);
+  a.isTrue(pass, 'initial middleware not called');
+  a.isTrue(passGet, 'initial GET middleware not called');
+  a.isTrue(passGetId, 'initial GET ID middleware not called');
+  a.isTrue(passPost, 'initial POST middleware not called');
+  a.isTrue(passPatch, 'initial PATCH middleware not called');
+  a.isTrue(passPut, 'initial PUT middleware not called');
+  a.isTrue(passDelete, 'initial DELETE middleware not called');
+});
+test('middlewares, AFTER AUTH, resource middleware', async () => {
+  let pass = false;
+  let passGet = false;
+  let passPatch = false;
+  let passPost = false;
+  let passPut = false;
+  let passDelete = false;
+  let passGetId = false;
+  db = await mongo();
+  const server2 = await createServer({
+    silent: true,
+    resources: {
+      dogs: {
+        middleware: {
+          initial: [(req, res, next) => {
+            pass = true;
+            next();
+          }],
+        },
+        get: {
+          middleware: { afterAuth: (req, res, next) => { passGet = true; next(); } },
+        },
+        getId: {
+          middleware: { afterAuth: (req, res, next) => { passGetId = true; next(); } },
+
+        },
+        post: {
+          middleware: { afterAuth: (req, res, next) => { passPost = true; next(); } },
+        },
+        patch: {
+          middleware: { afterAuth: (req, res, next) => { passPatch = true; next(); } },
+        },
+        put: {
+          middleware: { afterAuth: (req, res, next) => { passPut = true; next(); } },
+        },
+        delete: {
+          middleware: { afterAuth: (req, res, next) => { passDelete = true; next(); } },
+        },
+      },
+    },
+  }, db);
+  await request(server2).get('/dogs').expect(200);
+  await request(server2).get('/dogs/:id').expect(404);
+  await request(server2).post('/dogs/').expect(200);
+  await request(server2).patch('/dogs/:id').expect(400);
+  await request(server2).put('/dogs/:id').expect(404);
+  await request(server2).delete('/dogs/:id').expect(404);
+  a.isTrue(pass, 'initial middleware not called');
+  a.isTrue(passGet, 'initial GET middleware not called');
+  a.isTrue(passGetId, 'initial GET ID middleware not called');
+  a.isTrue(passPost, 'initial POST middleware not called');
+  a.isTrue(passPatch, 'initial PATCH middleware not called');
+  a.isTrue(passPut, 'initial PUT middleware not called');
+  a.isTrue(passDelete, 'initial DELETE middleware not called');
+});
+test('middlewares, AFTER VALIDATION, resource middleware', async () => {
+  let pass = false;
+  let passGet = false;
+  let passPatch = false;
+  let passPost = false;
+  let passPut = false;
+  let passDelete = false;
+  let passGetId = false;
+  db = await mongo();
+  const server2 = await createServer({
+    silent: true,
+    resources: {
+      dogs: {
+        middleware: {
+          initial: [(req, res, next) => {
+            pass = true;
+            next();
+          }],
+        },
+        get: {
+          middleware: { afterValidation: (req, res, next) => { passGet = true; next(); } },
+        },
+        getId: {
+          middleware: { afterValidation: (req, res, next) => { passGetId = true; next(); } },
+
+        },
+        post: {
+          middleware: { afterValidation: (req, res, next) => { passPost = true; next(); } },
+        },
+        patch: {
+          middleware: { afterValidation: (req, res, next) => { passPatch = true; next(); } },
+        },
+        put: {
+          middleware: { afterValidation: (req, res, next) => { passPut = true; next(); } },
+        },
+        delete: {
+          middleware: { afterValidation: (req, res, next) => { passDelete = true; next(); } },
+        },
+      },
+    },
+  }, db);
+  await request(server2).get('/dogs').expect(200);
+  await request(server2).get('/dogs/:id').expect(404);
+  await request(server2).post('/dogs/').expect(200);
+  await request(server2).patch('/dogs/:id').expect(400);
+  await request(server2).put('/dogs/:id').expect(404);
+  await request(server2).delete('/dogs/:id').expect(404);
+  a.isTrue(pass, 'initial middleware not called');
+  a.isTrue(passGet, 'initial GET middleware not called');
+  a.isTrue(passGetId, 'initial GET ID middleware not called');
+  a.isTrue(passPost, 'initial POST middleware not called');
+  a.isTrue(passPatch, 'initial PATCH middleware not called');
+  a.isTrue(passPut, 'initial PUT middleware not called');
+  a.isTrue(passDelete, 'initial DELETE middleware not called');
 });
 
 test('filters, OK', async () => {
@@ -280,7 +459,7 @@ test('NOT_FOUND', async () => {
  */
 suite('PUT /:resource/:id');
 test('OK', async () => {
-  const v = await db.collection('birds').insertOne({ _id: 'paco', name: 'Paco' });
+  await db.collection('birds').insertOne({ _id: 'paco', name: 'Paco' });
   const r = await request(server).put('/birds/paco').send({ age: 20 }).expect(200);
   a.equal(r.body.name, undefined);
   a.equal(r.body.age, 20);
@@ -294,7 +473,7 @@ test('NOT_FOUND', async () => {
  */
 suite('PUT /:resource/:id');
 test('OK', async () => {
-  const v = await db.collection('dinosaurs').insertOne({ _id: 'paco', name: 'Paco' });
+  await db.collection('dinosaurs').insertOne({ _id: 'paco', name: 'Paco' });
   const r = await request(server).patch('/dinosaurs/paco').send({ age: 20 }).expect(200);
   a.equal(r.body.name, 'Paco');
   a.equal(r.body.age, 20);

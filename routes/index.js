@@ -6,7 +6,7 @@ const {
   get,
 } = require('lodash');
 const { asyncController } = require('./util');
-const swagger = require('../swagger/generator');
+
 const {
   generateAuthLocalHandlers,
   generateJwtPermissionRoutes,
@@ -17,6 +17,7 @@ const {
   generateDynamicPermissionRoutes,
   generateMagicLinkHandlers,
   generateMagicCodeHandlers,
+  addMiddleware,
 } = require('../lib/middlewareGeneration');
 const {
   getTextQuery,
@@ -44,6 +45,7 @@ module.exports = (config, db) => {
   router.use('/moser-docs/swagger/', swaggerUi.serve);
 
   router.get('/moser-docs/swagger/', swaggerUi.setup(JSON.parse(JSON.stringify(config.swagger || {}))));
+
   /**
    * Executes a simple query
    * @param {String} resource resource being query
@@ -105,20 +107,43 @@ module.exports = (config, db) => {
   generateRestrictHandlers(config, router);
 
   /**
+   * Add initial middleware
+   */
+  addMiddleware('initial')(config, router);
+
+  /**
    * Auth local endpoints
    */
   generateAuthLocalHandlers(config, router, db);
   generateMagicLinkHandlers(config, router, db);
   generateMagicCodeHandlers(config, router, db);
+
+  /**
+   * Add afterAuth middleware
+   */
+  addMiddleware('afterAuth')(config, router);
+
   /**
    * Permission endpoints
    */
   generateJwtPermissionRoutes(config, router, db);
 
+
+  /**
+   * Add afterAuth middleware
+   */
+  addMiddleware('afterPermissions')(config, router);
+
   /**
    * Generate Validation endpoints
    */
   generateInputValidationRoutes(config, router);
+
+
+  /**
+   * Add afterValidation middleware
+   */
+  addMiddleware('afterValidation')(config, router);
 
   /**
    * Email endpoints
@@ -188,10 +213,17 @@ module.exports = (config, db) => {
     res.locals.resources = result;
     return next();
   }));
+
   /**
    * Routes, Execute dynamic permissions
    */
   generateDynamicPermissionRoutes(config, router);
+
+
+  /**
+   * Add afterPermission middleware
+   */
+  addMiddleware('afterDinamicPermissions')(config, router);
 
   /**
    * this is the only route that is handled after the permission
@@ -268,6 +300,9 @@ module.exports = (config, db) => {
 
     return res.sendStatus(204);
   }));
+
+
+  addMiddleware('beforeOutput')(config, router);
 
   /**
    * get outputs

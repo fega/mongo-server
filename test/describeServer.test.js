@@ -85,13 +85,13 @@ test('describeServer({rootProperties})', () => {
     middleware: [],
     pagination: 10,
   }), {
-      port: 3000,
-      root: '/',
-      host: 'http://localhost:3000',
-      static: 'public',
-      staticRoot: '/',
-      pagination: 10,
-    });
+    port: 3000,
+    root: '/',
+    host: 'http://localhost:3000',
+    static: 'public',
+    staticRoot: '/',
+    pagination: 10,
+  });
 });
 test('describeServer({resources:{}})', () => {
   a.deepEqual(ds({ resources: {} }), { resources: {} });

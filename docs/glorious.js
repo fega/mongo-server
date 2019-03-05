@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 const gdemo = new GDemo('[data-demo-container]');
 
 gdemo
