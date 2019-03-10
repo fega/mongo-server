@@ -62,6 +62,24 @@ For multiple fields, use the following format:
 GET /posts?$sort=user&$sort=views&$order[]=desc$$order[]=asc
 ```
 
+### Count
+
+Use $count to get an answer with the total document count
+
+```http
+GET /posts?$count=1
+```
+
+response:
+
+```javascript
+{
+    "count":10
+}
+```
+
+### 
+
 ### Advanced queries
 
 Use `$query` to send a JSON with any mongodb query

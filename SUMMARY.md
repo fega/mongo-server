@@ -13,10 +13,10 @@
 
 ## Auth and permissions
 
-* [Login and authentication](roadmap/login-and-authentication.md)
-* [Permission handling](roadmap/permission-handling.md)
-* [Local authentication](roadmap/local-authentication.md)
-* [Magic Links and codes](roadmap/magic-links-and-codes.md)
+* [Login and authentication](auth-and-permissions/login-and-authentication.md)
+* [Permission handling](auth-and-permissions/permission-handling.md)
+* [Local authentication](auth-and-permissions/local-authentication.md)
+* [Magic Links and codes](auth-and-permissions/magic-links-and-codes.md)
 
 ## Automatic Documentation
 
