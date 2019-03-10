@@ -14,6 +14,8 @@
 * [ ] CSRF support
 * [ ] File Uplading support \(With FlyDrive\)
 * [ ] Recipes / examples
+* [x] Add middleware support
+* [ ] Add middleware documentation
 
 ## In Consideration
 
