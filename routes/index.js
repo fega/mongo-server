@@ -53,7 +53,7 @@ module.exports = (config, db) => {
    */
   const find = async (resource, query, filter = {}) => {
     const {
-      $limit, $page, $sort, $order, $populate, $range,
+      $limit, $page, $sort, $order, $populate, $range, $count,
       $text, $regex, $query, $fill, $select, ...$filter
     } = query;
     const result = await db.collection(resource).find(
@@ -73,9 +73,31 @@ module.exports = (config, db) => {
     ).toArray();
     return result;
   };
+  const count = async (resource, query, filter = {}) => {
+    const {
+      $limit, $page, $sort, $order, $populate, $range, $count,
+      $text, $regex, $query, $fill, $select, ...$filter
+    } = query;
+    const result = await db.collection(resource).count(
+      {
+        ...getQuery($query, config),
+        ...getTextQuery($text),
+        ...getRegexQuery($regex),
+        ...getRangeQuery($range),
+        ...getFilters($filter),
+        ...filter,
+      },
+      {
+        limit: getNumber($limit, config.pagination),
+        skip: getNumber($page, 0) * getNumber($limit, config.pagination),
+        sort: getSort($sort, $order),
+      },
+    );
+    return result;
+  };
   const findAndPopulate = async (resource, query, filter = {}) => {
     const {
-      $limit, $page, $sort, $order, $populate, $range,
+      $limit, $page, $sort, $order, $populate, $range, $count,
       $text, $regex, $query, $fill, $select, ...$filter
     } = query;
     // Build pipeline
@@ -162,7 +184,7 @@ module.exports = (config, db) => {
       ? (await findAndPopulate(req.params.resource, { $populate, $fill }, { _id: req.params.id }))[0]
       : await db.collection(req.params.resource).findOne({ _id: req.params.id });
 
-    if (!result) return next(HttpError.NotFound('Not found'));
+    if (!result) return next(new HttpError.NotFound('Not found'));
     res.locals.resources = result;
     return next();
   }));
@@ -170,7 +192,7 @@ module.exports = (config, db) => {
     if (get(config, `resources.${req.params.resource}.post`) === false) return next();
 
     const defaultFn = get(config, `resources.${req.params.resource}.post.default`);
-    const _id = req.body._id || ObjectId().toString();
+    const _id = req.body._id || new ObjectId().toString();
     const { body, user } = req;
     const insert = defaultFn
       ? ({ ...await getDefaultPost(defaultFn(body, user), user, req, db), _id })
@@ -231,8 +253,12 @@ module.exports = (config, db) => {
   router.get('/:resource', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.get`) === false) return next();
 
-    const { $populate, $fill } = req.query;
+    const { $populate, $fill, $count } = req.query;
     const { filter, query } = req;
+
+    if ($count) {
+      return res.send({ count: await count(req.params.resource, query, filter) });
+    }
 
     const result = ($populate || $fill)
       ? await findAndPopulate(req.params.resource, query, filter)
@@ -241,6 +267,7 @@ module.exports = (config, db) => {
     res.locals.resources = result;
     return next();
   }));
+
   /**
    * Routes, Execute logic handlers
    */
@@ -249,7 +276,6 @@ module.exports = (config, db) => {
   /**
    * Routes, execute action
    */
-
   router.post('/:resource/', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.post`) === false) return next();
 

@@ -6,14 +6,14 @@ Get a full REST API with **zero coding** in **less than 30 seconds** \(seriously
 
 ### Documentation
 
-📖[ Read Documentation](https://nomadas.gitbook.io/mongo-server/)
+📖[Read Documentation](https://nomadas.gitbook.io/mongo-server/)
 
 ### Features
 
 * [x] Automatic REST \(GET, POST, PATCH, PUT,  DELETE\).
 * [x] Automatic Pagination, Sorting and Filters.
 * [x] Automatic Population \(like SQL join\).
-* [ ] Automatic API documentation \(In development\).
+* [x] Automatic API documentation \(In Alpha\).
 * [ ] Automatic Admin panel \(In development\).
 * [x] Static Serving.
 * [x] Input validation and output formatting.
@@ -26,10 +26,11 @@ Get a full REST API with **zero coding** in **less than 30 seconds** \(seriously
   * [ ] Common providers: Facebook, google and Github \(Coming soon\).
 * [x] DB seeding.
 * [x] Mailing capabilities.
-* [x] Security 
+* [x] Security
   * [x] Helmet integration
   * [x] CORS
   * [ ] CSRF \(coming soon\).
+  * [ ] Rate limit \(coming soon\).
 
 ## Some use cases
 

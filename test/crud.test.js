@@ -244,7 +244,16 @@ test('$select, OK', async () => {
   a.equal(r.body.length, 4);
   a.deepEqual(r.body[0], { author: 'fabian' });
 });
-
+test('$count, OK', async () => {
+  await db.collection('soursops').insertOne({ author: 'fabian' });
+  await db.collection('soursops').insertOne({ author: 'fabian' });
+  await db.collection('soursops').insertOne({ author: 'tata' });
+  await db.collection('soursops').insertOne({ author: 'tata' });
+  const r = await request(server).get('/soursops?$count=1').expect(200);
+  a.equal(r.body.count, 4);
+  const r1 = await request(server).get('/soursops?author=tata&$count=1').expect(200);
+  a.equal(r1.body.count, 2);
+});
 test('filters, BAD_REQUEST unsafe filters', async () => {
   await request(server).get('/comments?$author=tata').expect(400);
 });
@@ -331,7 +340,6 @@ test('?$where, invalid', async () => {
   a.equal(r.status, 400);
   a.equal(r.body.message, 'Invalid $where inside $query parameter');
 });
-
 
 test('?$sort=name, OK', async () => {
   await db.collection('robots').insertOne({ name: 4 });
