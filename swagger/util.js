@@ -164,11 +164,15 @@ const generateExtraDescriptions = (outObj) => {
 };
 
 const unrollTypeArray = (outObj) => {
-  const out = clone(outObj);
-  Object.keys(outObj).forEach((key) => {
-    out[key].type = Array.isArray(out[key].type) ? out[key].type[0] : out[key].type;
-  });
-  return out;
+  try {
+    const out = clone(outObj);
+    Object.keys(outObj).forEach((key) => {
+      out[key].type = Array.isArray(out[key].type) ? out[key].type[0] : out[key].type;
+    });
+    return out;
+  } catch (error) {
+    return outObj;
+  }
 };
 
 const completeOutWithIn = (name, outObj, ins) => {
