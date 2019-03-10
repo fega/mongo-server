@@ -163,6 +163,14 @@ const generateExtraDescriptions = (outObj) => {
   return out;
 };
 
+const unrollTypeArray = (outObj) => {
+  const out = clone(outObj);
+  Object.keys(outObj).forEach((key) => {
+    out[key].type = Array.isArray(out[key].type) ? out[key].type[0] : out[key].type;
+  });
+  return out;
+};
+
 const completeOutWithIn = (name, outObj, ins) => {
   const mixin = get(ins, 'in.body.children');
   if (!mixin) return outObj;
@@ -180,7 +188,8 @@ const describeOut = (resource, name, ins) => {
   if (!resource.out) return {};
   const preOut = describe(resource.out);
   const preOut2 = generateExtraDescriptions(preOut);
-  const out = completeOutWithIn(name, preOut2, ins);
+  const preOut3 = unrollTypeArray(preOut2);
+  const out = completeOutWithIn(name, preOut3, ins);
   return { out };
 };
 const describeEndpoint = (resource) => {

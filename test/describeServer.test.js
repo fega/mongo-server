@@ -51,7 +51,7 @@ const superConfig = {
     cats: false,
     horses: {
       out: resource => ({
-        hello: give(resource.hello).as('string').description('a field').ok(),
+        hello: give(resource.hello).as('number').description('a field').ok(),
       }),
       getId: true,
     },
@@ -103,7 +103,7 @@ test('describeServer({resources:{dogs:false}})', () => {
     },
   }), { resources: {} });
 });
-test.skip('describeServer(superConfig)', () => {
+test('describeServer(superConfig)', () => {
   a.deepEqual(ds(superConfig), {
     appName: 'Doggy',
 
@@ -183,25 +183,24 @@ test.skip('describeServer(superConfig)', () => {
               '',
             ],
             type: 'string',
-            models: [String],
           },
           horses: {
-            models: [String],
+            type: 'string',
           },
           horses_id: {
-            models: [String],
+            type: 'string',
             description: 'A horse Id',
           },
           horses_ids: {
-            models: [String],
+            type: 'string',
             description: 'An array of horse Ids',
           },
           createdAt: {
-            models: [Date],
+            type: 'string',
             description: 'Creation date of resource',
           },
           updatedAt: {
-            models: [Date],
+            type: 'string',
             description: 'Date of latest update of resource',
           },
         },
@@ -217,7 +216,7 @@ test.skip('describeServer(superConfig)', () => {
         out: {
           hello: {
             examples: [],
-            models: ['string'],
+            type: 'number',
             permissions: [],
             description: 'a field',
           },

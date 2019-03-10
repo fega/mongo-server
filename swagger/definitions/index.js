@@ -49,7 +49,8 @@ const getType = (value) => {
   if (value.rules && value.rules.some(rule => rule.name === 'integer')) {
     return 'integer';
   }
-  return value.type || 'string';
+  const _value = Array.isArray(value.type) ? value.type[0] : value.type;
+  return _value || 'string';
 };
 const getMin = (value) => {
   if (

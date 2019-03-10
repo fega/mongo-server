@@ -901,7 +901,7 @@
       "type": "object",
       "properties": {
         "hello": {
-          "type": "string",
+          "type": "number",
           "description": "a field"
         }
       }
