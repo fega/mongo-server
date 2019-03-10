@@ -247,10 +247,18 @@ test('$select, OK', async () => {
 test('$count, OK', async () => {
   await db.collection('soursops').insertOne({ author: 'fabian' });
   await db.collection('soursops').insertOne({ author: 'fabian' });
+  await db.collection('soursops').insertOne({ author: 'fabian' });
+  await db.collection('soursops').insertOne({ author: 'fabian' });
+  await db.collection('soursops').insertOne({ author: 'fabian' });
+  await db.collection('soursops').insertOne({ author: 'fabian' });
+  await db.collection('soursops').insertOne({ author: 'fabian' });
+  await db.collection('soursops').insertOne({ author: 'fabian' });
+  await db.collection('soursops').insertOne({ author: 'fabian' });
+  await db.collection('soursops').insertOne({ author: 'fabian' });
   await db.collection('soursops').insertOne({ author: 'tata' });
   await db.collection('soursops').insertOne({ author: 'tata' });
   const r = await request(server).get('/soursops?$count=1').expect(200);
-  a.equal(r.body.count, 4);
+  a.equal(r.body.count, 12);
   const r1 = await request(server).get('/soursops?author=tata&$count=1').expect(200);
   a.equal(r1.body.count, 2);
 });

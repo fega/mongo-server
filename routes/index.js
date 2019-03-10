@@ -88,7 +88,6 @@ module.exports = (config, db) => {
         ...filter,
       },
       {
-        limit: getNumber($limit, config.pagination),
         skip: getNumber($page, 0) * getNumber($limit, config.pagination),
         sort: getSort($sort, $order),
       },
