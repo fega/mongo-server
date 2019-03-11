@@ -82,7 +82,7 @@ suite('describeServer()');
 test('describeServer({})', () => {
   a.deepEqual(ds({}), {});
 });
-test.only('string type bug', () => {
+test('string type bug', () => {
   a.deepEqual(ds({
     resources: {
       mares: {

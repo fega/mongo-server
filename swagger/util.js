@@ -167,7 +167,7 @@ const unrollTypeArray = (outObj) => {
   try {
     const out = clone(outObj);
     Object.keys(outObj).forEach((key) => {
-      out[key].type = Array.isArray(out[key].type) ? out[key].type[0] : out[key].type;
+      out[key].type = (Array.isArray(out[key].type) ? out[key].type[0] : out[key].type) || 'string';
     });
     return out;
   } catch (error) {
@@ -191,7 +191,6 @@ const pickEndpointProperties = pick(['get', 'getId', 'put', 'patch', 'delete', '
 const describeOut = (resource, name, ins) => {
   if (!resource.out) return {};
   const preOut = describe(resource.out);
-  console.log('OUT', resource.out, preOut);
   const preOut2 = generateExtraDescriptions(preOut);
   const preOut3 = unrollTypeArray(preOut2);
   const out = completeOutWithIn(name, preOut3, ins);
