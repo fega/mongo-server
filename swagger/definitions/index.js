@@ -114,7 +114,7 @@ const getItems = (value) => {
       type: getType(itemValue),
       description: itemValue.description,
       enum: get(itemValue, 'valids'),
-      required: get(itemValue, 'flags.presence') === 'required',
+      // required: get(itemValue, 'flags.presence') === 'required' || undefined,
       minimum: getMin(itemValue),
       maximum: getMax(itemValue),
       maxLength: getMaxLength(itemValue),
@@ -131,18 +131,19 @@ const generateInputDefinition = (resource) => {
   const { children } = resource.in.body;
   const result = {
     type: 'object',
-    properties: mapValues(children, (value, name) => ({
-      type: getType(value),
-      description: value.description || `${capitalize(name)} field`,
-      enum: get(value, 'valids'),
-      required: get(value, 'flags.presence') === 'required',
-      minimum: getMin(value),
-      maximum: getMax(value),
-      format: getFormat(value, name),
-      maxLength: getMaxLength(value),
-      minLength: getMinLength(value),
-      items: getItems(value),
-    })),
+    properties: // console.log(name, value);
+      mapValues(children, (value, name) => ({
+        type: getType(value),
+        description: value.description || `${capitalize(name)} field`,
+        enum: get(value, 'valids'),
+        // required: get(value, 'flags.presence') === 'required' || undefined,
+        minimum: getMin(value),
+        maximum: getMax(value),
+        format: getFormat(value, name),
+        maxLength: getMaxLength(value),
+        minLength: getMinLength(value),
+        items: getItems(value),
+      })),
   };
 
   return result;
@@ -152,16 +153,21 @@ const generateOutputDefinition = (resource) => {
   const { out } = resource;
   const result = {
     type: 'object',
-    properties: mapValues(out, (value, name) => ({
-      type: getType(value),
-      description: value.description || `${capitalize(name)} field`,
-      enum: get(value, 'valids'),
-      minimum: getMin(value),
-      maximum: getMax(value),
-      format: getFormat(value, name),
-      maxLength: getMaxLength(value),
-      minLength: getMinLength(value),
-    })),
+    properties: mapValues(out, (value, name) => {
+      console.log('-', name, value);
+      const _value = get(resource, `in.body.children[${name}]`, value);
+      return {
+        type: getType(_value),
+        description: value.description || `${capitalize(name)} field`,
+        enum: get(_value, 'valids'),
+        minimum: getMin(_value),
+        maximum: getMax(_value),
+        format: getFormat(_value, name),
+        maxLength: getMaxLength(_value),
+        minLength: getMinLength(_value),
+        items: getItems(_value),
+      };
+    }),
   };
 
   return result;

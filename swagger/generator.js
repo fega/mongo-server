@@ -1,8 +1,8 @@
 const swaggerUi = require('swagger-ui-express');
 const { generateTags, describeServer } = require('./util');
 const generateDefinitions = require('./definitions');
-const generatePaths = require('./paths');
-
+const { generatePaths, securityDefinitions } = require('./paths');
+const { generateSecurityDefinitions } = require('./security');
 
 const swagger = (config) => {
   const description = describeServer(config);
@@ -25,11 +25,12 @@ const swagger = (config) => {
     securityDefinitions: {
       permissions: {
         type: 'apiKey',
-        authorizationUrl: `http://${config.host || 'localhost: 3000'} / auth / users / magic - link`,
+        authorizationUrl: `http://${config.host || 'localhost:3000'}/auth/users/magic-link`,
         in: 'header',
         name: 'Authorization',
         scopes: {
           'email:verified': 'Email verified',
+          ...securityDefinitions(),
         },
       },
     },

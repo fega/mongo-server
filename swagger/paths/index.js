@@ -1,11 +1,11 @@
 const {
-  mapValues, mapKeys, get, capitalize, pickBy,
+  mapValues, mapKeys, get, capitalize, pickBy, flatten, uniq,
 } = require('lodash');
 const { plural, singular } = require('pluralize');
 
 
 const produces = ['application/json'];
-
+const securityItems = [];
 // SECURITY
 const getSecurity = (resourceConfig, requestType) => {
   const permissions = [
@@ -13,10 +13,12 @@ const getSecurity = (resourceConfig, requestType) => {
     ...get(resourceConfig, 'permissions') || [],
   ];
   if (permissions.length) {
+    securityItems.push(...flatten(permissions));
     return {
-      security: {
-        permissions,
+      security: [{
+        permissions: flatten(permissions),
       },
+      ],
     };
   }
   return {};
@@ -339,7 +341,7 @@ const geAuthRoutes = resources => ({
 
 const getGetPath = (resource, name) => `/${plural(name)}`;
 const getIdGetPath = (resource, name) => `/${plural(name)}/{id}`;
-module.exports = (description) => {
+module.exports.generatePaths = (description) => {
   const { resources } = description;
 
   if (!resources) return {};
@@ -355,3 +357,14 @@ module.exports = (description) => {
   const authPaths = geAuthRoutes(resources);
   return { ...getPaths, ...getIdPaths, ...authPaths };
 };
+
+const securityDefinitions = () => {
+  const r = {};
+
+  securityItems.forEach((name) => { r[name] = 'security definitions'; });
+
+  return r;
+};
+
+
+module.exports.securityDefinitions = securityDefinitions;

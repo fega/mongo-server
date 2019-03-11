@@ -41,11 +41,13 @@
         "produces": [
           "application/json"
         ],
-        "security": {
-          "permissions": [
-            "dogs"
-          ]
-        },
+        "security": [
+          {
+            "permissions": [
+              "dogs"
+            ]
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -319,11 +321,13 @@
         "produces": [
           "application/json"
         ],
-        "security": {
-          "permissions": [
-            "dogs"
-          ]
-        },
+        "security": [
+          {
+            "permissions": [
+              "dogs"
+            ]
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -367,11 +371,13 @@
         "produces": [
           "application/json"
         ],
-        "security": {
-          "permissions": [
-            "dogs"
-          ]
-        },
+        "security": [
+          {
+            "permissions": [
+              "dogs"
+            ]
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -423,12 +429,14 @@
         "produces": [
           "application/json"
         ],
-        "security": {
-          "permissions": [
-            "admin",
-            "dogs"
-          ]
-        },
+        "security": [
+          {
+            "permissions": [
+              "admin",
+              "dogs"
+            ]
+          }
+        ],
         "responses": {
           "204": {
             "description": "success, no body"
@@ -852,16 +860,13 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name field",
-          "required": false
+          "description": "Name field"
         },
         "array": {
           "type": "array",
           "description": "Array field",
-          "required": false,
           "items": {
-            "type": "string",
-            "required": false
+            "type": "string"
           }
         }
       }
@@ -911,11 +916,13 @@
   "securityDefinitions": {
     "permissions": {
       "type": "apiKey",
-      "authorizationUrl": "http://localhost: 3000 / auth / users / magic - link",
+      "authorizationUrl": "http://localhost: 3000/auth/users/magic-link",
       "in": "header",
       "name": "Authorization",
       "scopes": {
-        "email:verified": "Email verified"
+        "email:verified": "Email verified",
+        "admin": "security definitions",
+        "dogs": "security definitions"
       }
     }
   }

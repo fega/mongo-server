@@ -191,6 +191,7 @@ const pickEndpointProperties = pick(['get', 'getId', 'put', 'patch', 'delete', '
 const describeOut = (resource, name, ins) => {
   if (!resource.out) return {};
   const preOut = describe(resource.out);
+  console.log('OUT', resource.out, preOut);
   const preOut2 = generateExtraDescriptions(preOut);
   const preOut3 = unrollTypeArray(preOut2);
   const out = completeOutWithIn(name, preOut3, ins);
@@ -276,9 +277,9 @@ const describeResource = (resource, name) => {
     map(describeEndpoint),
   )(_resource);
 
-  const ins = describeIn(resource, name);
+  const ins = describeIn(resource);
   const out = describeOut(resource, name, ins);
-  const auth = describeAuth(resource, name);
+  const auth = describeAuth(resource);
   const permissions = describePermissions(resource);
   return {
     ...methods,
