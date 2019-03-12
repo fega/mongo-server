@@ -154,7 +154,6 @@ const generateOutputDefinition = (resource) => {
   const result = {
     type: 'object',
     properties: mapValues(out, (value, name) => {
-      console.log('-', name, value);
       const _value = get(resource, `in.body.children[${name}]`, value);
       return {
         type: getType(_value),
