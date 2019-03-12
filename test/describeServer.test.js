@@ -186,7 +186,6 @@ test('describeServer({resources:{dogs:false}})', () => {
   }), { resources: {} });
 });
 test('describeServer(superConfig)', () => {
-  console.log(JSON.stringify(ds(superConfig).resources.mares, null, 2));
   a.deepEqual(ds(superConfig), describeServer);
 });
 
