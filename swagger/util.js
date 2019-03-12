@@ -278,6 +278,7 @@ const describeResource = (resource, name) => {
 
   const ins = describeIn(resource);
   const out = describeOut(resource, name, ins);
+  console.log(out);
   const auth = describeAuth(resource);
   const permissions = describePermissions(resource);
   return {

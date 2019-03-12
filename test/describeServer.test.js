@@ -60,7 +60,7 @@ const superConfig = {
       out: resource => ({
         hello: resource.number,
         number: give(resource.number).as('number').ok(),
-        image: give(resource.number).as(Image).ok(),
+        image: give(resource.number).format(Image).ok(),
       }),
       in: {
         body: {
@@ -88,7 +88,7 @@ test('string type bug', () => {
       mares: {
         out: resource => ({
           hello: resource.number,
-          number: give(resource.number).as('number').ok(),
+          number: give(resource.number).ok(),
           image: give(resource.number).as(Image).ok(),
         }),
         in: {
@@ -119,13 +119,9 @@ test('string type bug', () => {
             ],
           },
           number: {
-            permissions: [],
-            examples: [],
             type: 'number',
           },
           image: {
-            permissions: [],
-            examples: [],
             type: 'loi_internal_Image',
           },
         },
@@ -194,7 +190,7 @@ test('describeServer(superConfig)', () => {
   a.deepEqual(ds(superConfig), describeServer);
 });
 
-test.skip('generate.swagger(superConfig)', () => {
+test('generate.swagger(superConfig)', () => {
   const r = swagger(superConfig);
   a.deepEqual(r, swaggerResult);
 });

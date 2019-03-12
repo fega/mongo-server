@@ -16,14 +16,11 @@ module.exports = {
           ],
         },
         number: {
-          examples: [],
-          permissions: [],
           type: 'number',
         },
         image: {
-          examples: [],
-          permissions: [],
-          type: 'loi_internal_Image',
+          type: 'string',
+          format: 'loi_internal_Image',
         },
       },
       in: {
@@ -151,9 +148,7 @@ module.exports = {
       put: {},
       out: {
         hello: {
-          examples: [],
           type: 'number',
-          permissions: [],
           description: 'a field',
         },
       },

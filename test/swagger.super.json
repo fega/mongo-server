@@ -916,7 +916,7 @@
   "securityDefinitions": {
     "permissions": {
       "type": "apiKey",
-      "authorizationUrl": "http://localhost: 3000/auth/users/magic-link",
+      "authorizationUrl": "http://localhost:3000/auth/users/magic-link",
       "in": "header",
       "name": "Authorization",
       "scopes": {
