@@ -56,6 +56,11 @@ module.exports = (config, db) => {
   app.use(config.staticRoot || '/', express.static(path.join(process.cwd(), config.static || 'public')));
 
   /**
+   * enable trust proxy
+   */
+  if (config.trustProxy) app.enable('trust proxy');
+
+  /**
    * Custom middleware
    */
   if (config.middleware) app.use(config.middleware);

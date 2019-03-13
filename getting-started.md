@@ -71,6 +71,9 @@ module.exports= {
   middleware: [myFunction],
   // default pagination limit
   pagination: 10,
+  // set as true to enable trust proxy on express
+  trustProxy: false
+
   // custom error handler
   errorHandler: (req.res,next,err)=>{/* custom error handler */},
 
