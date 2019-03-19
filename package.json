@@ -20,7 +20,7 @@
     "bcryptjs": "^2.4.3",
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
-    "compression": "^1.7.3",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "date.js": "^0.3.3",
