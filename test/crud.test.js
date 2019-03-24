@@ -348,6 +348,11 @@ test('?$where, invalid', async () => {
   a.equal(r.status, 400);
   a.equal(r.body.message, 'Invalid $where inside $query parameter');
 });
+test('?$expr, invalid', async () => {
+  const r = await request(server).get('/hippos?$query={"$expr":"Puky"}');
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'Invalid $expr inside $query parameter');
+});
 
 test('?$sort=name, OK', async () => {
   await db.collection('robots').insertOne({ name: 4 });
