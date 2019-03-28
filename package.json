@@ -59,7 +59,7 @@
     "mocha": "^6.0.2",
     "nodemon": "^1.18.10",
     "proxyquire": "^2.1.0",
-    "sinon": "^7.2.7",
+    "sinon": "^7.3.1",
     "supertest": "^3.4.2"
   },
   "directories": {
