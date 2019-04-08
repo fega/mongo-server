@@ -2,6 +2,7 @@
 const chai = require('chai');
 const request = require('supertest');
 const sinon = require('sinon');
+const Joi = require('joi');
 // const MailDev = require('maildev');
 const delay = require('delay');
 const asPromised = require('chai-as-promised');
@@ -474,7 +475,26 @@ test('?$fill, OK', async () => {
 test('NOT_FOUND', async () => {
   const r = await request(server).get('/parrots/puki').expect(404);
 });
+test('OK, id is a number', async () => {
+  const _id = Math.floor(Math.random() * 10000);
+  db = await mongo();
 
+  await db.collection('pigeons').insertOne({ _id, name: 'Paco' });
+
+  const server2 = await createServer({
+    silent: true,
+    resources: {
+      pigeons: {
+        in: {
+          params: {
+            id: Joi.number(),
+          },
+        },
+      },
+    },
+  }, db);
+  await request(server2).get(`/pigeons/${_id}`).expect(200);
+});
 /**
  * PUT /resources/id endpoint
  */

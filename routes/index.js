@@ -176,12 +176,10 @@ module.exports = (config, db) => {
    */
   router.get('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.getId`) === false) return next();
-
     const { $populate, $fill } = req.query;
-    const { query } = req;
     const result = ($populate || $fill)
-      ? (await findAndPopulate(req.params.resource, { $populate, $fill }, { _id: req.params.id }))[0]
-      : await db.collection(req.params.resource).findOne({ _id: req.params.id });
+      ? (await findAndPopulate(req.params.resource, { $populate, $fill }, { _id: get(req, 'moser.validation.id', req.params.id) }))[0]
+      : await db.collection(req.params.resource).findOne({ _id: get(req, 'moser.validation.id', req.params.id) });
 
     if (!result) return next(new HttpError.NotFound('Not found'));
     res.locals.resources = result;
@@ -206,7 +204,7 @@ module.exports = (config, db) => {
     const { _id, ...put } = req.body;
     const result = await db
       .collection(req.params.resource)
-      .findOne({ _id: req.params.id });
+      .findOne({ _id: get(req, 'moser.validation.id', req.params.id) });
 
     if (!result) return next(new HttpError.NotFound('Resource not found'));
     res.locals.resources = result;
@@ -220,7 +218,7 @@ module.exports = (config, db) => {
     if (!Object.keys(patch).length) return next(new HttpError.BadRequest('Missing body'));
     const result = await db
       .collection(req.params.resource)
-      .findOne({ _id: req.params.id });
+      .findOne({ _id: get(req, 'moser.validation.id', req.params.id) });
     if (!result) return next(new HttpError.NotFound('Resource not found'));
     res.locals.resources = result;
     return next();
@@ -291,7 +289,7 @@ module.exports = (config, db) => {
 
     const result = await db
       .collection(req.params.resource)
-      .findOneAndReplace({ _id: req.params.id }, put, {
+      .findOneAndReplace({ _id: get(req, 'moser.validation.id', req.params.id) }, put, {
         returnOriginal: false,
       });
 
@@ -308,7 +306,7 @@ module.exports = (config, db) => {
 
     const result = await db
       .collection(req.params.resource)
-      .findOneAndUpdate({ _id: req.params.id }, { $set: patch }, {
+      .findOneAndUpdate({ _id: get(req, 'moser.validation.id', req.params.id) }, { $set: patch }, {
         returnOriginal: false,
       });
 
@@ -321,7 +319,7 @@ module.exports = (config, db) => {
 
     await db
       .collection(req.params.resource)
-      .deleteOne({ _id: req.params.id });
+      .deleteOne({ _id: get(req, 'moser.validation.id', req.params.id) });
 
     return res.sendStatus(204);
   }));
