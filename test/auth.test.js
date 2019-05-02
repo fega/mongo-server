@@ -463,6 +463,10 @@ test('GET /auth/:resource/magic-token/:searchToken, OK', async () => {
     restrict: true,
   }, db);
   const r = await request(s).get(`/auth/users/magic-token/${token}`);
+
+  const t = await db.collection('moser-magic-links').findOne({ search: token });
+  a.equal(t.status, 'RETRIEVED', 'Status no added to token');
+
   a.equal(r.status, 200);
   a.exists(r.body.$token);
 });
