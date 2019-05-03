@@ -57,7 +57,7 @@
     "eslint-plugin-import": "^2.16.0",
     "maildev": "^1.0.0-rc3",
     "mocha": "^6.1.4",
-    "nodemon": "^1.18.10",
+    "nodemon": "^1.19.0",
     "proxyquire": "^2.1.0",
     "sinon": "^7.3.1",
     "supertest": "^3.4.2"
