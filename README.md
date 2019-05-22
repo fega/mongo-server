@@ -12,6 +12,11 @@ Get a full REST API with **zero coding** in **less than 30 seconds** \(seriously
 
 * [x] Automatic REST \(GET, POST, PATCH, PUT,  DELETE\).
 * [x] Automatic Pagination, Sorting and Filters.
+  * [x] Regex Queries
+  * [x] Field Filtering
+  * [x] Item counting
+  * [x] Sorting
+  * [x] Pagination  
 * [x] Automatic Population \(like SQL join\).
 * [x] Automatic API documentation \(In Alpha\).
 * [ ] Automatic Admin panel \(In development\).

@@ -452,8 +452,26 @@ test('?$range, BAD_REQUEST');
 test('?$text, OK');
 test('?$text, BAD_REQUEST');
 
-test('?$regex, OK');
-test('?$regex, BAD_REQUEST');
+test('?$regex, OK', async () => {
+  const i1 = await db.collection('bees').insertOne({ _id: 'PaquiRRis', name: 'PaquiRRis' });
+  await db.collection('bees').insertOne({ _id: 'PaquiRRis2', name: 'PacuRRis' });
+
+  const r = await request(server).get('/bees?$regex=["name","paquirris"]');
+  a.equal(r.status, 200);
+  a.lengthOf(r.body, 1);
+  console.log(r.body);
+  a.equal(r.body[0]._id, 'PaquiRRis');
+});
+test('?$regex, BAD_REQUEST', async () => {
+  const r = await request(server).get('/bees?$regex=[name","paquirris"]');
+  a.equal(r.status, 400);
+});
+
+test('?$regex, BAD_REQUEST, UNSAFE REGEX', async () => {
+  const r = await request(server).get('/bees?$regex=["name","(x%2Bx%2B)%2By"]');
+  a.equal(r.status, 400);
+  a.equal(r.body.message, 'unsafe $regex');
+});
 
 /**
  * GET /resources/id endpoint

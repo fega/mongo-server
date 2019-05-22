@@ -826,6 +826,9 @@ test('GET POST PATCH PUT DELETE /:resources dynamic permissions', async () => {
   a.equal(d3.status, 403, 'PUT /resources/:id failing');
   a.equal(d4.status, 403, 'DELETE /resources/:id failing');
 });
+test('GET /:resources, only one special permission', async () => {
+
+});
 test('GET POST PATCH PUT DELETE /:resources 200 OK', async () => {
   const s = createServer({
     silent: true,
