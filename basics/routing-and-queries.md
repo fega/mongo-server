@@ -88,6 +88,15 @@ Use `$query` to send a JSON with any mongodb query
 GET /posts?$query={"name":"Puky"}
 ```
 
+### Regular Expressions \(Regex\)
+
+Use  `$regex`  to send a regex Query
+
+```text
+GET /posts?$regex=["FieldName","Regex","flags"]
+# the regex value should be a valid Js Array
+```
+
 ### Full-text search
 
 Coming soon...
