@@ -459,7 +459,6 @@ test('?$regex, OK', async () => {
   const r = await request(server).get('/bees?$regex=["name","paquirris"]');
   a.equal(r.status, 200);
   a.lengthOf(r.body, 1);
-  console.log(r.body);
   a.equal(r.body[0]._id, 'PaquiRRis');
 });
 test('?$regex, BAD_REQUEST', async () => {

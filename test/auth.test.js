@@ -705,12 +705,12 @@ test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, no user', async ()
   const r3 = await request(s).put('/posts/an-id');
   const r4 = await request(s).delete('/posts/an-id');
   const r5 = await request(s).get('/users');
-  a.equal(r.status, 401, 'Get /resources failing');
-  a.equal(r0.status, 401, 'Get /resources/:id failing');
-  a.equal(r1.status, 401, 'POST /resources failing');
-  a.equal(r2.status, 401, 'Get /resources/:id failing');
-  a.equal(r3.status, 401, 'Get /resources/:id failing');
-  a.equal(r4.status, 401, 'Get /resources/:id failing');
+  a.equal(r.status, 403, 'Get /resources failing');
+  a.equal(r0.status, 403, 'Get /resources/:id failing');
+  a.equal(r1.status, 403, 'POST /resources failing');
+  a.equal(r2.status, 403, 'Get /resources/:id failing');
+  a.equal(r3.status, 403, 'Get /resources/:id failing');
+  a.equal(r4.status, 403, 'Get /resources/:id failing');
   a.equal(r5.status, 200, 'Other endpoints are failing');
 });
 test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, Invalid JWT', async () => {
