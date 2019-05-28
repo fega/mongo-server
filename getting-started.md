@@ -26,7 +26,7 @@ Also when doing requests, it's good to know that:
 * Id values are not mutable. Any `id` value in the body of your PUT or PATCH request will be ignored. Only a value set in a POST request will be respected, but only if not already taken.
 * id values are currently saved as plain text, this probably will change in the
 
-### CLI usage
+## CLI usage
 
 ```bash
 Usage: mongodb-server [options]
@@ -41,7 +41,7 @@ Usage: mongodb-server [options]
     -h, --help               output usage information
 ```
 
-### Config file
+## Config file
 
 You can also set options in a `js` or `json` configuration file.
 
