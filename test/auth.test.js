@@ -688,6 +688,7 @@ test('GET /auth/:resource/facebook, resource doesnt have facebook auth', async (
 });
 
 suite('Permissions');
+
 test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, no user', async () => {
   const s = createServer({
     silent: true,
@@ -711,6 +712,32 @@ test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, no user', async ()
   a.equal(r2.status, 401, 'Get /resources/:id failing');
   a.equal(r3.status, 401, 'Get /resources/:id failing');
   a.equal(r4.status, 401, 'Get /resources/:id failing');
+  a.equal(r5.status, 200, 'Other endpoints are failing');
+});
+
+test('GET POST PATCH PUT DELETE /:resources 200, empty permissions array', async () => {
+  const s = createServer({
+    silent: true,
+    resources: {
+      users: { auth: { local: ['email', 'password'] } },
+      posts: {
+        permissions: [],
+      },
+    },
+  }, db);
+  const r = await request(s).get('/posts');
+  const r0 = await request(s).get('/posts/an-id');
+  const r1 = await request(s).post('/posts');
+  const r2 = await request(s).patch('/posts/an-id');
+  const r3 = await request(s).put('/posts/an-id');
+  const r4 = await request(s).delete('/posts/an-id');
+  const r5 = await request(s).get('/users');
+  a.equal(r.status, 200, 'Get /resources failing');
+  a.equal(r0.status, 404, 'Get /resources/:id failing');
+  a.equal(r1.status, 200, 'POST /resources failing');
+  a.equal(r2.status, 400, 'PATCH /resources/:id failing');
+  a.equal(r3.status, 404, 'PUT /resources/:id failing');
+  a.equal(r4.status, 404, 'DELETE /resources/:id failing');
   a.equal(r5.status, 200, 'Other endpoints are failing');
 });
 test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, Invalid JWT', async () => {
