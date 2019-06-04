@@ -43,11 +43,6 @@ after(async () => {
  */
 suite('GET /:resource');
 
-test('OK', async () => {
-  await db.collection('posts').insertOne({ title: 'a title' });
-  const r = await request(server).get('/posts').expect(200);
-  a.equal(r.body[0].title, 'a title');
-});
 
 test('middlewares, NO middlewares', async () => {
   const server2 = await createServer({
@@ -228,6 +223,32 @@ test('middlewares, AFTER VALIDATION, resource middleware', async () => {
   a.isTrue(passDelete, 'initial DELETE middleware not called');
 });
 
+suite('GET /:resource, FILTERS');
+before(async () => {
+  db = await mongo();
+  server = await createServer({
+    silent: true,
+    pagination: 10,
+    port: 3000,
+    noListen: true,
+    resources: {
+      products: {
+        out: resource => ({ ...resource, extraField: true }),
+      },
+    },
+    settings: {
+      restrictWhereQuery: true,
+    },
+  }, db);
+});
+after(async () => {
+  await db.dropDatabase();
+});
+test('OK', async () => {
+  await db.collection('posts').insertOne({ title: 'a title' });
+  const r = await request(server).get('/posts').expect(200);
+  a.equal(r.body[0].title, 'a title');
+});
 test('filters, OK', async () => {
   await db.collection('comments').insertOne({ author: 'fabian' });
   await db.collection('comments').insertOne({ author: 'fabian' });
@@ -235,7 +256,37 @@ test('filters, OK', async () => {
   await db.collection('comments').insertOne({ author: 'tata' });
   const r = await request(server).get('/comments?author=tata').expect(200);
   a.equal(r.body.length, 2);
+  a.equal(r.body[0].author, 'tata');
 });
+test('filters :ne, not equal', async () => {
+  await db.collection('ne-comments').insertOne({ author: 'fabian' });
+  await db.collection('ne-comments').insertOne({ author: 'fabian' });
+  await db.collection('ne-comments').insertOne({ author: 'tata' });
+  await db.collection('ne-comments').insertOne({ author: 'tata' });
+  const r = await request(server).get('/ne-comments?author:ne=tata').expect(200);
+  a.equal(r.body.length, 2);
+  a.equal(r.body[0].author, 'fabian');
+});
+
+test('filters :co, type coercion');
+test('filters :gt, greater than', async () => {
+  await db.collection('gt-comments').insertOne({ likes: 9 });
+  await db.collection('gt-comments').insertOne({ likes: 10 });
+  await db.collection('gt-comments').insertOne({ likes: 10.1 });
+  await db.collection('gt-comments').insertOne({ likes: 11 });
+  const r = await request(server).get('/gt-comments?author:gt=10').expect(200);
+  a.equal(r.body.length, 2);
+  a.equal(r.body[0].likes, 10.1);
+});
+test('filters :lt, lower than');
+test('filters :gte, greater than or equal');
+test('filters :lte, lower than or equal');
+test('filters :in, only one item');
+test('filters :in, Multiple items');
+test('filters :nin, only one item');
+test('filters :nin, Multiple items');
+test('filters :size, ok');
+
 test('$select, OK', async () => {
   await db.collection('durians').insertOne({ author: 'fabian' });
   await db.collection('durians').insertOne({ author: 'fabian' });

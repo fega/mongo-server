@@ -126,7 +126,13 @@ module.exports = (config, db) => {
    * Restrict endpoints
    */
   generateRestrictHandlers(config, router);
-
+  /**
+   *
+   */
+  router.use('*', (req, res, next) => {
+    res.locals.db = db;
+    next();
+  });
   /**
    * Add initial middleware
    */
@@ -316,7 +322,6 @@ module.exports = (config, db) => {
   }));
   router.delete('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.delete`) === false) return next();
-
     await db
       .collection(req.params.resource)
       .deleteOne({ _id: get(req, 'moser.validation.id', req.params.id) });
