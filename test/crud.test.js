@@ -274,18 +274,50 @@ test('filters :gt, greater than', async () => {
   await db.collection('gt-comments').insertOne({ likes: 10 });
   await db.collection('gt-comments').insertOne({ likes: 10.1 });
   await db.collection('gt-comments').insertOne({ likes: 11 });
-  const r = await request(server).get('/gt-comments?author:gt=10').expect(200);
+  const r = await request(server).get('/gt-comments?likes:gt=10').expect(200);
   a.equal(r.body.length, 2);
   a.equal(r.body[0].likes, 10.1);
 });
-test('filters :lt, lower than');
-test('filters :gte, greater than or equal');
-test('filters :lte, lower than or equal');
+
+test('filters :lt, lower than', async () => {
+  await db.collection('lt-comments').insertOne({ likes: 9 });
+  await db.collection('lt-comments').insertOne({ likes: 10 });
+  await db.collection('lt-comments').insertOne({ likes: 10.1 });
+  await db.collection('lt-comments').insertOne({ likes: 11 });
+  const r = await request(server).get('/lt-comments?likes:lt=10').expect(200);
+  a.equal(r.body.length, 1);
+  a.equal(r.body[0].likes, 9);
+});
+test('filters :gte, greater than or equal', async () => {
+  await db.collection('gte-comments').insertOne({ likes: 9 });
+  await db.collection('gte-comments').insertOne({ likes: 10 });
+  await db.collection('gte-comments').insertOne({ likes: 10.1 });
+  await db.collection('gte-comments').insertOne({ likes: 11 });
+  const r = await request(server).get('/gte-comments?likes:gte=10').expect(200);
+  a.equal(r.body.length, 3);
+  a.equal(r.body[0].likes, 10);
+});
+test('filters :lte, lower than or equal', async () => {
+  await db.collection('lte-comments').insertOne({ likes: 9 });
+  await db.collection('lte-comments').insertOne({ likes: 10 });
+  await db.collection('lte-comments').insertOne({ likes: 10.1 });
+  await db.collection('lte-comments').insertOne({ likes: 11 });
+  const r = await request(server).get('/lte-comments?likes:lte=10').expect(200);
+  a.equal(r.body.length, 2);
+  a.equal(r.body[0].likes, 9);
+});
 test('filters :in, only one item');
 test('filters :in, Multiple items');
 test('filters :nin, only one item');
 test('filters :nin, Multiple items');
-test('filters :size, ok');
+test('filters :size, ok', async () => {
+  await db.collection('size-comments').insertOne({ likes: [1, 2] });
+  await db.collection('size-comments').insertOne({ likes: [1, 2, 3, 4] });
+  await db.collection('size-comments').insertOne({ likes: [1, 2, 3] });
+  await db.collection('size-comments').insertOne({ likes: [1, 2, 3] });
+  const r = await request(server).get('/size-comments?likes:size=3').expect(200);
+  a.equal(r.body.length, 2);
+});
 
 test('$select, OK', async () => {
   await db.collection('durians').insertOne({ author: 'fabian' });
