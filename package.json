@@ -35,7 +35,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.11",
     "loy": "0.0.7",
-    "mongodb": "^3.2.6",
+    "mongodb": "^3.2.7",
     "morgan": "^1.9.1",
     "nodemailer": "^5.1.1",
     "passport": "^0.4.0",
@@ -46,7 +46,7 @@
     "randomstring": "^1.1.5",
     "raven": "^2.6.4",
     "safe-regex": "^2.0.2",
-    "swagger-ui-express": "^4.0.5"
+    "swagger-ui-express": "^4.0.6"
   },
   "devDependencies": {
     "@fega/maildev": "^1.0.0-rc3",
