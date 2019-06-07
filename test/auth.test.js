@@ -714,7 +714,6 @@ test('GET POST PATCH PUT DELETE /:resources 401 UNAUTHORIZED, no user', async ()
   a.equal(r4.status, 401, 'Get /resources/:id failing');
   a.equal(r5.status, 200, 'Other endpoints are failing');
 });
-
 test('GET POST PATCH PUT DELETE /:resources 200, empty permissions array', async () => {
   const s = createServer({
     silent: true,

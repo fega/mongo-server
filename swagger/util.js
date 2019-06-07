@@ -287,6 +287,7 @@ const describeResource = (resource, name) => {
     ...ins,
     ...permissions,
     ...resource.description ? { description: resource.description } : {},
+    ...resource.admin ? { admin: resource.admin } : {},
   };
 };
 
