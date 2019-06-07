@@ -126,13 +126,33 @@ module.exports = (config, db) => {
    * Restrict endpoints
    */
   generateRestrictHandlers(config, router);
+
   /**
-   *
+   * Populate Db in locals
    */
   router.use('*', (req, res, next) => {
     res.locals.db = db;
     next();
   });
+  /**
+   * populate filter in locals
+   */
+  router.get('*', (req, res, next) => {
+    const {
+      $limit, $page, $sort, $order, $populate, $range, $count,
+      $text, $regex, $query, $fill, $select, ...$filter
+    } = req.query;
+
+    res.locals.filter = {
+      ...getQuery($query, config),
+      ...getTextQuery($text),
+      ...getRegexQuery($regex),
+      ...getRangeQuery($range),
+      ...getFilters($filter),
+    };
+    next();
+  });
+
   /**
    * Add initial middleware
    */
