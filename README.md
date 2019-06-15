@@ -14,9 +14,11 @@ Get a full REST API with **zero coding** in **less than 30 seconds** \(seriously
 * [x] Automatic Pagination, Sorting and Filters.
   * [x] Regex Queries
   * [x] Field Filtering
+  * [ ] Advanced filters \(i.e: not equals, greater than, etc\)
+  * [ ] GeoSpatial queries
   * [x] Item counting
   * [x] Sorting
-  * [x] Pagination  
+  * [x] Pagination
 * [x] Automatic Population \(like SQL join\).
 * [x] Automatic API documentation \(In Alpha\).
 * [ ] Automatic Admin panel \(In development\).

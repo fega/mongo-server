@@ -15,32 +15,67 @@ PATCH  /posts/1
 DELETE /posts/1
 ```
 
-### Filter
+### Filter by equality
 
-You can filter by any field=value Use `.` to access deep properties
+You can filter by any by using `field=value`, Use `.` to access deep properties
 
 ```http
-GET /posts?title=moser&author=fega
+c
 GET /posts?id=1&id=2
 GET /comments?author.name=fega
 ```
 
-### Filter Fields
-
 You can use `$select` to return only the fields that you need.
+
+### Advanced filters \(Coming soon\)
+
+You can use different modifiers in order to perform special queries:
+
+```bash
+# Format 
+GET /resources?field:modifier=value
+
+# ne: Not Equal
+GET /comments?name:ne=Vektor
+
+# lt: Lower than
+GET /comments?points:lt=10
+
+# gt: Greater than
+GET /comments?points:gt=10
+
+# lte: Lower than or equal
+GET /comments?points:lte=10
+
+# gte: Greater than or equal
+GET /comments?points:gte=10
+
+# in:
+GET /comments?fruits:in=apple
+GET /comments?fruits:in[]=apple&fruits:in[]=banana
+
+# nin:
+GET /comments?fruits:nin=apple
+GET /comments?fruits:nin[]=apple&fruits:nin[]=banana
+
+# size 
+GET /items?fruits:size=10
+```
+
+### Pick fields to return
 
 ```http
 GET /posts?$select[]=author&$select[]=_id
 GET /posts?$select=name
 ```
 
-### Paginate
-
-Use `$page` and optionally `$limit` to paginate returned data. keep in mind that the first page is 0 \`$page=0\`
-
 ```
 GET /posts?$page=7
 ```
+
+### Paginate
+
+Use `$page` and optionally `$limit` to paginate returned data. keep in mind that the first page is 0 \`$page=0\`
 
 ```http
 GET /posts?$page=7&$limit=20
@@ -134,9 +169,24 @@ GET /employees?$fill=companies
 
 ### Flags
 
-Sometimes you want to pass some data that are neither queries or filters, to be user in the route logic, permissions or filters. you can use them with query flags: 
+Sometimes you want to pass some data that are neither queries or filters, to be used in the route logic, permissions or filters. you can use them with query flags: 
 
 ```http
 GET /employees?$$flag=someData&$$anotherFlag=moreData
+```
+
+### Geo Filters \(Coming Soon\)
+
+```bash
+# intersect
+GET /countries?location:geo:ins:polygon=[[]]
+GET /countries?location:geo:ins:multipolygon
+
+# within
+GET /countries?location:geo:win:polygon=[[]]
+GET /countries?location:geo:win:multipolygon=[[]]
+
+# Near Point
+GET /countries?location:geo:near=[LONG,LAT,MIN,MAX]
 ```
 
