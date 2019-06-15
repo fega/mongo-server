@@ -1,24 +1,9 @@
-# Swagger Docs
+# Server description
 
-### Defaults
+### Server description
 
-With Defaults, you can assign default properties on resource creation / update, if the function result includes the keys `$owner`, `$timestamps` or `$changelog` `$version`, it will trigger special behaviors
+You can access to a Swagger docs:
 
-```javascript
-module.exports= {
-  resources: {
-    dogs: {
-      post:{
-        permissions:["user:permission"],
-        default:(resource,user)=>({
-          ...resource,
-          $owner:true, // this will be saved as resourceName_id: id, so you can use it with the populate feature defined in the Relationships section
-          $timestamps:true, // createdAt, updatedAt
-          $version: true,
-        })
-      }
-    },
-  }
-}
+```http
+GET  /moser-docs/swagger
 ```
-
