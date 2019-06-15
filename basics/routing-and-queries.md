@@ -36,12 +36,13 @@ GET /posts?$select=name
 
 ### Paginate
 
-Use `$page` and optionally `$limit` to paginate returned data.
+Use `$page` and optionally `$limit` to paginate returned data. keep in mind that the first page is 0 \`$page=0\`
 
-In the `Link` header you'll get `first`, `prev`, `next` and `last` links.
+```
+GET /posts?$page=7
+```
 
 ```http
-GET /posts?$page=7
 GET /posts?$page=7&$limit=20
 ```
 

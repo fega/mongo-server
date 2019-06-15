@@ -1,13 +1,14 @@
-# Server description
+# Swagger Docs
 
-### Server description
+## Server description
 
 You can access to a Swagger docs:
 
 ```http
-# UI
+# UI
 GET  /moser-docs/swagger
 
 # JSON version
-GET /moser-docs/swagger.json
+GET /moser-docs/swagger.json
 ```
+
