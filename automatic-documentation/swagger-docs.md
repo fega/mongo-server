@@ -1,9 +1,12 @@
+# Swagger Docs
+
 You can access to a Swagger docs:
 
 ```http
-# UI
+# UI
 GET  /moser-docs/swagger
 
 # JSON version
-GET /moser-docs/swagger.json
+GET /moser-docs/swagger.json
 ```
+
