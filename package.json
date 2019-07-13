@@ -59,7 +59,7 @@
     "maildev": "^1.0.0-rc3",
     "mocha": "^6.1.4",
     "nodemon": "^1.19.1",
-    "proxyquire": "^2.1.0",
+    "proxyquire": "^2.1.1",
     "sinon": "^7.3.2",
     "supertest": "^3.4.2"
   },
