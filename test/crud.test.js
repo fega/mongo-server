@@ -3,6 +3,7 @@ const chai = require('chai');
 const request = require('supertest');
 const sinon = require('sinon');
 const Joi = require('joi');
+const { ObjectID } = require('mongodb');
 // const MailDev = require('maildev');
 const delay = require('delay');
 const asPromised = require('chai-as-promised');
@@ -282,7 +283,6 @@ test('filters :date, Date coercion', async () => {
 
   a.equal(r.body.length, 1);
 });
-
 test('filters :date, Date coercion, invalid date', async () => {
   const date = new Date();
   await db.collection('date-filters').insertOne({ createdAt: date });
@@ -294,8 +294,16 @@ test('filters :date, Date coercion, invalid date', async () => {
 
   a.equal(r.body.length, 0);
 });
+test('filters :id, ObjectID Date coercion', async () => {
+  const id = new ObjectID();
+  await db.collection('objectid-filters').insertOne({ _id: id });
 
+  const r = await request(server)
+    .get(`/objectid-filters?_id:id=${id.toString()}`)
+    .expect(200);
 
+  a.equal(r.body.length, 1);
+});
 test('filters :gt, greater than', async () => {
   await db.collection('gt-comments').insertOne({ likes: 9 });
   await db.collection('gt-comments').insertOne({ likes: 10 });
@@ -305,7 +313,6 @@ test('filters :gt, greater than', async () => {
   a.equal(r.body.length, 2);
   a.equal(r.body[0].likes, 10.1);
 });
-
 test('filters :lt, lower than', async () => {
   await db.collection('lt-comments').insertOne({ likes: 9 });
   await db.collection('lt-comments').insertOne({ likes: 10 });
@@ -333,6 +340,16 @@ test('filters :lte, lower than or equal', async () => {
   a.equal(r.body.length, 2);
   a.equal(r.body[0].likes, 9);
 });
+test('filters :gt:date, greater than date', async () => {
+  await db.collection('gtdate-comments').insertOne({ createdAt: DateJs('tomorrow', null) });
+  await db.collection('gtdate-comments').insertOne({ createdAt: DateJs('tomorrow', null) });
+  await db.collection('gtdate-comments').insertOne({ createdAt: DateJs('yesterday', null) });
+  await db.collection('gtdate-comments').insertOne({ createdAt: DateJs('yesterday', null) });
+
+  const r = await request(server).get(`/gtdate-comments?createdAt:gt:date=${new Date().toISOString()}`).expect(200);
+  a.equal(r.body.length, 2);
+});
+
 test('filters :in, only one item');
 test('filters :in, Multiple items');
 test('filters :nin, only one item');
