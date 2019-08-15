@@ -35,6 +35,10 @@ You can use different modifiers in order to perform special queries:
 # Format 
 GET /resources?field:modifier=value
 
+# date: date Coercion
+GET /comments?createdAt:date=2019-08-15T20:01:17.065Z
+GET /comments?createdAt:date=1565899340489
+
 # ne: Not Equal
 GET /comments?name:ne=Vektor
 
@@ -50,11 +54,11 @@ GET /comments?points:lte=10
 # gte: Greater than or equal
 GET /comments?points:gte=10
 
-# in:
+# in (coming soon):
 GET /comments?fruits:in=apple
 GET /comments?fruits:in[]=apple&fruits:in[]=banana
 
-# nin:
+# nin  (coming soon):
 GET /comments?fruits:nin=apple
 GET /comments?fruits:nin[]=apple&fruits:nin[]=banana
 
