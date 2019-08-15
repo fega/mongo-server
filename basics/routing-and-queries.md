@@ -34,10 +34,19 @@ You can use different modifiers in order to perform special queries:
 ```bash
 # Format 
 GET /resources?field:modifier=value
+# or
+GET /resources?field:modifier:coerce=value # where coerce can be "id", "date", or "number"
+
 
 # date: date Coercion
 GET /comments?createdAt:date=2019-08-15T20:01:17.065Z
 GET /comments?createdAt:date=1565899340489
+
+# id: Object Id Coercion
+GET /comments?variableStoredAsObjectId:id=5d392ddb3aac2900173a876a
+
+# number: Number Coercion
+GET /comments?points:number=10
 
 # ne: Not Equal
 GET /comments?name:ne=Vektor
