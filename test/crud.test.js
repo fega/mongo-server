@@ -6,6 +6,7 @@ const Joi = require('joi');
 // const MailDev = require('maildev');
 const delay = require('delay');
 const asPromised = require('chai-as-promised');
+const DateJs = require('date.js');
 const createServer = require('../server');
 const mongo = require('../db');
 
@@ -269,6 +270,32 @@ test('filters :ne, not equal', async () => {
 });
 
 test('filters :co, type coercion');
+
+test('filters :date, Date coercion', async () => {
+  const date = new Date();
+  await db.collection('date-filters').insertOne({ createdAt: date });
+  await db.collection('date-filters').insertOne({ createdAt: DateJs('yesterday') });
+
+  const r = await request(server)
+    .get(`/date-filters?createdAt:date=${date.toISOString()}`)
+    .expect(200);
+
+  a.equal(r.body.length, 1);
+});
+
+test('filters :date, Date coercion, invalid date', async () => {
+  const date = new Date();
+  await db.collection('date-filters').insertOne({ createdAt: date });
+  await db.collection('date-filters').insertOne({ createdAt: DateJs('yesterday') });
+
+  const r = await request(server)
+    .get('/date-filters?createdAt:date=dsdsadasds')
+    .expect(200);
+
+  a.equal(r.body.length, 0);
+});
+
+
 test('filters :gt, greater than', async () => {
   await db.collection('gt-comments').insertOne({ likes: 9 });
   await db.collection('gt-comments').insertOne({ likes: 10 });
