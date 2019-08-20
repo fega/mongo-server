@@ -27,6 +27,8 @@ const main = async (programConfig = {}) => {
     let config = {
       ...programConfig,
       // noListen: programConfig.noListen || false,
+      json: programConfig.json,
+      urlencoded: programConfig.urlencoded || { extended: false },
       port: programConfig.port || 3000,
       host: programConfig.host || 'http://localhost:3000',
       mongo: programConfig.mongo || 'mongodb://localhost:27017',

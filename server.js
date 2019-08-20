@@ -28,7 +28,7 @@ module.exports = (config, db) => {
   /**
    * body Parsing
    */
-  app.use(express.json());
+  app.use(express.json(config.json));
   app.use(express.urlencoded({ extended: false }));
 
   /**
