@@ -29,7 +29,7 @@ module.exports = (config, db) => {
    * body Parsing
    */
   app.use(express.json(config.json));
-  app.use(express.urlencoded({ extended: false }));
+  app.use(express.urlencoded(config.urlencoded || { extended: false }));
 
   /**
    * Enable cors module
