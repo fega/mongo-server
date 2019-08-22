@@ -349,6 +349,17 @@ test('filters :gt:date, greater than date', async () => {
   const r = await request(server).get(`/gtdate-comments?createdAt:gt:date=${new Date().toISOString()}`).expect(200);
   a.equal(r.body.length, 2);
 });
+test('filters RANGE :gt:date and :lt:date', async () => {
+  await db.collection('rangedate-comments').insertOne({ createdAt: DateJs('5 days ago', null) });
+  await db.collection('rangedate-comments').insertOne({ createdAt: DateJs('10 days ago', null) });
+  await db.collection('rangedate-comments').insertOne({ createdAt: DateJs('30 days ago', null) });
+  await db.collection('rangedate-comments').insertOne({ createdAt: DateJs('yesterday', null) });
+
+  const query = `createdAt:gt:date=${DateJs('15 days ago', null).toISOString()}&createdAt:lt:date=${DateJs('7 days ago', null).toISOString()}`;
+  const r = await request(server).get(`/rangedate-comments?${query}`).expect(200);
+
+  a.equal(r.body.length, 2);
+});
 
 test('filters :in, only one item');
 test('filters :in, Multiple items');
