@@ -361,7 +361,27 @@ test('filters RANGE :gt:date and :lt:date', async () => {
   a.equal(r.body.length, 2);
 });
 
-test('filters :in, only one item');
+test('filters :nin, only one item', async () => {
+  await db.collection('nin-comments').insertOne({ fruits: ['apples'] });
+  await db.collection('nin-comments').insertOne({ fruits: ['apples'] });
+  await db.collection('nin-comments').insertOne({ fruits: ['apples', 'oranges'] });
+  await db.collection('nin-comments').insertOne({ fruits: ['apples', 'oranges'] });
+
+  const query = 'fruits:nin=oranges';
+  const r = await request(server).get(`/nin-comments?${query}`).expect(200);
+  a.equal(r.body.length, 2);
+});
+
+test('filters :in, only one item', async () => {
+  await db.collection('in-comments').insertOne({ fruits: ['apples'] });
+  await db.collection('in-comments').insertOne({ fruits: ['apples'] });
+  await db.collection('in-comments').insertOne({ fruits: ['apples', 'oranges'] });
+  await db.collection('in-comments').insertOne({ fruits: ['apples', 'oranges'] });
+
+  const query = 'fruits:in=oranges';
+  const r = await request(server).get(`/in-comments?${query}`).expect(200);
+  a.equal(r.body.length, 2);
+});
 test('filters :in, Multiple items');
 test('filters :nin, only one item');
 test('filters :nin, Multiple items');

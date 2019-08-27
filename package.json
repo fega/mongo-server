@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.48.3",
+  "version": "0.48.4",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "index.js",
   "scripts": {
@@ -45,13 +45,13 @@
     "randomstring": "^1.1.5",
     "raven": "^2.6.4",
     "safe-regex": "^2.0.2",
+    "date.js": "^0.3.3",
     "swagger-ui-express": "^4.0.7"
   },
   "devDependencies": {
     "@fega/maildev": "^1.0.0-rc3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "date.js": "^0.3.3",
     "delay": "^4.3.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",
