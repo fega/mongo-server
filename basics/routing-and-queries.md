@@ -63,11 +63,11 @@ GET /comments?points:lte=10
 # gte: Greater than or equal
 GET /comments?points:gte=10
 
-# in (coming soon):
+# i:
 GET /comments?fruits:in=apple
 GET /comments?fruits:in[]=apple&fruits:in[]=banana
 
-# nin  (coming soon):
+# nin:
 GET /comments?fruits:nin=apple
 GET /comments?fruits:nin[]=apple&fruits:nin[]=banana
 
