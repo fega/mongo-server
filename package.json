@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.49.1",
+  "version": "0.49.2",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "index.js",
   "scripts": {
