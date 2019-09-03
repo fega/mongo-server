@@ -1,1 +1,1 @@
-module.exports.generateSecurityDefinitions = (description) => ({});
+module.exports.generateSecurityDefinitions = description => ({});

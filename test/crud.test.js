@@ -382,7 +382,18 @@ test('filters :in, only one item', async () => {
   const r = await request(server).get(`/in-comments?${query}`).expect(200);
   a.equal(r.body.length, 2);
 });
-test('filters :in, Multiple items');
+test('filters :in, Multiple items', async () => {
+  await db.collection('in-2-comments').insertOne({ fruits: ['apples'] });
+  await db.collection('in-2-comments').insertOne({ fruits: ['apples'] });
+  await db.collection('in-2-comments').insertOne({ fruits: ['oranges'] });
+  await db.collection('in-2-comments').insertOne({ fruits: ['oranges'] });
+  await db.collection('in-2-comments').insertOne({ fruits: ['pears'] });
+  await db.collection('in-2-comments').insertOne({ fruits: ['pears'] });
+
+  const query = 'fruits:in=oranges&fruits:in=apples ';
+  const r = await request(server).get(`/in-2-comments?${query}`).expect(200);
+  a.equal(r.body.length, 4);
+});
 test('filters :nin, only one item');
 test('filters :nin, Multiple items');
 test('filters :size, ok', async () => {

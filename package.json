@@ -1,13 +1,13 @@
 {
   "name": "moser",
-  "version": "0.48.5",
+  "version": "0.49.1",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha ./test/**/*.test.js --exit --ui qunit --timeout 5000",
     "test:watch": "NODE_ENV=test mocha --exit --watch --ui qunit --timeout 5000",
     "dev": "nodemon index.js",
-    "lint": "eslint ./",
+    "lint": "eslint ./ --fix",
     "start": "node server.js"
   },
   "author": "Fabian Gutierrez <fega.hg@gmail.com>",
@@ -23,6 +23,7 @@
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
+    "date.js": "^0.3.3",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "express-jwt": "^5.3.1",
@@ -34,7 +35,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "loy": "0.0.7",
-    "mongodb": "^3.3.0",
+    "mongodb": "^3.3.1",
     "morgan": "^1.9.1",
     "nodemailer": "^5.1.1",
     "passport": "^0.4.0",
@@ -45,7 +46,6 @@
     "randomstring": "^1.1.5",
     "raven": "^2.6.4",
     "safe-regex": "^2.0.2",
-    "date.js": "^0.3.3",
     "swagger-ui-express": "^4.0.7"
   },
   "devDependencies": {

@@ -148,10 +148,10 @@ test('("something"), user pass', () => {
       permissions: ['something'],
     },
   }, {
-      locals: {
-        resources: {},
-      },
-    }, next);
+    locals: {
+      resources: {},
+    },
+  }, next);
   a.ok(next.calledOnce);
   a.equal(next.firstCall.args.length, 0);
 });
@@ -165,10 +165,10 @@ test('("$special"), user pass', () => {
       _id: 1,
     },
   }, {
-      locals: {
-        resources: {},
-      },
-    }, next);
+    locals: {
+      resources: {},
+    },
+  }, next);
   a.ok(next.calledOnce);
   a.equal(next.firstCall.args.length, 0);
 });
@@ -183,10 +183,10 @@ test('("$special"), user  NOT pass', () => {
     },
 
   }, {
-      locals: {
-        resources: {},
-      },
-    }, next);
+    locals: {
+      resources: {},
+    },
+  }, next);
   a.ok(next.calledOnce);
   a.equal(next.firstCall.args.length, 1);
 });
