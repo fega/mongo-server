@@ -46,7 +46,7 @@
     "randomstring": "^1.1.5",
     "raven": "^2.6.4",
     "safe-regex": "^2.0.2",
-    "swagger-ui-express": "^4.0.7"
+    "swagger-ui-express": "^4.1.1"
   },
   "devDependencies": {
     "@fega/maildev": "^1.0.0-rc3",
