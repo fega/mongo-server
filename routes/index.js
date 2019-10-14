@@ -197,11 +197,18 @@ module.exports = (config, db) => {
    */
   generateNodemailerHandlers(config, router);
 
+  addMiddleware('beforeRetrieve')(config, router);
   /**
    * Routes, retrieve resources
    */
   router.get('/:resource/:id', asyncController(async (req, res, next) => {
+    // if there is get by Id is not enabled
     if (get(config, `resources.${req.params.resource}.getId`) === false) return next();
+
+    // if there is a previous get id resource (from a middleware)
+    if (res.locals.resources) return next();
+
+    // get resource
     const { $populate, $fill } = req.query;
     const result = ($populate || $fill)
       ? (await findAndPopulate(req.params.resource, { $populate, $fill }, { _id: get(req, 'moser.validation.id', req.params.id) }))[0]
