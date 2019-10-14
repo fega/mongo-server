@@ -342,9 +342,19 @@ module.exports = (config, db) => {
   }));
   router.delete('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.delete`) === false) return next();
-    await db
-      .collection(req.params.resource)
-      .deleteOne({ _id: get(req, 'moser.validation.id', req.params.id) });
+    const softDelete = get(config, `resources.${req.params.resource}.softDelete`);
+    if (softDelete) {
+      await db
+        .collection(req.params.resource)
+        .updateOne(
+          { _id: get(req, 'moser.validation.id', req.params.id) },
+          { $set: { __d: true } },
+        );
+    } else {
+      await db
+        .collection(req.params.resource)
+        .deleteOne({ _id: get(req, 'moser.validation.id', req.params.id) });
+    }
 
     return res.sendStatus(204);
   }));

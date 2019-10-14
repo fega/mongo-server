@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-env node, mocha */
 const chai = require('chai');
 const request = require('supertest');
@@ -723,7 +724,22 @@ test('OK', async () => {
 test('NOT_FOUND', async () => {
   const r = await request(server).delete('/bears/paco').send({ age: 20 }).expect(404);
 });
-test('?soft, OK');
+test('?soft, OK', async () => {
+  const server2 = await createServer({
+    silent: true,
+    resources: {
+      elephants: {
+        softDelete: true,
+      },
+    },
+  }, db);
+  const v = await db.collection('elephants').insertOne({ _id: 'paco', name: 'Paco' });
+  const r = await request(server2).delete('/elephants/paco').expect(204);
+
+  const item = await db.collection('elephants').findOne({ _id: 'paco' });
+  a.notEqual(item, null);
+  a.deepEqual(item, { __d: true, _id: 'paco', name: 'Paco' });
+});
 
 suite('POST /:resourceWithEmailEnabled/:id');
 test('missing resources item', async () => {
