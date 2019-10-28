@@ -186,7 +186,7 @@ const completeOutWithIn = (name, outObj, ins) => {
   return out;
 };
 
-const pickRootProperties = pick(['resources', 'root', 'port', 'host', 'static', 'staticRoot', 'pagination', 'restricted', 'appName']);
+const pickRootProperties = pick(['resources', 'root', 'port', 'host', 'static', 'staticRoot', 'pagination', 'restricted', 'appName', 'admin']);
 const pickEndpointProperties = pick(['get', 'getId', 'put', 'patch', 'delete', 'post']);
 const describeOut = (resource, name, ins) => {
   if (!resource.out) return {};
