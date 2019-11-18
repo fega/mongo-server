@@ -113,7 +113,12 @@ module.exports = (config, db) => {
     if ($sort) pipeline.push({ $sort: getSort($sort, $order) });
     pipeline.push({ $skip: getNumber($page, 0) * getNumber($limit, config.pagination) });
     pipeline.push({ $limit: getNumber($limit, config.pagination) });
-    pipeline.push(...getPopulatePipelines($populate, $fill, resource));
+    pipeline.push(...getPopulatePipelines(
+      $populate, 
+      $fill, 
+      resource,
+      get(config, `resources.${resource}.population`)  
+    ));
     // execute aggregation
     const result = await db.collection(resource).aggregate(pipeline).toArray();
 

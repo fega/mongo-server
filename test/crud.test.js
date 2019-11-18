@@ -31,7 +31,7 @@ before(async () => {
     resources: {
       products: {
         out: resource => ({ ...resource, extraField: true }),
-      },
+      }
     },
     settings: {
       restrictWhereQuery: true,
@@ -238,6 +238,15 @@ before(async () => {
       products: {
         out: resource => ({ ...resource, extraField: true }),
       },
+      'xompanies':{
+        population:{
+          'xmployees':{
+            $sort: 'points',
+            $order: 'desc',
+            $limit: 2
+          }
+        }
+      }
     },
     settings: {
       restrictWhereQuery: true,
@@ -612,6 +621,17 @@ test('?$populate, OK, 2 multitple population', async () => {
   a.equal(r2.body[0].companies.length, 1, '$fill failed');
   a.equal(r2.body[1].companies.length, 2, '$fill failed');
 });
+test('?$populate, OK, population with limits', async ()=>{
+  await db.collection('xompanies').insertOne({ _id: "a", name: 'corp' });
+  await db.collection('xompanies').insertOne({ _id: "b", name: 'inc' });
+  await db.collection('xmployees').insertOne({ _id: 1, name: 'Foobio', xompany_id: "a", points:2 });
+  await db.collection('xmployees').insertOne({ _id: 2, name: 'Barfy', xompany_ids: ["a"], points:1 });
+  await db.collection('xmployees').insertOne({ _id: 3, name: 'Barfoo', xompany_id: "a", points:3 });
+  const r = await request(server).get('/xompanies?$populate=xmployees');
+  a.equal(r.body[0]['xmployees'][0].points, 3);
+  a.equal(r.body[0]['xmployees'][1].points, 2);
+  a.equal(r.body[0]['xmployees'].length,2);
+})
 
 test('?$populate, BAD_REQUEST');
 
