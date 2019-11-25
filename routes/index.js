@@ -94,7 +94,7 @@ module.exports = (config, db) => {
     );
     return result;
   };
-  const findAndPopulate = async (resource, query, filter = {}) => {
+  const findAndPopulate = async (resource, query, filter = {}, request) => {
     const {
       $limit, $page, $sort, $order, $populate, $range, $count,
       $text, $regex, $query, $fill, $select, ...$filter
@@ -111,13 +111,17 @@ module.exports = (config, db) => {
       },
     }];
     if ($sort) pipeline.push({ $sort: getSort($sort, $order) });
+
     pipeline.push({ $skip: getNumber($page, 0) * getNumber($limit, config.pagination) });
+
     pipeline.push({ $limit: getNumber($limit, config.pagination) });
+
     pipeline.push(...getPopulatePipelines(
-      $populate, 
-      $fill, 
+      $populate,
+      $fill,
       resource,
-      get(config, `resources.${resource}.population`)  
+      get(config, `resources.${resource}.population`),
+      request,
     ));
     // execute aggregation
     const result = await db.collection(resource).aggregate(pipeline).toArray();
@@ -216,7 +220,13 @@ module.exports = (config, db) => {
     // get resource
     const { $populate, $fill } = req.query;
     const result = ($populate || $fill)
-      ? (await findAndPopulate(req.params.resource, { $populate, $fill }, { _id: get(req, 'moser.validation.id', req.params.id) }))[0]
+      ? (
+          await findAndPopulate(
+            req.params.resource,
+            { $populate, $fill },
+            { _id: get(req, 'moser.validation.id', req.params.id) },
+            req
+          ))[0]
       : await db.collection(req.params.resource).findOne({ _id: get(req, 'moser.validation.id', req.params.id) });
 
     if (!result) return next(new HttpError.NotFound('Not found'));
@@ -296,7 +306,7 @@ module.exports = (config, db) => {
     }
 
     const result = ($populate || $fill)
-      ? await findAndPopulate(req.params.resource, query, filter)
+      ? await findAndPopulate(req.params.resource, query, filter, req)
       : await find(req.params.resource, query, filter);
 
     res.locals.resources = result;

@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.52.0",
+  "version": "0.53.0",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "index.js",
   "scripts": {
@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@fega/maildev": "^1.0.0-rc3",
+    "@types/express": "^4.17.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "delay": "^4.3.0",
