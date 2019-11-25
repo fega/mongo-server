@@ -28,5 +28,5 @@
 * [Db Seeding](miscellaneous/db-seeding.md)
 * [Mailing settings](miscellaneous/untitled.md)
 * [Roadmap](miscellaneous/roadmap.md)
-* [Population Constrains](population-constrains.md)
+* [Population Constrains](miscellaneous/population-constrains.md)
 
