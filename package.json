@@ -56,7 +56,7 @@
     "delay": "^4.3.0",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",
-    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-import": "^2.19.1",
     "maildev": "^1.1.0",
     "mocha": "^6.2.1",
     "nodemon": "^1.19.3",
