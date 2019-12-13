@@ -1,32 +1,32 @@
 # Table of contents
 
 * [Introduction](README.md)
-* [Getting started](getting-started.md)
+* [Getting started](docs/getting-started.md)
 
 ## Basics
 
-* [Routing and Queries](basics/routing-and-queries.md)
-* [Restrict endpoints](basics/restrict-endpoints.md)
-* [Route logic](basics/route-logic.md)
-* [Default values](basics/untitled.md)
-* [Input validation and Output Formatting](basics/input-validation-and-output-formatting.md)
+* [Routing and Queries](docs/basics/routing-and-queries.md)
+* [Restrict endpoints](docs/basics/restrict-endpoints.md)
+* [Route logic](docs/basics/route-logic.md)
+* [Default values](docs/basics/untitled.md)
+* [Input validation and Output Formatting](docs/basics/input-validation-and-output-formatting.md)
 
 ## Auth and permissions
 
-* [Login and authentication](auth-and-permissions/login-and-authentication.md)
-* [Permission handling](auth-and-permissions/permission-handling.md)
-* [Local authentication](auth-and-permissions/local-authentication.md)
-* [Magic Links and codes](auth-and-permissions/magic-links-and-codes.md)
+* [Login and authentication](docs/auth-and-permissions/login-and-authentication.md)
+* [Permission handling](docs/auth-and-permissions/permission-handling.md)
+* [Local authentication](docs/auth-and-permissions/local-authentication.md)
+* [Magic Links and codes](docs/auth-and-permissions/magic-links-and-codes.md)
 
 ## Automatic Documentation
 
-* [Server description](automatic-documentation/automatic-api-documentation.md)
-* [Swagger Docs](automatic-documentation/swagger-docs.md)
+* [Server description](docs/automatic-documentation/automatic-api-documentation.md)
+* [Swagger Docs](docs/automatic-documentation/swagger-docs.md)
 
 ## Miscellaneous
 
-* [Db Seeding](miscellaneous/db-seeding.md)
-* [Mailing settings](miscellaneous/untitled.md)
-* [Roadmap](miscellaneous/roadmap.md)
-* [Population Constrains](miscellaneous/population-constrains.md)
+* [Db Seeding](docs/miscellaneous/db-seeding.md)
+* [Mailing settings](docs/miscellaneous/untitled.md)
+* [Roadmap](docs/miscellaneous/roadmap.md)
+* [Population Constrains](docs/miscellaneous/population-constrains.md)
 

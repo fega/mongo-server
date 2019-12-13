@@ -24,7 +24,7 @@ after(async () => {
   // await db.dropDatabase();
 });
 before(async () => {
-  db = await mongo();
+  ([db] = await mongo());
 });
 
 suite('local auth');

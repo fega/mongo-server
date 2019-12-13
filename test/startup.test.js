@@ -28,7 +28,7 @@ chai.use(asPromised);
 const a = chai.assert;
 
 test('seed, db already filled', async () => {
-  const db = await connect();
+  const [db] = await connect();
   await db.collection('hello').insert({});
   await main({
     silent: true,
@@ -39,7 +39,7 @@ test('seed, db already filled', async () => {
 });
 
 test('seed, db empty', async () => {
-  const db = await connect();
+  const [db] = await connect();
   await db.dropDatabase();
   await main({
     silent: true,

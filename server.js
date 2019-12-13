@@ -5,11 +5,18 @@ const logger = require('morgan');
 const chalk = require('chalk').default;
 const indexRouter = require('./routes');
 const errorHandler = require('./lib/middleware/errorHandler');
+const { prepareShutdown } = require('./lib/util/process');
+const { shutdownMongodb } = require('./lib/mongodb');
 
 const tag = chalk.cyan('[m-server]');
 
-
-module.exports = (config, db) => {
+/**
+ *
+ * @param {*} config
+ * @param {import('mongodb').Db} db
+ * @param {import('mongodb').MongoClient} [client]
+ */
+const createServer = (config, db, client) => {
   /**
    * create express server
    */
@@ -95,5 +102,17 @@ module.exports = (config, db) => {
       console.log(tag, `server listen on port ${chalk.yellow(config.port)}`);
     });
   }
+
+  /**
+   * On process exit handler
+   */
+  if (config.shutdown) {
+    prepareShutdown(config.shutdown(client, config));
+  } else if (client) {
+    prepareShutdown(shutdownMongodb(client));
+  }
+
   return app;
 };
+
+module.exports = createServer;

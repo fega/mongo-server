@@ -18,7 +18,7 @@ after(async () => {
 
 suite('configuration');
 before(async () => {
-  db = await mongo();
+  ([db] = await mongo());
   serverEmpty = await createServer({
     silent: true,
   }, db);

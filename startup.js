@@ -65,10 +65,11 @@ const main = async (programConfig = {}) => {
      * connecting to mongodb
      */
     log('connecting to mongodb');
-    const db = await connect(config).catch((error) => {
+    const [db, client] = await connect(config).catch((error) => {
       log(tag, 'error connecting to mongodb');
       log(error);
       process.exit(1);
+      return [];
     });
     log('using', chalk.yellow(db.databaseName), 'database');
 
@@ -92,9 +93,9 @@ const main = async (programConfig = {}) => {
     /**
      * creating the server
      */
-    const app = await createServer(config, db);
+    const app = await createServer(config, db, client);
 
-    return { app, db };
+    return { app, db, client };
   } catch (error) {
     throw error;
   }

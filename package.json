@@ -1,6 +1,6 @@
 {
   "name": "moser",
-  "version": "0.53.0",
+  "version": "0.54.0",
   "description": "\"a quick server in mongodb. inspired in json-server\" -n",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "date.js": "^0.3.3",
+    "debug": "^4.1.1",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "express-jwt": "^5.3.1",
