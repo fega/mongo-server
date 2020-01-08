@@ -314,6 +314,19 @@ test('filters :id, ObjectID Date coercion', async () => {
 
   a.equal(r.body.length, 1);
 });
+test('filters :bool, Boolean coercion', async () => {
+  await db.collection('bool-filters').insertOne({ boolean: false });
+  await db.collection('bool-filters').insertOne({ boolean: true });
+  await db.collection('bool-filters').insertOne({ boolean: true });
+
+
+  const r = await request(server)
+    .get('/bool-filters?boolean:bool=true')
+    .expect(200);
+
+  a.equal(r.body.length, 2);
+});
+
 test('filters :gt, greater than', async () => {
   await db.collection('gt-comments').insertOne({ likes: 9 });
   await db.collection('gt-comments').insertOne({ likes: 10 });
@@ -376,11 +389,26 @@ test('filters :nin, only one item', async () => {
   await db.collection('nin-comments').insertOne({ fruits: ['apples'] });
   await db.collection('nin-comments').insertOne({ fruits: ['apples', 'oranges'] });
   await db.collection('nin-comments').insertOne({ fruits: ['apples', 'oranges'] });
+  await db.collection('nin-comments').insertOne({ fruits: 'oranges' });
 
   const query = 'fruits:nin=oranges';
   const r = await request(server).get(`/nin-comments?${query}`).expect(200);
   a.equal(r.body.length, 2);
 });
+test('filters :nin, Multiple items', async () => {
+  await db.collection('nin-multi-objects').insertOne({ fruits: ['apples'] });
+  await db.collection('nin-multi-objects').insertOne({ fruits: ['apples'] });
+  await db.collection('nin-multi-objects').insertOne({ fruits: ['apples', 'oranges'] });
+  await db.collection('nin-multi-objects').insertOne({ fruits: ['apples', 'bananas'] });
+  await db.collection('nin-multi-objects').insertOne({ fruits: ['bananas'] });
+  await db.collection('nin-multi-objects').insertOne({ fruits: 'bananas' });
+  const query = 'fruits:nin=oranges&fruits:nin=bananas';
+
+  const r = await request(server).get(`/nin-multi-objects?${query}`).expect(200);
+
+  a.equal(r.body.length, 2);
+});
+
 
 test('filters :in, only one item', async () => {
   await db.collection('in-comments').insertOne({ fruits: ['apples'] });
@@ -404,8 +432,7 @@ test('filters :in, Multiple items', async () => {
   const r = await request(server).get(`/in-2-comments?${query}`).expect(200);
   a.equal(r.body.length, 4);
 });
-test('filters :nin, only one item');
-test('filters :nin, Multiple items');
+
 test('filters :size, ok', async () => {
   await db.collection('size-comments').insertOne({ likes: [1, 2] });
   await db.collection('size-comments').insertOne({ likes: [1, 2, 3, 4] });
