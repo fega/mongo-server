@@ -27,7 +27,7 @@ GET /comments?author.name=fega
 
 You can use `$select` to return only the fields that you need.
 
-### Advanced filters \(Coming soon\)
+### Advanced filters
 
 You can use different modifiers in order to perform special queries:
 
@@ -37,6 +37,9 @@ GET /resources?field:modifier=value
 # or
 GET /resources?field:modifier:coerce=value # where coerce can be "id", "date", or "number"
 
+
+# bool: Boolean Coercion
+GET /comments?seen:bool=true
 
 # date: date Coercion
 GET /comments?createdAt:date=2019-08-15T20:01:17.065Z
