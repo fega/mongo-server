@@ -409,7 +409,6 @@ test('filters :nin, Multiple items', async () => {
   a.equal(r.body.length, 2);
 });
 
-
 test('filters :in, only one item', async () => {
   await db.collection('in-comments').insertOne({ fruits: ['apples'] });
   await db.collection('in-comments').insertOne({ fruits: ['apples'] });
@@ -440,6 +439,36 @@ test('filters :size, ok', async () => {
   await db.collection('size-comments').insertOne({ likes: [1, 2, 3] });
   const r = await request(server).get('/size-comments?likes:size=3').expect(200);
   a.equal(r.body.length, 2);
+});
+
+test('filters combined :nin:number', async () => {
+  await db.collection('nin-number-filters').insertOne({ likes: [1, 2] });
+  await db.collection('nin-number-filters').insertOne({ likes: [1, 2, 3, 4] });
+  await db.collection('nin-number-filters').insertOne({ likes: [] });
+  await db.collection('nin-number-filters').insertOne({ likes: [1] });
+  await db.collection('nin-number-filters').insertOne({ likes: [2] });
+  await db.collection('nin-number-filters').insertOne({ likes: [3] });
+  await db.collection('nin-number-filters').insertOne({ likes: 3 });
+  await db.collection('nin-number-filters').insertOne({ likes: 1 });
+
+  const query = 'likes:nin:number=1&likes:nin:number=2';
+  const r = await request(server).get(`/nin-number-filters?${query}`).expect(200);
+  a.equal(r.body.length, 3);
+});
+
+test('filters combined :in:number', async () => {
+  await db.collection('in-number-filters').insertOne({ likes: [1, 2] });
+  await db.collection('in-number-filters').insertOne({ likes: [1, 2, 3, 4] });
+  await db.collection('in-number-filters').insertOne({ likes: [] });
+  await db.collection('in-number-filters').insertOne({ likes: [1] });
+  await db.collection('in-number-filters').insertOne({ likes: [2] });
+  await db.collection('in-number-filters').insertOne({ likes: [3] });
+  await db.collection('in-number-filters').insertOne({ likes: 3 });
+  await db.collection('in-number-filters').insertOne({ likes: 1 });
+
+  const query = 'likes:in:number=1&likes:in:number=2';
+  const r = await request(server).get(`/in-number-filters?${query}`).expect(200);
+  a.equal(r.body.length, 5);
 });
 
 test('$select, OK', async () => {
