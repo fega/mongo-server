@@ -23,6 +23,14 @@ const createServer = (config, db, client) => {
   const app = express();
 
   /**
+   * Enable status monitor
+   * @see https://github.com/RafalWilinski/express-status-monitor
+   */
+  if (config.statusMonitor) {
+    app.use(require('express-status-monitor')(config.statusMonitor));
+  }
+
+  /**
    * Enable morgan http logger
    */
   if (process.env.NODE_ENV !== 'test') app.use(logger(config.morgan || 'dev'));
