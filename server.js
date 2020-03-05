@@ -81,6 +81,13 @@ const createServer = (config, db, client) => {
   if (config.middleware) app.use(config.middleware);
 
   /**
+   * Plugins
+   */
+  if (config.plugins) {
+    config.plugins.forEach(plugin => app.use(plugin(config, db, client)));
+  }
+
+  /**
    * REST API mount
    */
   app.use(config.root || '/', indexRouter(config, db));

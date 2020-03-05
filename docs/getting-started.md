@@ -69,11 +69,16 @@ module.exports= {
   staticRoot: '/',
   // personalized middleware, executed before REST api
   middleware: [myFunction],
+  // Plugins, executed before REST api
+  // plugins are functions that receives 3 arguments and returns express middleware
+  // (config: MoserConfig, db: MongodbInstance, Client: MongodbClient)=> ExpressMiddleware || ExpressMiddleware[] 
+  plugins: [myPluginFunction],
   // default pagination limit
   pagination: 10,
   // set as true to enable trust proxy on express
   trustProxy: false
-
+  // status monitor options https://github.com/RafalWilinski/express-status-monitor
+  statusMonitor: false,
   // custom error handler
   errorHandler: (req.res,next,err)=>{/* custom error handler */},
 

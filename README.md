@@ -11,10 +11,11 @@ Get a full REST API with **zero coding** in **less than 30 seconds** \(seriously
 ### Features
 
 * [x] Automatic REST \(GET, POST, PATCH, PUT,  DELETE\).
+* [x] Status monitor
 * [x] Automatic Pagination, Sorting and Filters.
   * [x] Regex Queries
   * [x] Field Filtering
-  * [ ] Advanced filters \(i.e: not equals, greater than, etc\)
+  * [x] Advanced filters \(i.e: not equals, greater than, etc\)
   * [ ] GeoSpatial queries
   * [x] Item counting
   * [x] Sorting
