@@ -5,7 +5,7 @@
 
 ## Basics
 
-* [Routing and Queries](basics/routing-and-queries.md)
+* [Routing and Queries](docs/basics/routing-and-queries.md)
 * [Restrict endpoints](docs/basics/restrict-endpoints.md)
 * [Route logic](docs/basics/route-logic.md)
 * [Default values](docs/basics/untitled.md)

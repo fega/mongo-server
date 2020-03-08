@@ -22,7 +22,6 @@ const {
 const {
   getTextQuery,
   getRegexQuery,
-  getRangeQuery,
   getSort,
   getQuery,
   getNumber,
@@ -61,7 +60,6 @@ module.exports = (config, db) => {
         ...getQuery($query, config),
         ...getTextQuery($text),
         ...getRegexQuery($regex),
-        ...getRangeQuery($range),
         ...getFilters($filter),
         ...filter,
       },
@@ -83,7 +81,6 @@ module.exports = (config, db) => {
         ...getQuery($query, config),
         ...getTextQuery($text),
         ...getRegexQuery($regex),
-        ...getRangeQuery($range),
         ...getFilters($filter),
         ...filter,
       },
@@ -105,11 +102,11 @@ module.exports = (config, db) => {
         ...getQuery($query, config),
         ...getTextQuery($text),
         ...getRegexQuery($regex),
-        ...getRangeQuery($range),
         ...getFilters($filter),
         ...filter,
       },
     }];
+    // @ts-ignore
     if ($sort) pipeline.push({ $sort: getSort($sort, $order) });
 
     pipeline.push({ $skip: getNumber($page, 0) * getNumber($limit, config.pagination) });
@@ -156,7 +153,6 @@ module.exports = (config, db) => {
       ...getQuery($query, config),
       ...getTextQuery($text),
       ...getRegexQuery($regex),
-      ...getRangeQuery($range),
       ...getFilters($filter),
     };
     next();
@@ -221,12 +217,12 @@ module.exports = (config, db) => {
     const { $populate, $fill } = req.query;
     const result = ($populate || $fill)
       ? (
-          await findAndPopulate(
-            req.params.resource,
-            { $populate, $fill },
-            { _id: get(req, 'moser.validation.id', req.params.id) },
-            req
-          ))[0]
+        await findAndPopulate(
+          req.params.resource,
+          { $populate, $fill },
+          { _id: get(req, 'moser.validation.id', req.params.id) },
+          req,
+        ))[0]
       : await db.collection(req.params.resource).findOne({ _id: get(req, 'moser.validation.id', req.params.id) });
 
     if (!result) return next(new HttpError.NotFound('Not found'));
@@ -249,7 +245,6 @@ module.exports = (config, db) => {
   router.put('/:resource/:id', asyncController(async (req, res, next) => {
     if (get(config, `resources.${req.params.resource}.put`) === false) return next();
 
-    const { _id, ...put } = req.body;
     const result = await db
       .collection(req.params.resource)
       .findOne({ _id: get(req, 'moser.validation.id', req.params.id) });

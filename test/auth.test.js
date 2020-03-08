@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const Joi = require('joi');
 const date = require('date.js');
 const createServer = require('../server');
-const mongo = require('../db');
+const mongo = require('../lib/mongodb/connect');
 
 const rand = (length, current) => {
   const _current = current || '';

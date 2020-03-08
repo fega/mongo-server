@@ -2,7 +2,7 @@
 const chai = require('chai');
 const asPromised = require('chai-as-promised');
 const proxyquire = require('proxyquire').noCallThru();
-const connect = require('../db');
+const connect = require('../lib/mongodb/connect');
 
 const main = proxyquire('../startup', {
   '/config': {

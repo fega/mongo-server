@@ -6,7 +6,7 @@ const chalk = require('chalk').default;
 const indexRouter = require('./routes');
 const errorHandler = require('./lib/middleware/errorHandler');
 const { prepareShutdown } = require('./lib/util/process');
-const { shutdownMongodb } = require('./lib/mongodb');
+const { shutdownMongodb } = require('./lib/mongodb/index');
 
 const tag = chalk.cyan('[m-server]');
 
