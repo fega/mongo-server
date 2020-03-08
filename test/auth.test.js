@@ -226,6 +226,32 @@ test('POST /auth/:resource/magic-link, OK', async () => {
     });
   a.equal(r.status, 200);
 });
+test('POST /auth/:resource/magic-link, OK, SEnd JWT', async () => {
+  const email = `${ObjectId()}@gmail.com`;
+  const s = createServer({
+    silent: true,
+    resources: {
+      users: { auth: { magicLink: {sendJwt:true} } },
+    },
+    nodemailer: {
+      service: 'MailDev',
+    },
+    host: 'localhost:3000',
+    root: '/',
+    jwtSecret: 'secret',
+
+  }, db);
+  const r = await request(s)
+    .post('/auth/users/magic-link')
+    .send({
+      email,
+    });
+
+  console.log(r.body)
+  a.equal(r.status, 200, r.body);
+  a.equal(!!r.body._id, true, 'NO ID IN RESPONSE');
+  a.equal(!!r.body.$token, true, 'NO TOKEN IN RESPONSE');
+});
 
 test("GET /auth/:resource/magic-link/:token, resource doesn't have magic links", async () => {
   const s = createServer({
