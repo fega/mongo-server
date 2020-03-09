@@ -57,6 +57,10 @@ module.exports= {
   mongo: 'mongodb://localhost:27088',
   // database name
   db:'dbName',
+  // mongoDb client options
+  // http://mongodb.github.io/node-mongodb-native/3.1/api/MongoClient.html#.connect
+  mongoOptions: {},
+
   // enable cors using the cors module https://www.npmjs.com/package/cors
   cors: {origin:true},
   // enable gzip compression using the compression module https://www.npmjs.com/package/compression
