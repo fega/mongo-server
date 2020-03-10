@@ -1,12 +1,12 @@
-const createError = require('http-errors');
-const express = require('express');
 const path = require('path');
 const logger = require('morgan');
+const express = require('express');
 const chalk = require('chalk').default;
+const createError = require('http-errors');
+const debug = require('debug')('moser:server-setup');
 const indexRouter = require('./routes');
+const { prepareShutdown, defaultShutdownHandler } = require('./lib/util/process');
 const errorHandler = require('./lib/middleware/errorHandler');
-const { prepareShutdown } = require('./lib/util/process');
-const { shutdownMongodb } = require('./lib/mongodb/index');
 
 const tag = chalk.cyan('[m-server]');
 
@@ -17,6 +17,7 @@ const tag = chalk.cyan('[m-server]');
  * @param {import('mongodb').MongoClient} [client]
  */
 const createServer = (config, db, client) => {
+  debug('create Server');
   /**
    * create express server
    */
@@ -27,6 +28,7 @@ const createServer = (config, db, client) => {
    * @see https://github.com/RafalWilinski/express-status-monitor
    */
   if (config.statusMonitor) {
+    debug('setup status monitor');
     app.use(require('express-status-monitor')(config.statusMonitor));
   }
 
@@ -111,8 +113,9 @@ const createServer = (config, db, client) => {
   if (config.errorHandler) app.use(config.errorHandler);
   app.use(errorHandler);
 
+  let server;
   if (!config.noListen) {
-    app.listen(config.port, () => {
+    server = app.listen(config.port, () => {
       if (config.silent) return;
       console.log(tag, `server listen on port ${chalk.yellow(config.port)}`);
     });
@@ -122,9 +125,9 @@ const createServer = (config, db, client) => {
    * On process exit handler
    */
   if (config.shutdown) {
-    prepareShutdown(config.shutdown(client, config));
+    prepareShutdown(config.shutdown(config, server, client));
   } else if (client) {
-    prepareShutdown(shutdownMongodb(client));
+    prepareShutdown(defaultShutdownHandler(config, server, client));
   }
 
   return app;

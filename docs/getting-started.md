@@ -81,10 +81,13 @@ module.exports= {
   pagination: 10,
   // set as true to enable trust proxy on express
   trustProxy: false
-  // status monitor options https://github.com/RafalWilinski/express-status-monitor
-  statusMonitor: false,
   // custom error handler
   errorHandler: (req.res,next,err)=>{/* custom error handler */},
+  
+  // shutdown function, to gracefully stop the server
+  // notice that this function returns another function
+  shutdown: (config, ExpressServer, mongodbClient)=>()=>{/*custom shutdown function here  */}
+
 
   // extra settings
   settings:{
